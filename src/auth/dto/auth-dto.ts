@@ -25,4 +25,9 @@ export namespace AuthDTO {
         @Length(7, 20)
         password: string;
     }
+
+    export class CheakEmail {
+        @IsEmail()
+        email: string;
+    }
 }
