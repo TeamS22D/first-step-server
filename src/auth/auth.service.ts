@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -14,3 +15,10 @@ export class AuthService {
     return { message: '로그인 성공', accessToken };
   }
 }
+=======
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AuthService {
+}
+>>>>>>> origin/main
