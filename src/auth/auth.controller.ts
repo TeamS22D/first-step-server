@@ -26,7 +26,6 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException({message: "이메일이나 비밀번호를 확인해주십시오"})
     }
-
     const samePassword = bcrypt.compareSync(password, user.password)
     if (!samePassword) {
       throw new UnauthorizedException({message: "이메일이나 비밀번호를 확인해주십시오"})
@@ -36,8 +35,10 @@ export class AuthController {
       id: user.id,
     }
 
+
     const accessToken = this.jwtService.sign(payload);
 
     return {'accessToken' : accessToken};
   }
 }
+
