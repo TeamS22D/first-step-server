@@ -26,13 +26,10 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException("이메일이나 비밀번호를 확인해주십시오")
     }
-
     const samePassword = bcrypt.compareSync(password, user.password)
     if (!samePassword) {
       throw new UnauthorizedException("이메일이나 비밀번호를 확인해주십시오")
     }
-    
     return '로그인 완료'
   }
-
 }
