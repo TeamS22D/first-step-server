@@ -26,7 +26,7 @@ export namespace AuthDTO {
         password: string;
     }
 
-    export class CheakEmail {
+    export class CheckEmail {
         @IsEmail()
         email: string;
     }

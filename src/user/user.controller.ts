@@ -6,20 +6,20 @@ import {
   Get,
   Req,
   UseGuards,
-  Request
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { AuthDTO } from 'src/auth/dto/auth-dto';
 import { UserEntity } from './entities/user.entity';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
+import type { Request } from 'express';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('/cheakemail')
-  async cheakemail(@Body() authDTO: AuthDTO.CheakEmail) {
+  @Post('/checkemail')
+  async checkemail(@Body() authDTO: AuthDTO.CheckEmail) {
     const {email} = authDTO;
 
     const hasEmail = await this.userService.findByEmail(email);
@@ -36,7 +36,7 @@ export class UserController {
 
     const hasEmail = await this.userService.findByEmail(email);
     if (hasEmail) {
-      throw new ConflictException("이메일이 이미 사용 중입니다")
+      throw new ConflictException({message : "이메일이 이미 사용 중입니다"})
     }
 
     const userEntity = await this.userService.create(authDTO)
@@ -46,7 +46,7 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get('/')
-  async getProfile(@Req() req: any) {
+  async getProfile(@Req() req: Request) {
     const user = req.user
     return user
   }
