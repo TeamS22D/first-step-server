@@ -1,59 +1,36 @@
 import { Module } from '@nestjs/common';
-<<<<<<< HEAD
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+
+import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './security/passport.jwt';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { NaverStrategy } from './strategies/naver.strategy';
 import { KakaoStrategy } from './strategies/kakao.strategy';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { NaverStrategy } from './strategies/naver.strategy';
 
 @Module({
   imports: [
+    UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET', 'defaultSecret'),
-        signOptions: { expiresIn: '1h' },
+        signOptions: { expiresIn: '1h' }, // JWT 만료 시간을 1시간으로 설정
       }),
     }),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    GoogleStrategy,
+    JwtStrategy, // 일반 JWT 로그인을 위한 Strategy
+    GoogleStrategy, // 소셜 로그인을 위한 Strategy 들
     NaverStrategy,
     KakaoStrategy,
   ],
 })
 export class AuthModule {}
-
-=======
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { UserModule } from 'src/user/user.module';
-import { JwtStrategy } from './security/passport.jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-
-@Module({
-  imports: [UserModule, JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', ''),
-        signOptions: { expiresIn: '300s' },
-      }),
-    }),
-    PassportModule
-  ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-})
-export class AuthModule {}
->>>>>>> origin/main
