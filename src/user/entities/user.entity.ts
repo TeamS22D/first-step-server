@@ -7,6 +7,7 @@ import {
 
 import * as bcrypt from 'bcrypt';
 
+// @Entity({name: 'userss'})
 @Entity({name: 'user'})
 export class UserEntity {
     @PrimaryGeneratedColumn()
@@ -15,14 +16,19 @@ export class UserEntity {
     @Column()
     name: string;
 
-    @Column()
+    @Column({nullable: true})
     password : string;
 
-    @Column()
+    @Column({unique: true})
     email: string;
+
+    @Column({ type: 'enum', enum: ['email', 'google', 'kakao', 'naver'], default: 'email'})
+    provider: 'email' | 'google' | 'kakao' | 'naver';
 
     @BeforeInsert()
     private before() {
-        this.password = bcrypt.hashSync(this.password, 10);
+        if (this.password) {
+            this.password = bcrypt.hashSync(this.password, 10);
+        }
     }
 }

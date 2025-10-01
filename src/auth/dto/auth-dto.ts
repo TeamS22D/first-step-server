@@ -17,6 +17,14 @@ export namespace AuthDTO {
         name: string;
     }
 
+    export class SocialSignUp{
+        @IsEmail()
+        email: string;
+
+        @IsString()
+        name: string;
+    }
+
     export class SignIn {
         @IsEmail()
         email: string;

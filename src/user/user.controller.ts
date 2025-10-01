@@ -32,16 +32,9 @@ export class UserController {
 
   @Post('/signup')
   async signup(@Body() authDTO: AuthDTO.SignUp) {
-    const {email} = authDTO;
+    
+    return await this.userService.signup(authDTO, "email");
 
-    const hasEmail = await this.userService.findByEmail(email);
-    if (hasEmail) {
-      throw new ConflictException({message : "이메일이 이미 사용 중입니다"})
-    }
-
-    const userEntity = await this.userService.create(authDTO)
-
-    return "회원가입 성공";
   }
 
   @UseGuards(AuthGuard)
