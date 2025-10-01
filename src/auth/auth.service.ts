@@ -54,7 +54,7 @@ export class AuthService {
     }
 
     if (!user) { // 가입한 적이 없다면 회원가입
-      return this.userService.socialSingup(userDto, userDto.provider);
+      return this.userService.socialSignup(userDto, userDto.provider);
     }
     
 

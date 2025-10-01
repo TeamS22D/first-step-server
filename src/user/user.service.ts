@@ -40,7 +40,7 @@ export class UserService {
     };
   }
 
-  async socialSingup(userDto: SocialUserDto, provider: "email" | "google" | "kakao" | "naver") {
+  async socialSignup(userDto: SocialUserDto, provider: "email" | "google" | "kakao" | "naver") {
     const authDTO: AuthDTO.SocialSignUp = {
       email: userDto.email,
       name: userDto.name
