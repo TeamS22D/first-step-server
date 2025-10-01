@@ -6,14 +6,10 @@ import {
   Req,
   Res,
   UseGuards,
-  UnauthorizedException
 } from '@nestjs/common';
 
-import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthDTO } from './dto/auth-dto';
-import { SocialUserDto } from './dto/social-user.dto';
-import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 
@@ -38,7 +34,8 @@ export class AuthController {
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
     const result = await this.authService.socialLogin(user);
-    res.status(200).json({ ...result, user });
+    
+    return { ...result, user };
   }
 
   @Get('naver')
@@ -50,7 +47,8 @@ export class AuthController {
   async naverAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
     const result = await this.authService.socialLogin(user);
-    res.status(200).json({ ...result, user });
+  
+    return { ...result, user };
   }
 
   @Get('kakao')
@@ -62,7 +60,8 @@ export class AuthController {
   async kakaoAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
     const result = await this.authService.socialLogin(user);
-    res.status(200).json({ ...result, user });
+    
+    return {...result, user};
   }
 
 
