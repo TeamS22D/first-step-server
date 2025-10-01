@@ -21,6 +21,12 @@ export class UserEntity {
     @Column()
     email: string;
 
+    @Column( { type: 'timestamp', nullable: true })
+    expirationTime: Date;
+
+    @Column({ nullable: true })
+    verificationCode?: string;
+
     @BeforeInsert()
     private before() {
         this.password = bcrypt.hashSync(this.password, 10);
