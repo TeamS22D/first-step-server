@@ -12,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthDTO } from './dto/auth-dto';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
+import { Provider } from './dto/social-user.dto';
 
 
 @Controller('auth')
@@ -33,7 +34,7 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
-    const result = await this.authService.socialLogin(user);
+    const result = await this.authService.socialLogin(user, Provider.GOOGLE);
     
     return { ...result, user };
   }
@@ -46,7 +47,7 @@ export class AuthController {
   @UseGuards(AuthGuard('naver'))
   async naverAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
-    const result = await this.authService.socialLogin(user);
+    const result = await this.authService.socialLogin(user, Provider.NAVER);
   
     return { ...result, user };
   }
@@ -59,7 +60,7 @@ export class AuthController {
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
-    const result = await this.authService.socialLogin(user);
+    const result = await this.authService.socialLogin(user, Provider.KAKAO);
     
     return {...result, user};
   }
