@@ -18,7 +18,7 @@ export class MailService {
     async sendEmail(email: string) {
         const result = await this.userService.findByEmail(email);
         if (!result) {
-            throw new BadRequestException({message: '존재하지 않는 이메일입니다'})
+            throw new BadRequestException({ message: '존재하지 않는 이메일입니다' })
         }
 
         const temporaryCode = this.generateTemporaryCode();
@@ -48,7 +48,9 @@ export class MailService {
     async verifyCode(verificationCode: string, email: string) {
         const user = await this.userRepositorye.findOne({where: {email, verificationCode}});
         if (user && user.expirationTime > new Date()) {
-            return { message: user.email};
+            await this.userRepositorye.update(user.id, { isVerified: true });
+            
+            return { message: '인증이 완료되었습니다' };
         } else {
             throw new BadRequestException({ message: '유효한 코드가 아닙니다'})
         }

@@ -15,17 +15,20 @@ export class UserEntity {
     @Column()
     name: string;
 
-    @Column()
-    password : string;
+    @Column({ nullable: true })
+    password: string;
 
     @Column()
     email: string;
 
-    @Column( { type: 'timestamp', nullable: true })
+    @Column({ type: 'timestamp', nullable: true })
     expirationTime: Date;
 
     @Column({ nullable: true })
     verificationCode?: string;
+
+    @Column({ default: false, nullable: true })
+    isVerified: boolean;
 
     @BeforeInsert()
     private before() {
