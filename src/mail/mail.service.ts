@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 export class MailService {
     constructor(
         @InjectRepository(UserEntity)
-        private userRepositorye : Repository<UserEntity>,
+        private userRepository : Repository<UserEntity>,
         private readonly userService: UserService,
         private readonly mailerService: MailerService,
     ) {}
@@ -32,7 +32,7 @@ export class MailService {
                 html: `<p>인증코드: <strong>${temporaryCode}</strong>드립니다.</p>`,
             });
 
-            await this.userRepositorye.update({email: email}, {verificationCode: temporaryCode, expirationTime: expirationTime});
+            await this.userRepository.update({email: email}, {verificationCode: temporaryCode, expirationTime: expirationTime});
 
             return { message: '인증코드를 전송했습니다.'};
         } catch {
@@ -46,10 +46,10 @@ export class MailService {
     }
 
     async verifyCode(verificationCode: string, email: string) {
-        const user = await this.userRepositorye.findOne({where: {email, verificationCode}});
+        const user = await this.userRepository.findOne({where: {email, verificationCode}});
         if (user && user.expirationTime > new Date()) {
-            await this.userRepositorye.update(user.id, { isVerified: true });
-            
+            await this.userRepository.update(user.id, { isVerified: true });
+
             return { message: '인증이 완료되었습니다' };
         } else {
             throw new BadRequestException({ message: '유효한 코드가 아닙니다'})
