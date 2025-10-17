@@ -1,9 +1,14 @@
+import {
+  ConflictException
+} from '@nestjs/common'
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { UserEntity } from './entities/user.entity';
 import { AuthDTO } from 'src/auth/dto/auth-dto';
+import { SocialUserDto } from 'src/auth/dto/social-user.dto';
 
 @Injectable()
 export class UserService {
@@ -12,9 +17,37 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(authDTO: AuthDTO.SignUp) {
-    const userEntity = await this.userRepository.create(authDTO);
-    return await this.userRepository.save(userEntity);
+  async signup(authDTO: AuthDTO.SignUp | AuthDTO.SocialSignUp, provider: "email" | "google" | "kakao" | "naver") {
+    const { email, ...rest } = authDTO;
+    const hasEmail = await this.findByEmail(email);
+    if (hasEmail) {
+      throw new ConflictException({message : "이메일이 이미 사용 중입니다"});
+    }
+    const userEntity = this.userRepository.create({
+      provider: provider,
+      ...rest,
+      email,
+    });
+
+    await this.userRepository.save(userEntity);
+
+    return {
+      message: "회원가입이 완료되었습니다.",
+      user: {
+        email: email,
+        name: rest.name
+      }
+    };
+  }
+
+  async socialSignup(userDto: SocialUserDto, provider: "email" | "google" | "kakao" | "naver") {
+    const authDTO: AuthDTO.SocialSignUp = {
+      email: userDto.email,
+      name: userDto.name
+    };
+
+    return await this.signup(authDTO, provider);
+    
   }
 
   async findById (id: number) {

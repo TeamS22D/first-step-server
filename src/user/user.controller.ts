@@ -40,8 +40,9 @@ export class UserController {
     }
 
     const userEntity = await this.userService.create(authDTO)
+    
+    return await this.userService.signup(authDTO, "email");
 
-    return "회원가입 성공";
   }
 
   @UseGuards(AuthGuard)
