@@ -24,7 +24,7 @@ export class UserController {
 
     const hasEmail = await this.userService.findByEmail(email);
     if (hasEmail) {
-      throw new ConflictException("이메일이 이미 사용 중입니다")
+      throw new ConflictException({message: "이메일이 이미 사용 중입니다"})
     }
 
     return true;
@@ -32,6 +32,14 @@ export class UserController {
 
   @Post('/signup')
   async signup(@Body() authDTO: AuthDTO.SignUp) {
+    const {email} = authDTO;
+
+    const hasEmail = await this.userService.findByEmail(email);
+    if (hasEmail) {
+      throw new ConflictException({message: "이메일이 이미 사용 중입니다"})
+    }
+
+    const userEntity = await this.userService.create(authDTO)
     
     return await this.userService.signup(authDTO, "email");
 

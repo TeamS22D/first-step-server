@@ -16,12 +16,21 @@ export class UserEntity {
     @Column()
     name: string;
 
-    @Column({nullable: true})
-    password : string;
+    @Column({ nullable: true })
+    password: string;
 
     @Column({unique: true})
     email: string;
 
+    @Column({ type: 'timestamp', nullable: true })
+    expirationTime: Date;
+
+    @Column({ nullable: true })
+    verificationCode?: string;
+
+    @Column({ default: false, nullable: true })
+    isVerified: boolean;
+  
     @Column({ type: 'enum', enum: ['email', 'google', 'kakao', 'naver'], default: 'email'})
     provider: 'email' | 'google' | 'kakao' | 'naver';
 
