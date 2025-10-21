@@ -7,6 +7,9 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { UserEntity } from './user/entities/user.entity';
 import { MailModule } from './mail/mail.module';
+import { CacheModule } from '@nestjs/cache-manager'
+import * as redisStore from 'cache-manager-redis-store';
+import { RedisClientOptions } from 'redis';
 
 @Module({
   imports: [
@@ -15,9 +18,9 @@ import { MailModule } from './mail/mail.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: process.env.SQL_HOST,
       port: 3306,
-      username: 'root',
+      username: process.env.SQL_NAME,
       password: process.env.SQL_SECRET,
       database: 'user',
       entities: [UserEntity],
@@ -26,6 +29,18 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
     UserModule,
     MailModule,
+    CacheModule.registerAsync<RedisClientOptions>({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.getOrThrow<string>('process.env.REDIS_HOST'),
+        port: configService.getOrThrow<number>('process.env.ReDIS_PORT'),
+        db: 0,
+        ttl: 300,
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

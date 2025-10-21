@@ -13,8 +13,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', ''),
-        signOptions: { expiresIn: '300s' },
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: 'JWT_ACCESS_TIME' },
       }),
     }),
     PassportModule
