@@ -1,4 +1,5 @@
 import {
+    IsBoolean,
     IsEmail,
     IsString,
     Length
@@ -24,5 +25,15 @@ export namespace AuthDTO {
         @IsString()
         @Length(7, 20)
         password: string;
+    }
+
+    export class CheckEmail {
+        @IsEmail()
+        email: string;
+    }
+
+    export class CheckVerified {
+        @IsBoolean()
+        isVerified: boolean
     }
 }

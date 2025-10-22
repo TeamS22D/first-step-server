@@ -1,29 +1,37 @@
-import { 
+import {
   Controller,
-  Body,
-  ConflictException,
-  Post
-} from '@nestjs/common';
-
+  Body, 
+  Post, 
+  Get, 
+  Req, 
+  UseGuards,
+  } from '@nestjs/common';
+  
 import { UserService } from './user.service';
 import { AuthDTO } from 'src/auth/dto/auth-dto';
-
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import type { Request } from 'express';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService
+  ) {}
+
+  @Post('/checkemail')
+  async checkemail(@Body() authDTO: AuthDTO.CheckEmail) {
+    return await this.userService.checkEmail(authDTO);
+  }
 
   @Post('/signup')
   async signup(@Body() authDTO: AuthDTO.SignUp) {
-    const {email, name} = authDTO;
+    console.log('[controller] signup body=', authDTO);
+    return await this.userService.signup(authDTO);
+  }
 
-    const hasEmail = await this.userService.findByEmail(email);
-    if (hasEmail) {
-      throw new ConflictException("이메일이 이미 사용 중입니다")
-    }
-
-    const userEntity = await this.userService.create(authDTO)
-
-    return "회원가입 성공";
+  @UseGuards(AuthGuard)
+  @Get('/')
+  async getProfile(@Req() req: Request) {
+    return req.user;
   }
 }
