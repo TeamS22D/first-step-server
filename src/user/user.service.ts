@@ -9,7 +9,7 @@ import { AuthDTO } from 'src/auth/dto/auth-dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,) {}
+  constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>) {}
 
   async findById(id: number) {
     return await this.userRepository.findOne({ where: { id }});
