@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 
 import { UserService } from 'src/user/user.service';
 import { AuthDTO } from './dto/auth-dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AuthService {
