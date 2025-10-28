@@ -13,4 +13,4 @@ export class CreateBizwordDto {
   @IsString()
   @IsOptional()
   example?: string; // 예문
-}
+} 
