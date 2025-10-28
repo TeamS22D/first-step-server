@@ -22,11 +22,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     PassportModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, 
+  providers: [
+    AuthService,
     JwtStrategy,
     GoogleStrategy,
     NaverStrategy,
-    KakaoStrategy
+    KakaoStrategy,
   ],
 })
 export class AuthModule {}

@@ -39,7 +39,7 @@ export class UserController {
       throw new ConflictException({message: "이메일이 이미 사용 중입니다"})
     }
 
-    const userEntity = await this.userService.create(authDTO)
+    const userEntity = await this.userService.signup(authDTO, 'email');
     
     return await this.userService.signup(authDTO, "email");
 
