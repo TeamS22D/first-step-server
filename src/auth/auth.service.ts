@@ -8,14 +8,12 @@ import * as bcrypt from 'bcrypt';
 
 import { UserService } from 'src/user/user.service';
 import { AuthDTO } from './dto/auth-dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async signin(authDTO: AuthDTO.SignIn) {

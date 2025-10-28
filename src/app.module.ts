@@ -10,6 +10,7 @@ import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager'
 import * as redisStore from 'cache-manager-redis-store';
 import { RedisClientOptions } from 'redis';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -35,12 +36,13 @@ import { RedisClientOptions } from 'redis';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         store: redisStore,
-        host: configService.getOrThrow<string>('process.env.REDIS_HOST'),
-        port: configService.getOrThrow<number>('process.env.ReDIS_PORT'),
+        host: configService.getOrThrow<string>('REDIS_HOST'),
+        port: configService.getOrThrow<number>('REDIS_PORT'),
         db: 0,
         ttl: 300,
       }),
     }),
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

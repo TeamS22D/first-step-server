@@ -21,12 +21,6 @@ export class UserEntity {
     @Column()
     email: string;
 
-    @Column({ type: 'timestamp', nullable: true })
-    expirationTime: Date;
-
-    @Column({ nullable: true })
-    verificationCode?: string;
-
     @Column({ default: false, nullable: true })
     isVerified: boolean;
 
