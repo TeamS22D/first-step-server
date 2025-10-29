@@ -24,6 +24,9 @@ export class UserEntity {
     @Column({ default: false, nullable: true })
     isVerified: boolean;
 
+    @Column({ nullable: true })
+    refreshToken: string;
+
     @BeforeInsert()
     private before() {
         this.password = bcrypt.hashSync(this.password, 10);

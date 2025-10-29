@@ -36,17 +36,19 @@ export class MailService {
             const RedisKey = `verification:${email}`
             await this.redis.set(RedisKey, temporaryCode, 'EX', 300)
 
-            return { message: '인증코드를 전송했습니다.'}; }
-            catch (error) {
-                console.error('에러 타입:', typeof error);
-                console.error('에러 메시지:', error?.message);
-                console.error('에러 스택:', error?.stack);
-                console.error('전체 에러:', JSON.stringify(error, null, 2));
+            return { message: '인증코드를 전송했습니다.'}; 
+        }
+
+        catch (error) {
+            console.error('에러 타입:', typeof error);
+            console.error('에러 메시지:', error?.message);
+            console.error('에러 스택:', error?.stack);
+            console.error('전체 에러:', JSON.stringify(error, null, 2));
             
-            throw new InternalServerErrorException({ 
-                message: '이메일 전송 중 오류가 발생했습니다.',
-                detail: error?.message || '알 수 없는 오류'})
-            }
+        throw new InternalServerErrorException({ 
+            message: '이메일 전송 중 오류가 발생했습니다.',
+            detail: error?.message || '알 수 없는 오류'})
+        }
     }
 
     private generateTemporaryCode(): string {

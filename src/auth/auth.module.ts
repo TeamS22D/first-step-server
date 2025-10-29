@@ -17,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         signOptions: { expiresIn: 'JWT_ACCESS_TIME' },
       }),
     }),
-    PassportModule
+    PassportModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

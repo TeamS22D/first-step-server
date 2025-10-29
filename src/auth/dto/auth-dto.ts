@@ -34,6 +34,6 @@ export namespace AuthDTO {
 
     export class CheckVerified {
         @IsBoolean()
-        isVerified: boolean
+        isVerified: boolean;
     }
 }
