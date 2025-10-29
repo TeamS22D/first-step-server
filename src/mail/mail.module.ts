@@ -30,9 +30,9 @@ import Redis from 'ioredis';
   ],
   controllers: [MailController],
   providers: [
-    MailService,  // 한 번만!
+    MailService,
     {
-      provide: 'REDIS',  // 문자열 토큰 사용
+      provide: 'REDIS',
       useFactory: () => {
         return new Redis({
           host: 'localhost',
