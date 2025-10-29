@@ -3,9 +3,9 @@ import { MailController } from './mail.controller';
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { UserModule } from 'src/user/user.module';
-import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
+import Redis from 'ioredis';
 
 @Module({
   imports: [
@@ -29,6 +29,17 @@ import { UserEntity } from 'src/user/entities/user.entity';
     TypeOrmModule.forFeature([UserEntity]),
   ],
   controllers: [MailController],
-  providers: [MailService, UserService]
+  providers: [
+    MailService,
+    {
+      provide: 'REDIS',
+      useFactory: () => {
+        return new Redis({
+          host: 'localhost',
+          port: 6379,
+        });
+      },
+    }
+  ]
 })
 export class MailModule {}

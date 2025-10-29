@@ -15,4 +15,9 @@ export class AuthController {
   async signin(@Body() authDTO: AuthDTO.SignIn) {
     return this.authService.signin(authDTO);
   }
+  
+    @Post('refresh')
+  async refresh(@Body() body: { userId: number; refreshToken: string }) {
+    return this.authService.refresh(body.userId, body.refreshToken);
+  }
 }
