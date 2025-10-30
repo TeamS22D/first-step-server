@@ -5,23 +5,26 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
+import { ConfigModule, ConfigService} from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Module({
   imports: [
     MailerModule.forRootAsync({
-      useFactory: () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         transport: {
           host: 'smtp.gmail.com',
           port: 465,
           auth: {
-            user: process.env.EMAILADDRESS,
-            pass: process.env.EMAILPASSWORD
+            user: configService.getOrThrow<string>('EMAIL_ADDRESS'),
+            pass: configService.getOrThrow<string>('EMAIL_PASS')
           },
           secure: true
         },
         defaults: {
-          from: `'Waa' <${process.env.EMAILADDRESS}>`,
+          from: `'Waa' <${configService.getOrThrow<string>('EMAIL_ADDRESS')}>`,
         },
       }),
     }),
@@ -33,10 +36,12 @@ import Redis from 'ioredis';
     MailService,
     {
       provide: 'REDIS',
-      useFactory: () => {
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
         return new Redis({
-          host: 'localhost',
-          port: 6379,
+          host: configService.getOrThrow<string>('REDIS_HOST'),
+          port: configService.getOrThrow<number>('REDIS_PORT'),
         });
       },
     }
