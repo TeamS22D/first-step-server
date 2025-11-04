@@ -1,3 +1,5 @@
+// src/bizwords/entities/bizword.entity.ts
+
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
@@ -5,12 +7,15 @@ export class Bizword {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: '' })
-  term: string;
+  @Column()
+  word: string;
 
-  @Column({ default: '' })
-  meaning: string;
+  @Column('simple-json') 
+  desc: string[];
 
-  @Column({ nullable: true })
-  example?: string;
+  @Column({ type: 'text'})
+  example: string;
+
+  @Column({ type: 'text' }) 
+  desc_searchable: string;
 }

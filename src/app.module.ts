@@ -30,7 +30,7 @@ import { Bizword } from './bizwords/entities/bizword.entity';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        
+
         synchronize: false,
       }),
     }),
