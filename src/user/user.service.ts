@@ -11,6 +11,10 @@ import { AuthDTO } from 'src/auth/dto/auth-dto';
 export class UserService {
   constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>) {}
 
+  async updateRefreshToken(userId: number, token: string) {
+    await this.userRepository.update(userId, { refreshToken: token })
+  }
+
   async findById(id: number) {
     return await this.userRepository.findOne({ where: { id }});
   }

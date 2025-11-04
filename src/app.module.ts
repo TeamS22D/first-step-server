@@ -12,6 +12,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { RedisClientOptions } from 'redis';
 import { BizwordsModule } from './bizwords/bizwords.module';
 import { Bizword } from './bizwords/entities/bizword.entity';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -48,11 +49,12 @@ import { Bizword } from './bizwords/entities/bizword.entity';
         host: configService.getOrThrow<string>('REDIS_HOST'),
         port: configService.getOrThrow<number>('REDIS_PORT'),
         db: 0,
-        ttl: 300,
+        ttl: configService.getOrThrow<number>('REDIS_TTL'),
       }),
     }),
     
     BizwordsModule, 
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

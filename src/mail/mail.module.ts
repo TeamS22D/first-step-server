@@ -3,25 +3,28 @@ import { MailController } from './mail.controller';
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { UserModule } from 'src/user/user.module';
-import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
+import { ConfigModule, ConfigService} from '@nestjs/config';
+import Redis from 'ioredis';
 
 @Module({
   imports: [
     MailerModule.forRootAsync({
-      useFactory: () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         transport: {
           host: 'smtp.gmail.com',
           port: 465,
           auth: {
-            user: process.env.EMAILADDRESS,
-            pass: process.env.EMAILPASSWORD
+            user: configService.getOrThrow<string>('EMAIL_ADDRESS'),
+            pass: configService.getOrThrow<string>('EMAIL_PASS')
           },
           secure: true
         },
         defaults: {
-          from: `'Waa' <${process.env.EMAILADDRESS}>`,
+          from: `'Waa' <${configService.getOrThrow<string>('EMAIL_ADDRESS')}>`,
         },
       }),
     }),
@@ -29,6 +32,19 @@ import { UserEntity } from 'src/user/entities/user.entity';
     TypeOrmModule.forFeature([UserEntity]),
   ],
   controllers: [MailController],
-  providers: [MailService, UserService]
+  providers: [
+    MailService,
+    {
+      provide: 'REDIS',
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return new Redis({
+          host: configService.getOrThrow<string>('REDIS_HOST'),
+          port: configService.getOrThrow<number>('REDIS_PORT'),
+        });
+      },
+    }
+  ]
 })
 export class MailModule {}

@@ -17,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         expiresIn: config.getOrThrow('JWT_ACCESS_TIME'),
       }),
     }),
-    PassportModule
+    PassportModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

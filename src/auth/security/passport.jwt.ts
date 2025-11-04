@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         const { id } = payload;
         const user = await this.userService.findById(id);
         if (!user) {
-            throw new UnauthorizedException({ message: '회원 존재하지 않음' })
+            throw new UnauthorizedException({ message: '회원 존재하지 않음' });
         }
 
         return user;
