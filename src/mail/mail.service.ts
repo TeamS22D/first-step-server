@@ -1,5 +1,11 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+
+import { 
+    Injectable, 
+    BadRequestException, 
+    InternalServerErrorException
+} from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes } from 'crypto';
 import { UserEntity } from 'src/user/entities/user.entity';
@@ -21,7 +27,7 @@ export class MailService {
     async sendEmail(email: string) {
         const result = await this.userService.findByEmail(email);
         if (!result) {
-            throw new BadRequestException({ message: '존재하지 않는 이메일입니다' })
+            throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
         }
 
         const temporaryCode = this.generateTemporaryCode();
@@ -33,8 +39,8 @@ export class MailService {
                 html: `<p>인증코드: <strong>${temporaryCode}</strong>드립니다.</p>`,
             });
 
-            const RedisKey = `verification:${email}`
-            await this.redis.set(RedisKey, temporaryCode, 'EX', 300)
+            const RedisKey = `verification:${email}`;
+            await this.redis.set(RedisKey, temporaryCode, 'EX', 300);
 
             return { message: '인증코드를 전송했습니다.'}; 
         }
@@ -47,7 +53,7 @@ export class MailService {
             
         throw new InternalServerErrorException({ 
             message: '이메일 전송 중 오류가 발생했습니다.',
-            detail: error?.message || '알 수 없는 오류'})
+            detail: error?.message || '알 수 없는 오류'});
         }
     }
 

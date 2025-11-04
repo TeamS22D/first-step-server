@@ -1,7 +1,8 @@
 import { 
   Injectable, 
   ConflictException 
-  } from '@nestjs/common';
+} from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -12,7 +13,7 @@ export class UserService {
   constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>) {}
 
   async updateRefreshToken(userId: number, token: string) {
-    await this.userRepository.update(userId, { refreshToken: token })
+    await this.userRepository.update(userId, { refreshToken: token });
   }
 
   async findById(id: number) {

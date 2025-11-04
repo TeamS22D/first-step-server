@@ -6,7 +6,7 @@ import {
   Req, 
   UseGuards,
   } from '@nestjs/common';
-  
+
 import { UserService } from './user.service';
 import { AuthDTO } from 'src/auth/dto/auth-dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
@@ -15,7 +15,7 @@ import type { Request } from 'express';
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   @Post('/checkemail')
