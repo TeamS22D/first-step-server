@@ -30,12 +30,16 @@ export class MailService {
             throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
         }
 
+        if (result.isVerified == true) {
+            return { message: '이미 인증이 완료된 유저입니다.' }
+        }
+
         const temporaryCode = this.generateTemporaryCode();
 
         try {
             await this.mailerService.sendMail({
                 to: email,
-                subject: 'test',
+                subject: 'first step 인증 코드',
                 html: `<p>인증코드: <strong>${temporaryCode}</strong>드립니다.</p>`,
             });
 

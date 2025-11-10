@@ -42,7 +42,6 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         ttl: 300,
       }),
     }),
-    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

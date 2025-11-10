@@ -6,6 +6,7 @@ import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import Redis from 'ioredis';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -21,12 +22,13 @@ import Redis from 'ioredis';
           secure: true
         },
         defaults: {
-          from: `'Waa' <${process.env.EMAILADDRESS}>`,
+          from: `'First Step' <${process.env.EMAILADDRESS}>`,
         },
       }),
     }),
     UserModule,
     TypeOrmModule.forFeature([UserEntity]),
+    RedisModule,
   ],
   controllers: [MailController],
   providers: [
