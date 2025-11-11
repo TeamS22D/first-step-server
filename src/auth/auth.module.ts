@@ -9,15 +9,23 @@ import { JwtStrategy } from './security/passport.jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, JwtModule.registerAsync({
+  imports: [
+    UserModule,
+    JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: 'JWT_ACCESS_TIME' },
-      }),
+      useFactory: (config: ConfigService) => {
+        const jwtTime = config.getOrThrow<number>('JWT_TIME');
+
+        return {
+          secret: config.getOrThrow<string>('JWT_SECRET'),
+          signOptions: {
+            expiresIn: jwtTime
+          }
+        };
+      },
     }),
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

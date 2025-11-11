@@ -10,6 +10,7 @@ import Redis from 'ioredis';
 
 @Module({
   imports: [
+    ConfigModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -36,7 +37,6 @@ import Redis from 'ioredis';
     MailService,
     {
       provide: 'REDIS',
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return new Redis({
