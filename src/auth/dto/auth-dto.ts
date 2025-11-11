@@ -15,6 +15,10 @@ export namespace AuthDTO {
         password: string;
 
         @IsString()
+        @Length(7, 20)
+        checkPassword: string;
+
+        @IsString()
         name: string;
     }
 
@@ -35,5 +39,11 @@ export namespace AuthDTO {
     export class CheckVerified {
         @IsBoolean()
         isVerified: boolean;
+    }
+
+    export class VerifedCodeEmail {
+        @IsEmail()
+        email: string;
+        verificationCode: string;
     }
 }

@@ -21,11 +21,13 @@ export class AuthService {
     const { email, password } = authDTO;
 
     const user = await this.userService.findByEmail(email);
+    
     if (!user) {
       throw new UnauthorizedException({ message: '이메일이나 비밀번호를 확인해주십시오' });
     }
 
     const samePassword = await bcrypt.compare(password, user.password);
+
     if (!samePassword) {
       throw new UnauthorizedException({ message: '이메일이나 비밀번호를 확인해주십시오' });
     }
@@ -45,11 +47,13 @@ export class AuthService {
   // 엑세스 토큰 재발급
   async refresh(userId: number, refreshToken: string) {
     const user = await this.userService.findById(userId);
+
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException({ message: '유저가 존재하지 않거나 토큰이 없습니다.' });
     }
 
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+
     if (!isMatch) {
       throw new UnauthorizedException({ message: '토큰이 일치하지 않습니다.' });
     }

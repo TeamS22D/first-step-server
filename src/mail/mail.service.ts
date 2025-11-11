@@ -12,6 +12,7 @@ import { UserEntity } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { Inject } from '@nestjs/common';
+import { AuthDTO } from 'src/auth/dto/auth-dto';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -26,12 +27,13 @@ export class MailService {
 
     async sendEmail(email: string) {
         const result = await this.userService.findByEmail(email);
+
         if (!result) {
             throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
         }
 
         if (result.isVerified == true) {
-            return { message: '이미 인증이 완료된 유저입니다.' }
+            return { message: '이미 인증이 완료된 유저입니다.' };
         }
 
         const temporaryCode = this.generateTemporaryCode();
@@ -66,12 +68,15 @@ export class MailService {
         return temporaryCode;
     }
 
-    async verifyCode(verificationCode: string, email: string) {
+    async verifyCode(authDTO: AuthDTO.VerifedCodeEmail) {
+
+        const { email, verificationCode } = authDTO;
         const RedisKey = `verification:${email}`;
         const storedCode = await this.redis.get(RedisKey);
+        const user = await this.userRepository.findOne({ where: { email } });
 
-        if (!storedCode) {
-            throw new BadRequestException({ message: '유효한 코드가 아닙니다.'});
+        if (!user) {
+            throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
         }
 
         if (storedCode !== verificationCode) {
@@ -79,11 +84,6 @@ export class MailService {
         }
 
         await this.redis.del(RedisKey);
-
-        const user = await this.userRepository.findOne({ where: { email } });
-        if (!user) {
-            throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
-        }
 
         await this.userRepository.update(user.id, { isVerified: true });
 

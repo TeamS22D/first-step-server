@@ -10,7 +10,6 @@ import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager'
 import * as redisStore from 'cache-manager-redis-store';
 import { RedisClientOptions } from 'redis';
-import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [

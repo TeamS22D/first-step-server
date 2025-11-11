@@ -2,10 +2,11 @@ import {
     Controller,
     Get, 
     Param, 
-    Post 
+    Post, 
+    Body
 } from '@nestjs/common';
-
 import { MailService } from './mail.service';
+import { AuthDTO } from 'src/auth/dto/auth-dto';
 
 @Controller('mail')
 export class MailController {
@@ -18,11 +19,8 @@ export class MailController {
         return await this.mailService.sendEmail(email);
     }
 
-    @Get(':verificationCode/:email')
-    async emailCertified(
-        @Param('verificationCode') verificationCode: string,
-        @Param('email') email: string,
-    ) {
-        return await this.mailService.verifyCode(verificationCode, email);
+    @Get('/verificationCodeEmail')
+    async emailCertified(@Body() authDTO: AuthDTO.VerifedCodeEmail) {
+        return await this.mailService.verifyCode(authDTO);
     }
 }
