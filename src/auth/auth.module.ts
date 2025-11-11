@@ -9,7 +9,9 @@ import { JwtStrategy } from './security/passport.jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, JwtModule.registerAsync({
+  imports: [
+    UserModule,
+    JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -17,7 +19,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         expiresIn: config.getOrThrow('JWT_ACCESS_TIME'),
       }),
     }),
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
