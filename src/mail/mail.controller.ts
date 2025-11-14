@@ -16,11 +16,11 @@ export class MailController {
 
     @Post(':email')
     async sendEmail(@Param('email') email: string) {
-        return await this.mailService.sendEmail(email);
+        return await this.mailService.sendEmail(email); // 이메일 코드 전송
     }
 
     @Get('/verificationCodeEmail')
     async emailCertified(@Body() authDTO: AuthDTO.VerifedCodeEmail) {
-        return await this.mailService.verifyCode(authDTO);
+        return await this.mailService.verifyCode(authDTO); // 이메일 코드 인증
     }
 }

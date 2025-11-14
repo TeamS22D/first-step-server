@@ -21,22 +21,22 @@ export class AuthService {
     const { email, password } = authDTO;
 
     const user = await this.userService.findByEmail(email);
-    
+
     if (!user) {
-      throw new UnauthorizedException({ message: '이메일이나 비밀번호를 확인해주십시오' });
+      throw new UnauthorizedException({ message: "이메일이나 비밀번호를 확인해주십시오" }); // 이메일이 없거나 일치하지 않음
     }
 
     const samePassword = await bcrypt.compare(password, user.password);
 
     if (!samePassword) {
-      throw new UnauthorizedException({ message: '이메일이나 비밀번호를 확인해주십시오' });
+      throw new UnauthorizedException({ message: "이메일이나 비밀번호를 확인해주십시오" }); // 비밀번호가 일치하지 않음
     }
 
     const payload = { id: user.id };
 
     // 엑세스토큰, refresh토큰 발급
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '300s' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '1d' });
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.userService.updateRefreshToken(user.id, hashedRefreshToken);
@@ -49,13 +49,13 @@ export class AuthService {
     const user = await this.userService.findById(userId);
 
     if (!user || !user.refreshToken) {
-      throw new UnauthorizedException({ message: '유저가 존재하지 않거나 토큰이 없습니다.' });
+      throw new UnauthorizedException({ message: "유저가 존재하지 않거나 토큰이 없습니다." }); // 유저가 없거나 유저 정보에 refresh 토큰 없음
     }
 
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!isMatch) {
-      throw new UnauthorizedException({ message: '토큰이 일치하지 않습니다.' });
+      throw new UnauthorizedException({ message: "토큰이 일치하지 않습니다." }); // 토큰이 일치하지 않다면
     }
     
     const payload = { id: user.id };

@@ -20,18 +20,17 @@ export class UserController {
 
   @Post('/checkemail')
   async checkemail(@Body() authDTO: AuthDTO.CheckEmail) {
-    return await this.userService.checkEmail(authDTO);
+    return await this.userService.checkEmail(authDTO); // 이메일 확인
   }
 
   @Post('/signup')
   async signup(@Body() authDTO: AuthDTO.SignUp) {
-    console.log('[controller] signup body=', authDTO);
-    return await this.userService.signup(authDTO);
+    return await this.userService.signup(authDTO); // 회원가입
   }
 
   @UseGuards(AuthGuard)
   @Get('/')
   async getProfile(@Req() req: Request) {
-    return req.user;
+    return req.user; // 로그인 확인..?
   }
 }
