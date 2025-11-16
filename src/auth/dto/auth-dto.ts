@@ -46,4 +46,9 @@ export namespace AuthDTO {
         email: string;
         verificationCode: string;
     }
+
+    export class generateToken {
+        @IsEmail()
+        email: string;
+    }
 }

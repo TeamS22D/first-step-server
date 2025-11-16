@@ -5,11 +5,13 @@ import {
   Get, 
   Req, 
   UseGuards,
+  Delete,
+  Patch,
   } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { AuthDTO } from 'src/auth/dto/auth-dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 
 @Controller('user')
@@ -33,4 +35,17 @@ export class UserController {
   async getProfile(@Req() req: Request) {
     return req.user; // 로그인 확인..?
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/deleteuser')
+  async deleteUser(@Req() req: Request) {
+    return this.userService.deleteUser(req.user?.['id']);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/update')   // 또는 @Put
+  async updateUser(@Req() req: Request, @Body() dto: Partial<AuthDTO.SignUp>) {
+    const userId = req.user?.['id'];
+    return this.userService.updateUser(userId, dto);
+}
 }

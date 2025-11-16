@@ -34,10 +34,10 @@ export class MailService {
         }
 
         if (result.isVerified == true) {
-            return { message: "이미 인증이 완료된 유저입니다." }; // 안증이 완료되었다면
+            return { message: "이미 인증이 완료된 유저입니다." }; // 인증이 완료되었다면
         }
 
-        const temporaryCode = this.generateTemporaryCode();
+        const temporaryCode = this.generateTemporaryCode(6);
 
         try {
             await this.mailerService.sendMail({
@@ -64,9 +64,9 @@ export class MailService {
         }
     }
 
-    private generateTemporaryCode(): string {
-        const temporaryCode = randomBytes(3).toString('hex').toUpperCase();
-        return temporaryCode;
+    private generateTemporaryCode(length = 6): string {
+        const bytes = Math.ceil(length / 2);
+        return randomBytes(bytes).toString('hex').toUpperCase().slice(0, length);
     }
 
     // 이메일 코드 인증
@@ -75,18 +75,17 @@ export class MailService {
         const { email, verificationCode } = authDTO;
         const RedisKey = `verification:${email}`;
         const storedCode = await this.redis.get(RedisKey);
-        const user = await this.userRepository.findOne({ where: { email } });
+        const user = await this.userService.findByEmail(email)
 
         if (!user) {
             throw new BadRequestException({ message: "존재하지 않는 이메일입니다" }); // 이메일이 존재하지 않다면
         }
 
-        if (storedCode !== verificationCode) {
+        if (!storedCode || storedCode !== verificationCode) {
             throw new BadRequestException({ message: "인증코드가 일치하지 않습니다." }); // 인증코드가 일치하지 않다면
         }
 
         await this.redis.del(RedisKey);
-
         await this.userRepository.update(user.id, { isVerified: true });
 
         return { message: "인증이 완료되었습니다" };

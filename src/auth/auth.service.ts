@@ -32,7 +32,7 @@ export class AuthService {
       throw new UnauthorizedException({ message: "이메일이나 비밀번호를 확인해주십시오" }); // 비밀번호가 일치하지 않음
     }
 
-    const payload = { id: user.id };
+    const payload = { id: user.id, email: user.email };
 
     // 엑세스토큰, refresh토큰 발급
     const accessToken = this.jwtService.sign(payload, { expiresIn: '300s' });
