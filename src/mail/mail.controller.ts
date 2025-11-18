@@ -12,7 +12,7 @@ export class MailController {
         return await this.mailService.sendEmail(email);
     }
 
-    @Get(':verificationCode/:email')
+    @Get(':email/:verificationCode')
     async emailCertified(
         @Param('verificationCode') verificationCode: string,
         @Param('email') email: string,

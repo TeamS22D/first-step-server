@@ -16,6 +16,10 @@ export namespace AuthDTO {
 
         @IsString()
         name: string;
+
+        @IsString()
+        @Length(7, 20)
+        checkPassword: string;
     }
 
     export class SignIn {

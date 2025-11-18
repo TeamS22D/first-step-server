@@ -21,10 +21,14 @@ export class MailService {
     async sendEmail(email: string) {
         const result = await this.userService.findByEmail(email);
         if (!result) {
-            throw new BadRequestException({ message: '존재하지 않는 이메일입니다' })
+            throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
         }
 
-        const temporaryCode = this.generateTemporaryCode();
+        if (result.isVerified==true) {
+            return { message: "이미 인증이 완료된 유저입니다." };
+        }
+
+        const temporaryCode = this.generateTemporaryCode(6);
 
         try {
             await this.mailerService.sendMail({
@@ -51,30 +55,25 @@ export class MailService {
         }
     }
 
-    private generateTemporaryCode(): string {
-        const temporaryCode = randomBytes(3).toString('hex').toUpperCase();
-        return temporaryCode;
+    private generateTemporaryCode(length = 6): string {
+        const bytes = Math.ceil(length / 2);
+        return randomBytes(bytes).toString('hex').toUpperCase().slice(0, length);
     }
 
     async verifyCode(verificationCode: string, email: string) {
         const RedisKey = `verification:${email}`;
         const storedCode = await this.redis.get(RedisKey);
 
-        if (!storedCode) {
-            throw new BadRequestException({ message: '유효한 코드가 아닙니다.'});
+        if (!storedCode || storedCode !== verificationCode) {
+            throw new BadRequestException({ message: "인증코드가 일치하지 않습니다." }); // 인증코드가 일치하지 않다면
         }
 
-        if (storedCode !== verificationCode) {
-            throw new BadRequestException({ message: '인증코드가 일치하지 않습니다.'});
-        }
-
-        await this.redis.del(RedisKey);
-
-        const user = await this.userRepository.findOne({ where: { email } });
+        const user = await this.userService.findByEmail(email);
         if (!user) {
             throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
         }
-
+        
+        await this.redis.del(RedisKey);
         await this.userRepository.update(user.id, { isVerified: true });
 
         return { message: '인증이 완료되었습니다' };
