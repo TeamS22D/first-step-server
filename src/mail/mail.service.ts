@@ -74,7 +74,7 @@ export class MailService {
         }
         
         await this.redis.del(RedisKey);
-        await this.userRepository.update(user.id, { isVerified: true });
+        await this.userRepository.update(user.user_id, { isVerified: true });
 
         return { message: '인증이 완료되었습니다' };
     }

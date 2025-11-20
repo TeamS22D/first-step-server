@@ -30,22 +30,22 @@ export class UserController {
     return await this.userService.signup(authDTO); // 회원가입
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Get('/')
   async getProfile(@Req() req: Request) {
-    return req.user; // 로그인 확인..?
+    return req.user; // 로그인 확인
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('/deleteuser')
   async deleteUser(@Req() req: Request) {
-    return this.userService.deleteUser(req.user?.['id']);
+    return this.userService.deleteUser(req.user?.['id']); // 유저 삭제
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch('/update')
   async updateUser(@Req() req: Request, @Body() dto: Partial<AuthDTO.SignUp>) {
     const userId = req.user?.['id'];
-    return this.userService.updateUser(userId, dto);
+    return this.userService.updateUser(userId, dto); // 유저 업데이트
   }
 }

@@ -11,6 +11,11 @@ import { CacheModule } from '@nestjs/cache-manager'
 import * as redisStore from 'cache-manager-redis-store';
 import { RedisClientOptions } from 'redis';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { MissionModule } from './mission/mission.module';
+import { UserMissionController } from './user-mission/user-mission.controller';
+import { UserMissionModule } from './user-mission/user-mission.module';
+import { MissionEntity } from './user/entities/mission.entity';
+import { UserMissionEntity } from './user/entities/userMission.entity';
 
 @Module({
   imports: [
@@ -27,13 +32,14 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [UserEntity],
+        entities: [UserEntity, MissionEntity, UserMissionEntity],
         synchronize: true,
       }),
     }),
     AuthModule,
     UserModule,
     MailModule,
+    MissionModule,
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
@@ -47,8 +53,9 @@ import { RedisModule } from '@nestjs-modules/ioredis';
       }),
     }),
     RedisModule,
+    UserMissionModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UserMissionController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

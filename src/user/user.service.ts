@@ -18,8 +18,8 @@ export class UserService {
     await this.userRepository.update(userId, { refreshToken: token });
   }
 
-  async findById(id: number) {
-    return await this.userRepository.findOne({ where: { id }});
+  async findById(user_id: number) {
+    return await this.userRepository.findOne({ where: { user_id }});
   }
 
   async findByEmail(email: string) {
@@ -74,7 +74,7 @@ export class UserService {
     const user = this.userRepository.create(authDTO);
     const saved = await this.userRepository.save(user);
 
-    return { message: "회원가입이 완료되었습니다.", email: email, userId: saved.id };
+    return { message: "회원가입이 완료되었습니다.", email: email, userId: saved.user_id };
   }
 
   async deleteUser(userId: number) {
@@ -112,7 +112,7 @@ export class UserService {
 
       // 중복 체크 (본인 제외)
       const existing = await this.findByEmail(emailTrim);
-      if (existing && existing.id !== userId) {
+      if (existing && existing.user_id !== userId) {
         throw new ConflictException({ message: '이미 사용 중인 이메일입니다.' });
       }
 

@@ -29,14 +29,14 @@ export class AuthService {
       throw new UnauthorizedException({ message: '이메일이나 비밀번호를 확인해주십시오' });
     }
 
-    const payload = { id: user.id };
+    const payload = { id: user.user_id };
 
     // 엑세스토큰, refresh토큰 발급
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.userService.updateRefreshToken(user.id, hashedRefreshToken);
+    await this.userService.updateRefreshToken(user.user_id, hashedRefreshToken);
 
     return { email, accessToken, refreshToken };
   }
@@ -53,7 +53,7 @@ export class AuthService {
       throw new UnauthorizedException({ message: '토큰이 일치하지 않습니다.' });
     }
     
-    const payload = { id: user.id };
+    const payload = { id: user.user_id };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };
   }
