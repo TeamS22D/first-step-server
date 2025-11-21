@@ -36,7 +36,7 @@ export class UserMissionService {
 
         const allUserMission = await this.userMissionRepository.find({ where: {user_id} });
 
-        if (!allUserMission) {
+        if (allUserMission.length === 0) {
             throw new BadRequestException({ message: "미션이 존재하지 않습니다." });
         }
         
@@ -56,9 +56,9 @@ export class UserMissionService {
     }
 
     async findUserMissionByMissionId(userMissionDTO: UserMissionDTO.readUserMission) {
-        const { user_id, user_mission_id } = userMissionDTO;
+        const { user_id, mission_id } = userMissionDTO;
 
-        const userMission = await this.userMissionRepository.findOne({ where: {user_id, user_mission_id} });
+        const userMission = await this.userMissionRepository.findOne({ where: {user_id, mission_id} });
 
         if (!userMission) {
             throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
@@ -90,7 +90,7 @@ export class UserMissionService {
             throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
         }
 
-        const deleteUserMission = this.userMissionRepository.delete(user_mission_id);
+        const deleteUserMission = await this.userMissionRepository.delete(user_mission_id);
 
         return { message: "유저미션 삭제", delete: userMissionDTO };
     }

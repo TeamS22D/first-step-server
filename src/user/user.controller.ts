@@ -37,13 +37,13 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete('/deleteuser')
+  @Delete('/deleteUser')
   async deleteUser(@Req() req: Request) {
     return this.userService.deleteUser(req.user?.['id']); // 유저 삭제
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch('/update')
+  @Patch('/updateUser')
   async updateUser(@Req() req: Request, @Body() dto: Partial<AuthDTO.SignUp>) {
     const userId = req.user?.['id'];
     return this.userService.updateUser(userId, dto); // 유저 업데이트

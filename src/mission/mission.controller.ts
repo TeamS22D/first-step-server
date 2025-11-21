@@ -2,6 +2,7 @@ import {
     Body, 
     Controller, 
     Delete, 
+    Get, 
     Patch, 
     Post, 
     UseGuards 
@@ -18,25 +19,25 @@ export class MissionController {
     @UseGuards(AuthGuard('jwt'))
     @Post('/createMission')
     async createMission(@Body() missionDTO: MissionDTO.createMission) {
-        return await this.missionService.createMission(missionDTO);
+        return this.missionService.createMission(missionDTO);
     }
 
-    @Post('/findAllMission')
+    @Get('/findAllMission')
     async findAllMission() {
         return await this.missionService.findAllMission();
     }
 
-    @Post('/findByMissionName')
+    @Get('/:mission_name')
     async findByMissionName(@Body() missionDTO: MissionDTO.readMission) {
         return await this.missionService.findByMissionName(missionDTO);
     }
 
-    @Post('/findByMissionTheme')
+    @Get('/:mission_theme')
     async findByMissionTheme(@Body() missionDTO: MissionDTO.readMission) {
         return await this.missionService.findByMissionTheme(missionDTO);
     }
 
-    @Post('/findByMissionId')
+    @Get('/:mission_id')
     async findByMissionId(@Body() missionDTO: MissionDTO.readMission) {
         return await this.missionService.findByMissionId(missionDTO);
     }
@@ -48,8 +49,8 @@ export class MissionController {
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @Delete('deleteMission')
-    async deleteMission(@Body() missionDTO: MissionDTO.deelteMission) {
+    @Delete('/deleteMission')
+    async deleteMission(@Body() missionDTO: MissionDTO.deleteMission) {
         return this.missionService.deleteMission(missionDTO);
     }
 }

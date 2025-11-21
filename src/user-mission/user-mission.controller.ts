@@ -2,6 +2,7 @@ import {
     Body, 
     Controller, 
     Delete, 
+    Get, 
     Patch, 
     Post, 
     UseGuards 
@@ -20,17 +21,17 @@ export class UserMissionController {
         return this.userMissionService.createUserMission(userMissionDTO);
     }
 
-    @Post('/findAllUserMission')
+    @Get('/:user_id')
     async findAllUserMission(@Body() userMissionDTO: UserMissionDTO.readUserMission) {
         return this.userMissionService.findAllUserMission(userMissionDTO);
     }
 
-    @Post('/findUserMissionById')
-    async findUserMissionById(@Body() usermissionDTO: UserMissionDTO.readUserMission) {
-        return this.userMissionService.findUserMissionById(usermissionDTO);
+    @Get('/:user_mission_id')
+    async findUserMissionById(@Body() userMissionDTO: UserMissionDTO.readUserMission) {
+        return this.userMissionService.findUserMissionById(userMissionDTO);
     }
 
-    @Post('/findUserMissionByMissionId')
+    @Get('/:user_id/:mission_id')
     async findUserMissionByMissionId(@Body() userMissionDTO: UserMissionDTO.readUserMission) {
         return this.userMissionService.findUserMissionByMissionId(userMissionDTO);
     }

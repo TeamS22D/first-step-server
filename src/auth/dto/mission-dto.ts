@@ -40,7 +40,7 @@ export namespace MissionDTO {
         description: string;
     }
 
-    export class deelteMission {
+    export class deleteMission {
         @IsNumber()
         mission_id: number;
     }
