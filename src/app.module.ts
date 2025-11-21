@@ -29,8 +29,8 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [UserEntity],
-        synchronize: true,
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: false,
       }),
     }),
     

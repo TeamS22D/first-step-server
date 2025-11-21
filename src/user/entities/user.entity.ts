@@ -3,9 +3,12 @@ import {
     BeforeInsert,
     Entity,
     PrimaryGeneratedColumn,
+    ManyToMany,
+    JoinTable,
 } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
+import { Bizword } from 'src/bizwords/entities/bizword.entity';
 
 @Entity({name: 'users'})
 export class UserEntity {
@@ -27,8 +30,14 @@ export class UserEntity {
     @Column({ nullable: true })
     refreshToken: string;
 
+    @ManyToMany(() => Bizword)
+    @JoinTable({ name: 'user_favorites' })
+    favorites: Bizword[];
+
     @BeforeInsert()
     private before() {
-        this.password = bcrypt.hashSync(this.password, 10);
+        if (this.password) {
+            this.password = bcrypt.hashSync(this.password, 10);
+        }
     }
 }
