@@ -14,16 +14,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const jwtTime = config.getOrThrow<number>('JWT_TIME');
-
-        return {
-          secret: config.getOrThrow<string>('JWT_SECRET'),
-          signOptions: {
-            expiresIn: jwtTime
-          }
-        };
-      },
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        expiresIn: config.getOrThrow('JWT_ACCESS_TIME'),
+      }),
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],

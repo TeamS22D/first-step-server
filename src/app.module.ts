@@ -2,14 +2,16 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService} from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { UserEntity } from './user/entities/user.entity';
 import { MailModule } from './mail/mail.module';
-import { CacheModule } from '@nestjs/cache-manager'
+import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { RedisClientOptions } from 'redis';
+import { BizwordsModule } from './bizwords/bizwords.module';
+import { Bizword } from './bizwords/entities/bizword.entity';
 import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
@@ -27,13 +29,15 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [UserEntity],
-        synchronize: true,
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: false,
       }),
     }),
+    
     AuthModule,
     UserModule,
     MailModule,
+    
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
@@ -46,9 +50,11 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         ttl: configService.getOrThrow<number>('REDIS_TTL'),
       }),
     }),
+    
+    BizwordsModule, 
     RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
