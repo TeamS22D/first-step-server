@@ -11,6 +11,7 @@ import { CacheModule } from '@nestjs/cache-manager'
 import * as redisStore from 'cache-manager-redis-store';
 import { RedisClientOptions } from 'redis';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     AuthModule,
     UserModule,
     MailModule,
+    AiModule,
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
