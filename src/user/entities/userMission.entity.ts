@@ -9,7 +9,7 @@ import {
 import { MissionEntity } from './mission.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
-@Entity({ name: 'userMissions' })
+@Entity({ name: 'user-missions' })
 export class UserMissionEntity {
   @PrimaryGeneratedColumn()
   user_mission_id: number;

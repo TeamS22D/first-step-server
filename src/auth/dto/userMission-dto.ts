@@ -1,4 +1,3 @@
-import { Type } from "class-transformer";
 import { IsDate, IsInt, IsNumber } from "class-validator";
 
 export namespace UserMissionDTO {

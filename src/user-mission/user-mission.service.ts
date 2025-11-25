@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserMissionDTO } from 'src/auth/dto/userMission-dto';
 import { UserMissionEntity } from 'src/user/entities/userMission.entity';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 
 @Injectable()
 export class UserMissionService {
@@ -32,14 +32,19 @@ export class UserMissionService {
     }
 
     async findAllUserMission(user_id: number) {
-        const allUserMission = await this.userMissionRepository.find({ where: {user_id} });
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const count = await this.userMissionRepository.countBy({user_id: user_id});
+        
+        const missions = await this.userMissionRepository.find({where: { user_id, end_date: MoreThan(now) }});
 
-        if (allUserMission.length === 0) {
+        if (!missions || missions.length === 0) {
             throw new BadRequestException({ message: "미션이 존재하지 않습니다." });
         }
-        
-        return allUserMission;
+
+        return {count, missions};
     }
+
 
     async findUserMissionById(user_mission_id: number) {
         const userMission = await this.userMissionRepository.findOne({ where: {user_mission_id} });
