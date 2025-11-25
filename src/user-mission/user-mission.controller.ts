@@ -3,6 +3,7 @@ import {
     Controller, 
     Delete, 
     Get, 
+    Param, 
     Patch, 
     Post, 
     UseGuards 
@@ -22,18 +23,18 @@ export class UserMissionController {
     }
 
     @Get('/:user_id')
-    async findAllUserMission(@Body() userMissionDTO: UserMissionDTO.readUserMission) {
-        return this.userMissionService.findAllUserMission(userMissionDTO);
+    async findAllUserMission(@Param('user_id') user_id: number) {
+        return this.userMissionService.findAllUserMission(user_id);
     }
 
     @Get('/:user_mission_id')
-    async findUserMissionById(@Body() userMissionDTO: UserMissionDTO.readUserMission) {
-        return this.userMissionService.findUserMissionById(userMissionDTO);
+    async findUserMissionById(@Param('user_mission_id') user_mission_id: number) {
+        return this.userMissionService.findUserMissionById(user_mission_id);
     }
 
     @Get('/:user_id/:mission_id')
-    async findUserMissionByMissionId(@Body() userMissionDTO: UserMissionDTO.readUserMission) {
-        return this.userMissionService.findUserMissionByMissionId(userMissionDTO);
+    async findUserMissionByMissionId(@Param('user_id') user_id: number, @Param('mission_id') mission_id: number) {
+        return this.userMissionService.findUserMissionByMissionId(user_id, mission_id);
     }
 
     @UseGuards(AuthGuard('jwt'))

@@ -31,9 +31,7 @@ export class UserMissionService {
         return saved;
     }
 
-    async findAllUserMission(userMissionDTO: UserMissionDTO.readUserMission) {
-        const { user_id } = userMissionDTO;
-
+    async findAllUserMission(user_id: number) {
         const allUserMission = await this.userMissionRepository.find({ where: {user_id} });
 
         if (allUserMission.length === 0) {
@@ -43,9 +41,7 @@ export class UserMissionService {
         return allUserMission;
     }
 
-    async findUserMissionById(userMissionDTO: UserMissionDTO.readUserMission) {
-        const { user_mission_id } = userMissionDTO;
-
+    async findUserMissionById(user_mission_id: number) {
         const userMission = await this.userMissionRepository.findOne({ where: {user_mission_id} });
 
         if (!userMission) {
@@ -55,9 +51,7 @@ export class UserMissionService {
         return userMission;
     }
 
-    async findUserMissionByMissionId(userMissionDTO: UserMissionDTO.readUserMission) {
-        const { user_id, mission_id } = userMissionDTO;
-
+    async findUserMissionByMissionId(user_id: number, mission_id: number) {
         const userMission = await this.userMissionRepository.findOne({ where: {user_id, mission_id} });
 
         if (!userMission) {

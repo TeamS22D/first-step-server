@@ -27,17 +27,17 @@ export class MissionController {
         return await this.missionService.findAllMission();
     }
 
-    @Get('/:mission_name')
+    @Get('/findByMissionName')
     async findByMissionName(@Body() missionDTO: MissionDTO.readMission) {
         return await this.missionService.findByMissionName(missionDTO);
     }
 
-    @Get('/:mission_theme')
+    @Get('/findByMissionTheme')
     async findByMissionTheme(@Body() missionDTO: MissionDTO.readMission) {
         return await this.missionService.findByMissionTheme(missionDTO);
     }
 
-    @Get('/:mission_id')
+    @Get('/findByMissionId')
     async findByMissionId(@Body() missionDTO: MissionDTO.readMission) {
         return await this.missionService.findByMissionId(missionDTO);
     }
