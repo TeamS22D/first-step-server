@@ -26,7 +26,7 @@ export class BizwordsController {
   }
 
   @Get()
-  findAll(@Query('search') searchTerm?: string) {
+  findAll(@Query('searchTerm') searchTerm?: string) {
     return this.bizwordsService.findAll(searchTerm);
   }
 
