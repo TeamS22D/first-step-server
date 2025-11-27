@@ -1,109 +1,115 @@
-import { 
-    BadRequestException, 
-    Injectable, 
-    NotFoundException 
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { MissionDTO } from 'src/dto/mission-dto';
 import { MissionEntity } from '../entities/mission.entity';
 
-import { 
-    Like, 
-    Repository 
-} from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class MissionService {
-    constructor(@InjectRepository(MissionEntity) private missionRepository: Repository<MissionEntity>) {}
+  constructor(
+    @InjectRepository(MissionEntity)
+    private missionRepository: Repository<MissionEntity>,
+  ) {}
 
-    async createMission(missionDTO: MissionDTO.createMission) {
-        const { mission_name, mission_theme, description } = missionDTO;
+  async createMission(missionDTO: MissionDTO.createMission) {
+    const { mission_name, mission_theme, description } = missionDTO;
 
-        const saved = await this.missionRepository.save(missionDTO);
+    const saved = await this.missionRepository.save(missionDTO);
 
-        return saved;
+    return saved;
+  }
+
+  async findAllMission() {
+    const allMission = await this.missionRepository.find();
+
+    if (allMission.length === 0) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async findAllMission() {
-        const allMission = await this.missionRepository.find();
+    return allMission;
+  }
 
-        if (allMission.length === 0) {
-            throw new BadRequestException({ message: "미션을 찾을 수 없습니다." })
-        }
+  async findByMissionName(missionDTO: MissionDTO.readMission) {
+    const { mission_name } = missionDTO;
 
-        return allMission;
+    const missions = await this.missionRepository.find({
+      where: {
+        mission_name: Like(`%${mission_name}%`),
+      },
+    });
+
+    if (missions.length === 0) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async findByMissionName(missionDTO: MissionDTO.readMission) {
-        const { mission_name } = missionDTO;
+    return missions;
+  }
 
-        const missions = await this.missionRepository.find({
-            where: {
-                mission_name: Like(`%${mission_name}%`)
-            }
-        });
+  async findByMissionTheme(missionDTO: MissionDTO.readMission) {
+    const { mission_theme } = missionDTO;
 
-        if (missions.length === 0) {
-            throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
-        }
+    const missions = await this.missionRepository.find({
+      where: {
+        mission_theme: Like(`%${mission_theme}%`),
+      },
+    });
 
-        return missions;
+    if (missions.length === 0) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async findByMissionTheme(missionDTO: MissionDTO.readMission) {
-        const { mission_theme } = missionDTO;
+    return missions;
+  }
 
-        const missions = await this.missionRepository.find({
-            where: {
-                mission_theme: Like(`%${mission_theme}%`)
-            }
-        });
+  async findByMissionId(missionDTO: MissionDTO.readMission) {
+    const { mission_id } = missionDTO;
 
-        if (missions.length === 0) {
-            throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
-        }
+    const mission = await this.missionRepository.findOne({
+      where: { mission_id },
+    });
 
-        return missions;
+    if (!mission) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async findByMissionId(missionDTO: MissionDTO.readMission) {
-        const { mission_id } = missionDTO;
+    return mission;
+  }
 
-        const mission = await this.missionRepository.findOne({ where: {mission_id} });
+  async updateMission(missionDTO: MissionDTO.updateMission) {
+    const { mission_id, mission_name, mission_theme, description } = missionDTO;
 
-        if (!mission) {
-            throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
-        }
+    const mission = await this.missionRepository.findOne({
+      where: { mission_id },
+    });
 
-        return mission;
+    if (!mission) {
+      throw new NotFoundException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async updateMission(missionDTO: MissionDTO.updateMission) {
-        const { mission_id, mission_name, mission_theme, description } = missionDTO;
+    const update = await this.missionRepository.update(mission_id, missionDTO);
 
-        const mission = await this.missionRepository.findOne({ where:{ mission_id } });
+    return { message: '미션 업데이트', update: missionDTO };
+  }
 
-        if (!mission) {
-            throw new NotFoundException({ message: "미션을 찾을 수 없습니다." });
-        }
+  async deleteMission(missionDTO: MissionDTO.deleteMission) {
+    const { mission_id } = missionDTO;
 
-        const update = await this.missionRepository.update(mission_id, missionDTO);
+    const mission = await this.missionRepository.findOne({
+      where: { mission_id },
+    });
 
-        return { message: "미션 업데이트", update: missionDTO };
+    if (!mission) {
+      throw new NotFoundException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async deleteMission(missionDTO: MissionDTO.deleteMission) {
-        const { mission_id } = missionDTO;
+    const deleteMission = await this.missionRepository.delete(mission_id);
 
-        const mission = await this.missionRepository.findOne({ where: {mission_id} })
-
-        if (!mission) {
-            throw new NotFoundException({ message: "미션을 찾을 수 없습니다." });
-        }
-
-        const deleteMission = await this.missionRepository.delete(mission_id);
-
-        return { message: "미션 삭제", mission_id: mission_id };
-    }
+    return { message: '미션 삭제', mission_id: mission_id };
+  }
 }
