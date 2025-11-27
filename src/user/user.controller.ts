@@ -10,7 +10,7 @@ import {
   } from '@nestjs/common';
 
 import { UserService } from './user.service';
-import { AuthDTO } from 'src/auth/dto/auth-dto';
+import { AuthDTO } from 'src/dto/auth-dto';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 

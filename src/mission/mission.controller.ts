@@ -10,7 +10,7 @@ import {
 
 import { MissionService } from './mission.service';
 import { AuthGuard } from '@nestjs/passport';
-import { MissionDTO } from 'src/auth/dto/mission-dto';
+import { MissionDTO } from 'src/dto/mission-dto';
 
 @Controller('mission')
 export class MissionController {

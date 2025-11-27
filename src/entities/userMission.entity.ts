@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 import { MissionEntity } from './mission.entity';
-import { UserEntity } from '../../user/entities/user.entity';
+import { UserEntity } from './user.entity';
 
 @Entity({ name: 'user-missions' })
 export class UserMissionEntity {

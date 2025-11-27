@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService} from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { UserEntity } from './user/entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager'
 import * as redisStore from 'cache-manager-redis-store';
@@ -14,8 +14,8 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { MissionModule } from './mission/mission.module';
 import { UserMissionController } from './user-mission/user-mission.controller';
 import { UserMissionModule } from './user-mission/user-mission.module';
-import { MissionEntity } from './user/entities/mission.entity';
-import { UserMissionEntity } from './user/entities/userMission.entity';
+import { MissionEntity } from './entities/mission.entity';
+import { UserMissionEntity } from './entities/userMission.entity';
 
 @Module({
   imports: [

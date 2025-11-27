@@ -9,7 +9,7 @@ import {
     UseGuards 
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
-import { UserMissionDTO } from 'src/auth/dto/userMission-dto';
+import { UserMissionDTO } from 'src/dto/userMission-dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user-mission')

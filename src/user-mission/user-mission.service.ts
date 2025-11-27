@@ -4,8 +4,8 @@ import {
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserMissionDTO } from 'src/auth/dto/userMission-dto';
-import { UserMissionEntity } from 'src/user/entities/userMission.entity';
+import { UserMissionDTO } from 'src/dto/userMission-dto';
+import { UserMissionEntity } from '../entities/userMission.entity';
 import { MoreThan, Repository } from 'typeorm';
 
 @Injectable()

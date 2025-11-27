@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { MissionDTO } from 'src/auth/dto/mission-dto';
-import { MissionEntity } from 'src/user/entities/mission.entity';
+import { MissionDTO } from 'src/dto/mission-dto';
+import { MissionEntity } from '../entities/mission.entity';
 
 import { 
     Like, 

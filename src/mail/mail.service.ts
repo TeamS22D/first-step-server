@@ -2,7 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes } from 'crypto';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { Inject } from '@nestjs/common';
