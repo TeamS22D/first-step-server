@@ -1,15 +1,25 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export namespace MissionDTO {
   export class createMission {
     @IsString()
-    mission_name: string;
+    missionName: string;
 
     @IsString()
-    mission_theme: string;
+    missionTheme: string;
+
+    @IsString()
+    body: string;
 
     @IsString()
     description: string;
+
+    @IsOptional()
+    @IsString()
+    referenceAnswer?: string | null;
+
+    @IsNumber()
+    rubricId: number;
   }
 
   export class readMission {

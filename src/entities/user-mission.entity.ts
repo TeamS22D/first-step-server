@@ -1,9 +1,10 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { Mission } from './mission.entity';
 import { UserEntity } from './user.entity';
@@ -30,9 +31,9 @@ export class UserMission {
   @JoinColumn({ name: 'user_id' })
   userId: number;
 
-  @Column('datetime')
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column('timestamp')
+  @UpdateDateColumn()
   updatedAt: Date;
 }

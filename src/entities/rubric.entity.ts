@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Mission } from './mission.entity';
 
 @Entity({ name: 'rubrics' })
@@ -15,9 +15,9 @@ export class Rubric {
   @OneToMany(() => Mission, (mission) => mission.rubric)
   missions: Mission[];
 
-  @Column('datetime')
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column('timestamp')
+  @UpdateDateColumn()
   updatedAt: Date;
 }

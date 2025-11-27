@@ -18,8 +18,8 @@ export class MissionController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/create-mission')
-  async createMission(@Body() questionDto: QuestionDto.createQuestion) {
-    return this.missionService.createMission(questionDto);
+  async createMission(@Body() dto: MissionDTO.createMission) {
+    return this.missionService.createMission(dto);
   }
 
   @Get('/findAllMission')

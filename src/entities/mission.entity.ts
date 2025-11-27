@@ -1,10 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { Rubric } from './rubric.entity';
 import { UserMission } from './user-mission.entity';
@@ -25,7 +26,7 @@ export class Mission {
   userMissions: UserMission[];
 
   @Column({ nullable: false })
-  title: string;
+  missionName: string;
 
   @Column()
   missionTheme: string;
@@ -34,11 +35,14 @@ export class Mission {
   body: string;
 
   @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ type: 'text', nullable: true })
   referenceAnswer: string;
 
-  @Column('datetime')
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column('timestamp')
+  @UpdateDateColumn()
   updatedAt: Date;
 }
