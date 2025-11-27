@@ -1,27 +1,44 @@
 import {
   Column,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Rubric } from './rubric.entity';
+import { UserMission } from './user-mission.entity';
 
-import { UserMissionEntity } from './userMission.entity';
-
-@Entity({ name: 'missions' })
-export class MissionEntity {
+@Entity({ name: 'mission' })
+export class Mission {
   @PrimaryGeneratedColumn()
-  mission_id: number;
+  missionId: number;
 
-  @OneToMany(() => UserMissionEntity, userMission => userMission.mission)
-  userMissions: UserMissionEntity[];
+  @ManyToOne(() => Rubric, (rubric) => rubric.missions, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'rubric_id' })
+  rubric: Rubric;
+
+  @OneToMany(() => UserMission, (user_mission) => user_mission.mission)
+  userMissions: UserMission[];
 
   @Column({ nullable: false })
-  mission_name: string;
-
-  @Column({ nullable: false })
-  mission_theme: string;
+  title: string;
 
   @Column()
-  description: string;
+  missionTheme: string;
 
+  @Column({ type: 'text', nullable: false })
+  body: string;
+
+  @Column({ type: 'text', nullable: true })
+  referenceAnswer: string;
+
+  @Column('datetime')
+  createdAt: Date;
+
+  @Column('timestamp')
+  updatedAt: Date;
 }

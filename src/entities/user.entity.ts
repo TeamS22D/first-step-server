@@ -7,13 +7,13 @@ import {
 } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
-import { UserMissionEntity } from './userMission.entity';
+import { UserMission } from './user-mission.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn()
-  user_id: number;
-  
+  userId: number;
+
   @Column()
   name: string;
 
@@ -29,8 +29,8 @@ export class UserEntity {
   @Column({ nullable: true })
   refreshToken: string;
 
-  @OneToMany(() => UserMissionEntity, userMission => userMission.user)
-  userMissions: UserMissionEntity[];
+  @OneToMany(() => UserMission, (userMission) => userMission.userId)
+  userMissions: UserMission[];
 
   @BeforeInsert()
   private before() {
