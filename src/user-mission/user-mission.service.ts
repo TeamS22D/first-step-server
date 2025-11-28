@@ -1,96 +1,111 @@
-import { 
-    BadRequestException, 
-    Injectable 
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserMissionDTO } from 'src/dto/userMission-dto';
-import { UserMissionEntity } from '../entities/userMission.entity';
+import { UserMissionDTO } from 'src/dto/user-mission-dto';
+import { UserMission } from '../entities/user-mission.entity';
 import { MoreThan, Repository } from 'typeorm';
 
 @Injectable()
 export class UserMissionService {
-    constructor(@InjectRepository(UserMissionEntity) private userMissionRepository: Repository<UserMissionEntity>) {}
+  constructor(
+    @InjectRepository(UserMission)
+    private userMissionRepository: Repository<UserMission>,
+  ) {}
 
-    async createUserMission(userMissionDTO: UserMissionDTO.createUserMission) {
-        const { user_id, mission_id } = userMissionDTO;
+  async createUserMission(userMissionDTO: UserMissionDTO.createUserMission) {
+    const { userId, missionId } = userMissionDTO;
 
-        const start_date = new Date();
-        const end_date = new Date(start_date);
-        end_date.setDate(end_date.getDate() + 7);
+    const start_date = new Date();
+    const end_date = new Date(start_date);
+    end_date.setDate(end_date.getDate() + 7);
 
-        const entity = this.userMissionRepository.create({
-            user_id: user_id,
-            mission_id: mission_id,
-            start_date: start_date,
-            end_date: end_date
-        });
+    const entity = this.userMissionRepository.create({
+      user_id: user_id,
+      mission_id: mission_id,
+      start_date: start_date,
+      end_date: end_date,
+    });
 
-        const saved = await this.userMissionRepository.save(entity);
+    const saved = await this.userMissionRepository.save(entity);
 
-        return saved;
+    return saved;
+  }
+
+  async findAllUserMission(user_id: number) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const count = await this.userMissionRepository.countBy({
+      user_id: user_id,
+    });
+
+    const missions = await this.userMissionRepository.find({
+      where: { user_id, end_date: MoreThan(now) },
+    });
+
+    if (!missions || missions.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
     }
 
-    async findAllUserMission(user_id: number) {
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        const count = await this.userMissionRepository.countBy({user_id: user_id});
-        
-        const missions = await this.userMissionRepository.find({where: { user_id, end_date: MoreThan(now) }});
+    return { count, missions };
+  }
 
-        if (!missions || missions.length === 0) {
-            throw new BadRequestException({ message: "미션이 존재하지 않습니다." });
-        }
+  async findUserMissionById(user_mission_id: number) {
+    const userMission = await this.userMissionRepository.findOne({
+      where: { user_mission_id },
+    });
 
-        return {count, missions};
+    if (!userMission) {
+      throw new BadRequestException({ message: '미션이 없습니다.' });
     }
 
+    return userMission;
+  }
 
-    async findUserMissionById(user_mission_id: number) {
-        const userMission = await this.userMissionRepository.findOne({ where: {user_mission_id} });
+  async findUserMissionByMissionId(user_id: number, mission_id: number) {
+    const userMission = await this.userMissionRepository.findOne({
+      where: { user_id, mission_id },
+    });
 
-        if (!userMission) {
-            throw new BadRequestException({ message: "미션이 없습니다." });
-        }
-
-        return userMission;
+    if (!userMission) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async findUserMissionByMissionId(user_id: number, mission_id: number) {
-        const userMission = await this.userMissionRepository.findOne({ where: {user_id, mission_id} });
+    return userMission;
+  }
 
-        if (!userMission) {
-            throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
-        }
+  async updateUserMission(userMissionDTO: UserMissionDTO.updateUserMission) {
+    const { user_mission_id } = userMissionDTO;
 
-        return userMission;
+    const userMission = await this.userMissionRepository.findOne({
+      where: { user_mission_id },
+    });
+
+    if (!userMission) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async updateUserMission(userMissionDTO: UserMissionDTO.updateUserMission) {
-        const { user_mission_id } = userMissionDTO;
+    const update = await this.userMissionRepository.update(
+      user_mission_id,
+      userMissionDTO,
+    );
 
-        const userMission = await this.userMissionRepository.findOne({ where: {user_mission_id} });
+    return { message: '유저미션 업데이트', update: userMissionDTO };
+  }
 
-        if (!userMission) {
-            throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
-        }
+  async deleteUserMission(userMissionDTO: UserMissionDTO.deleteUserMission) {
+    const { user_mission_id } = userMissionDTO;
 
-        const update = await this.userMissionRepository.update(user_mission_id, userMissionDTO);
+    const userMission = await this.userMissionRepository.findOne({
+      where: { user_mission_id },
+    });
 
-        return { message: "유저미션 업데이트", update: userMissionDTO };
+    if (!userMission) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    async deleteUserMission(userMissionDTO: UserMissionDTO.deleteUserMission) {
-        const { user_mission_id } = userMissionDTO
+    const deleteUserMission =
+      await this.userMissionRepository.delete(user_mission_id);
 
-        const userMission = await this.userMissionRepository.findOne({ where: {user_mission_id} });
-
-        if (!userMission) {
-            throw new BadRequestException({ message: "미션을 찾을 수 없습니다." });
-        }
-
-        const deleteUserMission = await this.userMissionRepository.delete(user_mission_id);
-
-        return { message: "유저미션 삭제", delete: userMissionDTO };
-    }
+    return { message: '유저미션 삭제', delete: userMissionDTO };
+  }
 }

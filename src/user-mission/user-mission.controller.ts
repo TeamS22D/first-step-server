@@ -1,52 +1,62 @@
-import { 
-    Body, 
-    Controller, 
-    Delete, 
-    Get, 
-    Param, 
-    Patch, 
-    Post, 
-    UseGuards 
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
-import { UserMissionDTO } from 'src/dto/userMission-dto';
+import { UserMissionDTO } from 'src/dto/user-mission-dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user-mission')
 export class UserMissionController {
-    constructor(private readonly userMissionService: UserMissionService) {}
+  constructor(private readonly userMissionService: UserMissionService) {}
 
-    @Post('/createUserMission')
-    async createUserMission(@Body() userMissionDTO: UserMissionDTO.createUserMission) {
-        console.log('raw body:', userMissionDTO);
-        return this.userMissionService.createUserMission(userMissionDTO);
-    }
+  @Post('/create')
+  async createUserMission(
+    @Body() userMissionDTO: UserMissionDTO.createUserMission,
+  ) {
+    return this.userMissionService.createUserMission(userMissionDTO);
+  }
 
-    @Get('/:user_id')
-    async findAllUserMission(@Param('user_id') user_id: number) {
-        return this.userMissionService.findAllUserMission(user_id);
-    }
+  @Get('/:userId')
+  async findAllUserMission(@Param('userId') userId: number) {
+    return this.userMissionService.findAllUserMission(userId);
+  }
 
-    @Get('/:user_mission_id')
-    async findUserMissionById(@Param('user_mission_id') user_mission_id: number) {
-        return this.userMissionService.findUserMissionById(user_mission_id);
-    }
+  @Get('/:userMissionId')
+  async findUserMissionById(@Param('userMissionId') userMissionId: number) {
+    return this.userMissionService.findUserMissionById(userMissionId);
+  }
 
-    @Get('/:user_id/:mission_id')
-    async findUserMissionByMissionId(@Param('user_id') user_id: number, @Param('mission_id') mission_id: number) {
-        return this.userMissionService.findUserMissionByMissionId(user_id, mission_id);
-    }
+  @Get('/:userId/:missionId')
+  async findUserMissionByMissionId(
+    @Param('userId') userId: number,
+    @Param('missionId') missionId: number,
+  ) {
+    return this.userMissionService.findUserMissionByMissionId(
+      userId,
+      missionId,
+    );
+  }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Patch('/updateUserMission')
-    async updateUserMission(@Body() userMissionDTO: UserMissionDTO.updateUserMission) {
-        return this.userMissionService.updateUserMission(userMissionDTO);
-    }
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/updateUserMission')
+  async updateUserMission(
+    @Body() userMissionDTO: UserMissionDTO.updateUserMission,
+  ) {
+    return this.userMissionService.updateUserMission(userMissionDTO);
+  }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Delete('/deleteUserMission')
-    async deleteUserMission(@Body() userMissionDTO: UserMissionDTO.deleteUserMission) {
-        return this.userMissionService.deleteUserMission(userMissionDTO);
-    }
-
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/deleteUserMission')
+  async deleteUserMission(
+    @Body() userMissionDTO: UserMissionDTO.deleteUserMission,
+  ) {
+    return this.userMissionService.deleteUserMission(userMissionDTO);
+  }
 }

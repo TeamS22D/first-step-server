@@ -4,7 +4,8 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn, UpdateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Mission } from './mission.entity';
 import { UserEntity } from './user.entity';
@@ -21,8 +22,8 @@ export class UserMission {
   @JoinColumn({ name: 'mission_id' })
   mission: Mission;
 
-  @Column({ type: 'text' })
-  answer: string;
+  @Column({ type: 'text', nullable: true })
+  answer?: string | null;
 
   @ManyToOne(() => UserEntity, (user) => user.userMissions, {
     onDelete: 'CASCADE',
