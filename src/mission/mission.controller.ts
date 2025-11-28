@@ -17,33 +17,33 @@ export class MissionController {
   constructor(private readonly missionService: MissionService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('/create-mission')
+  @Post('/create')
   async createMission(@Body() dto: MissionDTO.createMission) {
     return this.missionService.createMission(dto);
   }
 
-  @Get('/find-all-mission')
+  @Get('/find-all')
   async findAllMission() {
     return await this.missionService.findAllMission();
   }
 
-  @Get('/find-by-mission-name')
+  @Get('/find-by-name')
   async findByMissionName(@Body() missionDTO: MissionDTO.readMission) {
     return await this.missionService.findByMissionName(missionDTO);
   }
 
-  @Get('/find-by-mission-theme')
+  @Get('/find-by-theme')
   async findByMissionTheme(@Body() missionDTO: MissionDTO.readMission) {
     return await this.missionService.findByMissionTheme(missionDTO);
   }
 
-  @Get('/find-by-mission-id')
+  @Get('/find-by-id')
   async findByMissionId(@Body() missionDTO: MissionDTO.readMission) {
     return await this.missionService.findByMissionId(missionDTO);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch('/update-mission')
+  @Patch('/update')
   async updateMission(@Body() missionDTO: MissionDTO.updateMission) {
     return this.missionService.updateMission(missionDTO);
   }
