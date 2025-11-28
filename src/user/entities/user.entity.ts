@@ -10,7 +10,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Bizword } from 'src/bizwords/entities/bizword.entity';
 
-@Entity({name: 'users'})
+@Entity({ name: 'users' })
 export class UserEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -29,6 +29,12 @@ export class UserEntity {
 
     @Column({ nullable: true })
     refreshToken: string;
+
+    @Column({ type: 'date', nullable: true })
+    lastAttendanceDate: Date;
+
+    @Column({ default: 0 })
+    attendanceStreak: number;
 
     @ManyToMany(() => Bizword)
     @JoinTable({ name: 'user_favorites' })
