@@ -5,7 +5,7 @@ import {
   NotFoundException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThan } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { AuthDTO } from 'src/auth/dto/auth-dto';
 
@@ -86,5 +86,34 @@ export class UserService {
       message: '출석체크 완료!',
       streak: user.attendanceStreak,
     };
+  }
+
+  async getAttendanceRank(userId: number) { 
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+    
+    const myStreak = user.attendanceStreak;
+
+    const totalUsers = await this.userRepository.count();
+
+    const betterThanMe = await this.userRepository.count({
+      where: {
+        attendanceStreak: MoreThan(myStreak)
+      }
+    });
+
+    const myRank = betterThanMe + 1;
+
+    const percentile = (myRank / totalUsers) * 100;
+
+    return {
+      name : user.name,
+      streak : myStreak,
+      rank : myRank,
+      totalUsers : totalUsers,
+      percentile : percentile.toFixed(2),
+    }
   }
 }

@@ -41,4 +41,11 @@ export class UserController {
     const userId = (req.user as any).id;
     return await this.userService.checkAttendance(userId);
   }
+
+  @UseGuards(AuthGuard)
+  @Get('/attendance/rank')
+  async getAttendanceRank(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    return await this.userService.getAttendanceRank(userId);
+  }
 }
