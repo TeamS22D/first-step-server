@@ -33,8 +33,14 @@ export class RubricController {
     return this.rubricService.findAll();
   }
 
+  @Get('/:id')
+  async findById(@Param('id') id: number) {
+    return this.rubricService.findOne(Number(id));
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Delete('/delete/:id')
   async delete(@Param('id') id: number) {
-    return this.rubricService.delete(id);
+    return this.rubricService.delete(Number(id));
   }
 }

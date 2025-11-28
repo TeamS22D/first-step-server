@@ -29,7 +29,7 @@ export class UserEntity {
   @Column({ nullable: true })
   refreshToken: string;
 
-  @OneToMany(() => UserMission, (userMission) => userMission.userId)
+  @OneToMany(() => UserMission, (userMission) => userMission.user)
   userMissions: UserMission[];
 
   @BeforeInsert()

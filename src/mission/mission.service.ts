@@ -29,7 +29,6 @@ export class MissionService {
     return await this.missionRepository.save(mission);
   }
 
-  //TODO: 페이지네이션 구현
   async findAllMission() {
     return await this.missionRepository.find();
   }
@@ -81,14 +80,21 @@ export class MissionService {
   }
 
   async updateMission(missionDTO: MissionDTO.updateMission) {
-    const { missionId } = missionDTO;
+    const { missionId, rubricId, ...rest } = missionDTO;
     const exists = await this.missionRepository.existsBy({ missionId });
+
+    const rubric = await this.rubricService.getRubricById(rubricId);
+
+    const updateData = {
+      ...rest,
+      rubric: rubric,
+    };
 
     if (!exists) {
       throw new NotFoundException({ message: '미션을 찾을 수 없습니다.' });
     }
-    await this.missionRepository.update(missionId, missionDTO);
-    return { message: '미션 업데이트', update: missionDTO };
+    await this.missionRepository.update(missionId, updateData);
+    return { message: '미션 업데이트', update: updateData };
   }
 
   async deleteMission(missionDTO: MissionDTO.deleteMission) {

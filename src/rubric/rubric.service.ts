@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rubric } from '../entities/rubric.entity';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { RubricDto } from '../dto/rubric-dto';
 
 export class RubricService {
@@ -38,6 +38,18 @@ export class RubricService {
 
   async findAll() {
     return await this.rubricRepository.find();
+  }
+
+  async findOne(id: number) {
+    const rubric = await this.rubricRepository.findOne({
+      where: { rubricId: id },
+    });
+
+    if (!rubric) {
+      throw new BadRequestException({ message: '루브릭을 찾을 수 없습니다.' });
+    }
+
+    return rubric;
   }
 
   async delete(rubricId: number) {

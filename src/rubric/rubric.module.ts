@@ -5,9 +5,7 @@ import { RubricController } from './rubric.controller';
 import { RubricService } from './rubric.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Rubric]),
-  ],
+  imports: [TypeOrmModule.forFeature([Rubric])],
   providers: [RubricService],
   controllers: [RubricController],
   exports: [RubricService],
