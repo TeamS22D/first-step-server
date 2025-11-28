@@ -6,23 +6,27 @@ import {
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { MissionDTO } from 'src/dto/mission-dto';
-import { MissionEntity } from '../entities/mission.entity';
-
+import { Mission } from '../entities/mission.entity';
 import { Like, Repository } from 'typeorm';
+import { RubricService } from '../rubric/rubric.service';
 
 @Injectable()
 export class MissionService {
   constructor(
-    @InjectRepository(MissionEntity)
-    private missionRepository: Repository<MissionEntity>,
+    @InjectRepository(Mission)
+    private readonly missionRepository: Repository<Mission>,
+    private readonly rubricService: RubricService,
   ) {}
 
-  async createMission(missionDTO: MissionDTO.createMission) {
-    const { mission_name, mission_theme, description } = missionDTO;
+  async createMission(missionDto: MissionDTO.createMission) {
+    const { rubricId, ...rest } = missionDto;
+    const rubric = await this.rubricService.getRubricById(rubricId);
 
-    const saved = await this.missionRepository.save(missionDTO);
-
-    return saved;
+    const mission = this.missionRepository.create({
+      ...rest,
+      rubric: rubric,
+    });
+    return await this.missionRepository.save(mission);
   }
 
   async findAllMission() {

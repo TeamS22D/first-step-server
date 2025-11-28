@@ -11,8 +11,9 @@ export namespace MissionDTO {
     @IsString()
     body: string;
 
+    @IsOptional()
     @IsString()
-    description: string;
+    description?: string | null;
 
     @IsOptional()
     @IsString()
