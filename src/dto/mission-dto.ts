@@ -25,24 +25,33 @@ export namespace MissionDTO {
 
   export class readMission {
     @IsNumber()
-    mission_id: number;
+    missionId: number;
 
     @IsString()
-    mission_name: string;
+    missionName: string;
 
     @IsString()
-    mission_theme: string;
+    missionTheme: string;
   }
 
   export class updateMission {
     @IsNumber()
-    mission_id: number;
+    missionId: number;
 
     @IsString()
-    mission_name: string;
+    missionName: string;
 
     @IsString()
-    mission_theme: string;
+    missionTheme: string;
+
+    @IsString()
+    rubricId: number;
+
+    @IsString()
+    body: string;
+
+    @IsString()
+    referenceAnswer: string;
 
     @IsString()
     description: string;
@@ -50,6 +59,6 @@ export namespace MissionDTO {
 
   export class deleteMission {
     @IsNumber()
-    mission_id: number;
+    missionId: number;
   }
 }

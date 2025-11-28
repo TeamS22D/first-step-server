@@ -29,22 +29,17 @@ export class MissionService {
     return await this.missionRepository.save(mission);
   }
 
+  //TODO: 페이지네이션 구현
   async findAllMission() {
-    const allMission = await this.missionRepository.find();
-
-    if (allMission.length === 0) {
-      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
-    }
-
-    return allMission;
+    return await this.missionRepository.find();
   }
 
   async findByMissionName(missionDTO: MissionDTO.readMission) {
-    const { mission_name } = missionDTO;
+    const { missionName } = missionDTO;
 
     const missions = await this.missionRepository.find({
       where: {
-        mission_name: Like(`%${mission_name}%`),
+        missionName: Like(`%${missionName}%`),
       },
     });
 
@@ -56,11 +51,11 @@ export class MissionService {
   }
 
   async findByMissionTheme(missionDTO: MissionDTO.readMission) {
-    const { mission_theme } = missionDTO;
+    const { missionTheme } = missionDTO;
 
     const missions = await this.missionRepository.find({
       where: {
-        mission_theme: Like(`%${mission_theme}%`),
+        missionTheme: Like(`%${missionTheme}%`),
       },
     });
 
@@ -72,10 +67,10 @@ export class MissionService {
   }
 
   async findByMissionId(missionDTO: MissionDTO.readMission) {
-    const { mission_id } = missionDTO;
+    const { missionId } = missionDTO;
 
     const mission = await this.missionRepository.findOne({
-      where: { mission_id },
+      where: { missionId },
     });
 
     if (!mission) {
@@ -86,34 +81,24 @@ export class MissionService {
   }
 
   async updateMission(missionDTO: MissionDTO.updateMission) {
-    const { mission_id, mission_name, mission_theme, description } = missionDTO;
+    const { missionId } = missionDTO;
+    const exists = await this.missionRepository.existsBy({ missionId });
 
-    const mission = await this.missionRepository.findOne({
-      where: { mission_id },
-    });
-
-    if (!mission) {
+    if (!exists) {
       throw new NotFoundException({ message: '미션을 찾을 수 없습니다.' });
     }
-
-    const update = await this.missionRepository.update(mission_id, missionDTO);
-
+    await this.missionRepository.update(missionId, missionDTO);
     return { message: '미션 업데이트', update: missionDTO };
   }
 
   async deleteMission(missionDTO: MissionDTO.deleteMission) {
-    const { mission_id } = missionDTO;
+    const { missionId } = missionDTO;
+    const exists = await this.missionRepository.existsBy({ missionId });
 
-    const mission = await this.missionRepository.findOne({
-      where: { mission_id },
-    });
-
-    if (!mission) {
+    if (!exists) {
       throw new NotFoundException({ message: '미션을 찾을 수 없습니다.' });
     }
-
-    const deleteMission = await this.missionRepository.delete(mission_id);
-
-    return { message: '미션 삭제', mission_id: mission_id };
+    await this.missionRepository.delete(missionId);
+    return { message: '미션 삭제', missionId: missionId };
   }
 }

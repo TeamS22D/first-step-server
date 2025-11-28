@@ -5,7 +5,8 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn, UpdateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Rubric } from './rubric.entity';
 import { UserMission } from './user-mission.entity';
