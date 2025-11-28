@@ -30,7 +30,13 @@ export class UserMission {
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  userId: number;
+  user: UserEntity;
+
+  @Column()
+  startDate: Date;
+
+  @Column()
+  endDate: Date;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -12,34 +12,35 @@ export class UserMissionService {
     private userMissionRepository: Repository<UserMission>,
   ) {}
 
-  async createUserMission(userMissionDTO: UserMissionDTO.createUserMission) {
-    const { userId, missionId } = userMissionDTO;
+  async createUserMission(dto: UserMissionDTO.createUserMission) {
+    const { userId, missionId } = dto;
 
-    const start_date = new Date();
-    const end_date = new Date(start_date);
-    end_date.setDate(end_date.getDate() + 7);
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 7);
 
     const entity = this.userMissionRepository.create({
-      user_id: user_id,
-      mission_id: mission_id,
-      start_date: start_date,
-      end_date: end_date,
+      user: { userId },
+      mission: { missionId },
+      startDate,
+      endDate,
     });
 
-    const saved = await this.userMissionRepository.save(entity);
-
-    return saved;
+    return await this.userMissionRepository.save(entity);
   }
 
-  async findAllUserMission(user_id: number) {
+  async findAllUserMission(userId: number) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    const count = await this.userMissionRepository.countBy({
-      user_id: user_id,
+    const count = await this.userMissionRepository.count({
+      where: { user: { userId } },
     });
 
     const missions = await this.userMissionRepository.find({
-      where: { user_id, end_date: MoreThan(now) },
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
     });
 
     if (!missions || missions.length === 0) {
@@ -49,9 +50,9 @@ export class UserMissionService {
     return { count, missions };
   }
 
-  async findUserMissionById(user_mission_id: number) {
+  async findUserMissionById(userMissionId: number) {
     const userMission = await this.userMissionRepository.findOne({
-      where: { user_mission_id },
+      where: { userMissionId },
     });
 
     if (!userMission) {
@@ -61,9 +62,12 @@ export class UserMissionService {
     return userMission;
   }
 
-  async findUserMissionByMissionId(user_id: number, mission_id: number) {
+  async findUserMissionByMissionId(userId: number, missionId: number) {
     const userMission = await this.userMissionRepository.findOne({
-      where: { user_id, mission_id },
+      where: {
+        user: { userId },
+        mission: { missionId },
+      },
     });
 
     if (!userMission) {
@@ -73,39 +77,35 @@ export class UserMissionService {
     return userMission;
   }
 
-  async updateUserMission(userMissionDTO: UserMissionDTO.updateUserMission) {
-    const { user_mission_id } = userMissionDTO;
+  async updateUserMission(dto: UserMissionDTO.updateUserMission) {
+    const { userMissionId } = dto;
 
     const userMission = await this.userMissionRepository.findOne({
-      where: { user_mission_id },
+      where: { userMissionId },
     });
 
     if (!userMission) {
       throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    const update = await this.userMissionRepository.update(
-      user_mission_id,
-      userMissionDTO,
-    );
+    await this.userMissionRepository.update(userMissionId, dto);
 
-    return { message: '유저미션 업데이트', update: userMissionDTO };
+    return { message: '유저 미션 업데이트 완료', update: dto };
   }
 
-  async deleteUserMission(userMissionDTO: UserMissionDTO.deleteUserMission) {
-    const { user_mission_id } = userMissionDTO;
+  async deleteUserMission(dto: UserMissionDTO.deleteUserMission) {
+    const { userMissionId } = dto;
 
     const userMission = await this.userMissionRepository.findOne({
-      where: { user_mission_id },
+      where: { userMissionId },
     });
 
     if (!userMission) {
       throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
-    const deleteUserMission =
-      await this.userMissionRepository.delete(user_mission_id);
+    await this.userMissionRepository.delete(userMissionId);
 
-    return { message: '유저미션 삭제', delete: userMissionDTO };
+    return { message: '유저 미션 삭제 완료', delete: dto };
   }
 }

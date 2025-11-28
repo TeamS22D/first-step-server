@@ -23,17 +23,17 @@ export class UserMissionController {
     return this.userMissionService.createUserMission(userMissionDTO);
   }
 
-  @Get('/:userId')
+  @Get('/:user-id')
   async findAllUserMission(@Param('userId') userId: number) {
     return this.userMissionService.findAllUserMission(userId);
   }
 
-  @Get('/:userMissionId')
+  @Get('/:user-mission-id')
   async findUserMissionById(@Param('userMissionId') userMissionId: number) {
     return this.userMissionService.findUserMissionById(userMissionId);
   }
 
-  @Get('/:userId/:missionId')
+  @Get('/:user-id/:mission-id')
   async findUserMissionByMissionId(
     @Param('userId') userId: number,
     @Param('missionId') missionId: number,
@@ -45,7 +45,7 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch('/updateUserMission')
+  @Patch('/update-user-mission')
   async updateUserMission(
     @Body() userMissionDTO: UserMissionDTO.updateUserMission,
   ) {
@@ -53,7 +53,7 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete('/deleteUserMission')
+  @Delete('/delete-user-mission')
   async deleteUserMission(
     @Body() userMissionDTO: UserMissionDTO.deleteUserMission,
   ) {

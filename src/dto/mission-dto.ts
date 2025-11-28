@@ -59,6 +59,6 @@ export namespace MissionDTO {
 
   export class deleteMission {
     @IsNumber()
-    missionId: number;
+    missionIdww: number;
   }
 }
