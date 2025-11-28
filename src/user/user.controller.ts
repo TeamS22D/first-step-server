@@ -34,4 +34,11 @@ export class UserController {
   async getProfile(@Req() req: Request) {
     return req.user;
   }
+
+  @UseGuards(AuthGuard)
+  @Post('/attendance')
+  async attendance(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    return await this.userService.checkAttendance(userId);
+  }
 }
