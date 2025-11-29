@@ -44,6 +44,7 @@ export class BizwordsService implements OnModuleInit {
   }
 
   async findAll(searchTerm?: string): Promise<Bizword[]> {
+    const selectColumns: (keyof Bizword)[] = ['id', 'word', 'desc', 'example'];
     if (searchTerm) {
       const lowerCaseSearch = searchTerm.toLowerCase();
       return this.bizwordRepository.find({
@@ -52,9 +53,10 @@ export class BizwordsService implements OnModuleInit {
           { example: Like(`%${lowerCaseSearch}%`) },
           { desc_searchable: Like(`%${lowerCaseSearch}%`) },
         ],
+        select: selectColumns,
       });
     }
-    return this.bizwordRepository.find();
+    return this.bizwordRepository.find({ select: selectColumns });
   }
 
   async findOne(id: number): Promise<Bizword> {
