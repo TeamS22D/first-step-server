@@ -5,8 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
+import { Provider, SocialUserDto } from 'src/auth/dto/social-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CheckEmailDto, SignUpDto } from '../dto/auth-dto';
 
@@ -98,6 +99,21 @@ export class UserService {
     };
   }
 
+  async socialSignup(userDto: SocialUserDto, provider: Provider) {
+    const { email, name } = userDto;
+    if (await this.findByEmail(email)) {
+      throw new ConflictException({ message: '이메일이 이미 사용 중입니다.' }); // 이메일 중복
+    }
+    const userEntity = this.userRepository.create({
+      email,
+      provider,
+      name,
+      isVerified: true,
+    });
+
+    return await this.userRepository.save(userEntity);
+  }
+
   async deleteUser(userId: number) {
     const user = await this.findById(userId);
 
@@ -185,7 +201,9 @@ export class UserService {
       throw new BadRequestException({ message: '변경할 정보가 없습니다.' });
     }
 
-    await this.userRepository.update(userId, updateData);
+    Object.assign(user, updateData);
+
+    await this.userRepository.save(user);
 
     return { message: '사용자 정보가 정상적으로 업데이트되었습니다.' };
   }

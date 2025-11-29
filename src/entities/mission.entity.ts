@@ -11,6 +11,7 @@ import {
 import { Rubric } from './rubric.entity';
 import { UserMission } from './user-mission.entity';
 import { forwardRef } from '@nestjs/common';
+import { Provider } from '../auth/dto/social-user.dto';
 
 @Entity({ name: 'mission' })
 export class Mission {

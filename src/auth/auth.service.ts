@@ -1,15 +1,16 @@
 import {
-  Injectable,
   UnauthorizedException,
+  Injectable,
   Inject,
   forwardRef,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 
+import { JwtService } from '@nestjs/jwt';
+import { SocialUserDto } from './dto/social-user.dto';
+import { Provider } from './dto/social-user.dto';
 import { UserService } from 'src/user/user.service';
+import * as bcrypt from 'bcrypt';
 import { SignInDto } from '../dto/auth-dto';
-import { UserEntity } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,11 @@ export class AuthService {
         message: '이메일이나 비밀번호를 확인해주십시오',
       });
     }
+    if (user.provider !== Provider.LOCAL) {
+      throw new UnauthorizedException({
+        message: `이 이메일은 ${user.provider}로 가입되어 있습니다.`,
+      });
+    }
 
     const samePassword = await bcrypt.compare(password, user.password);
     if (!samePassword) {
@@ -40,8 +46,8 @@ export class AuthService {
     const payload = { id: user.userId };
 
     // 엑세스토큰, refresh토큰 발급
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign({ payload, type: 'access' });
+    const refreshToken = this.jwtService.sign({ payload, type: 'refresh' }, { expiresIn: '7d' });
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.userService.updateRefreshToken(user.userId, hashedRefreshToken);
@@ -64,7 +70,29 @@ export class AuthService {
     }
 
     const payload = { id: user.userId };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign({ payload, type: 'access' });
     return { accessToken };
+  }
+
+  async socialLogin(userDto: SocialUserDto, provider: Provider) {
+    const { email, socialId } = userDto;
+
+    const user = await this.userService.findByEmail(email);
+    // console.log(user?.provider, provider);
+    if (user && user.provider != provider) {
+      throw new UnauthorizedException({
+        message: `이 이메일은 ${user.provider}로 가입되어 있습니다.`,
+      });
+    }
+
+    if (!user) {
+      // 가입한 적이 없다면 회원가입
+      return this.userService.socialSignup(userDto, userDto.provider);
+    }
+
+    console.log('소셜 로그인 유저 정보:', userDto);
+    const payload = { email: email, sub: socialId };
+    const accessToken = this.jwtService.sign(payload);
+    return { message: '로그인 성공', accessToken };
   }
 }

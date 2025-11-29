@@ -11,6 +11,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { UserMission } from './user-mission.entity';
 import { Bizword } from '../bizwords/entities/bizword.entity';
+import { Provider } from '../auth/dto/social-user.dto';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -41,12 +42,14 @@ export class UserEntity {
   @Column({ default: 0 })
   attendanceStreak: number;
 
+  @Column({
+    type: 'enum',
+    enum: Provider,
+    default: Provider.LOCAL,
+  })
+  provider: Provider;
+
   @ManyToMany(() => Bizword)
   @JoinTable({ name: 'user_favorites' })
   favorites: Bizword[];
-
-  @BeforeInsert()
-  private before() {
-    this.password = bcrypt.hashSync(this.password, 10);
-  }
 }
