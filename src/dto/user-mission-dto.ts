@@ -21,12 +21,6 @@ export namespace UserMissionDTO {
   }
 
   export class updateUserMission {
-    @IsNumber()
-    userMissionId: number;
-
-    @IsInt()
-    durationDays: number;
-
     @IsDate()
     startDate: Date;
 
@@ -34,8 +28,4 @@ export namespace UserMissionDTO {
     endDate: Date;
   }
 
-  export class deleteUserMission {
-    @IsNumber()
-    userMissionId: number;
-  }
 }

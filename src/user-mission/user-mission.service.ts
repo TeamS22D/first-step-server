@@ -77,25 +77,22 @@ export class UserMissionService {
     return userMission;
   }
 
-  async updateUserMission(dto: UserMissionDTO.updateUserMission) {
-    const { userMissionId } = dto;
-
+  async updateUserMission(
+    userMissionId: number,
+    dto: UserMissionDTO.updateUserMission,
+  ) {
     const userMission = await this.userMissionRepository.findOne({
       where: { userMissionId },
     });
-
     if (!userMission) {
       throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
 
     await this.userMissionRepository.update(userMissionId, dto);
-
     return { message: '유저 미션 업데이트 완료', update: dto };
   }
 
-  async deleteUserMission(dto: UserMissionDTO.deleteUserMission) {
-    const { userMissionId } = dto;
-
+  async deleteUserMission(userMissionId: number) {
     const userMission = await this.userMissionRepository.findOne({
       where: { userMissionId },
     });
@@ -106,6 +103,6 @@ export class UserMissionService {
 
     await this.userMissionRepository.delete(userMissionId);
 
-    return { message: '유저 미션 삭제 완료', delete: dto };
+    return { message: '유저 미션 삭제 완료' };
   }
 }

@@ -4,11 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Mission } from './mission.entity';
 import { UserEntity } from './user.entity';
+import { GradingResult } from './grading-result.entity';
 
 @Entity({ name: 'users_missions' })
 export class UserMission {

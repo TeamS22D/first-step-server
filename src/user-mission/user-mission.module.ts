@@ -6,7 +6,9 @@ import { UserMission } from '../entities/user-mission.entity';
 import { GradingResult } from '../entities/grading-result.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserMission, GradingResult])],
+  imports: [
+    TypeOrmModule.forFeature([UserMission, GradingResult, GradingResult]),
+  ],
   providers: [UserMissionService],
   controllers: [UserMissionController],
   exports: [UserMissionService],

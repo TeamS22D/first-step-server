@@ -23,17 +23,17 @@ export class UserMissionController {
     return this.userMissionService.createUserMission(userMissionDTO);
   }
 
-  @Get('/:user-id')
+  @Get('/user/:userId')
   async findAllUserMission(@Param('userId') userId: number) {
-    return this.userMissionService.findAllUserMission(userId);
+    return this.userMissionService.findAllUserMission(Number(userId));
   }
 
-  @Get('/:user-mission-id')
+  @Get('/mission/:userMissionId')
   async findUserMissionById(@Param('userMissionId') userMissionId: number) {
     return this.userMissionService.findUserMissionById(userMissionId);
   }
 
-  @Get('/:user-id/:mission-id')
+  @Get('/:userId/:missionId')
   async findUserMissionByMissionId(
     @Param('userId') userId: number,
     @Param('missionId') missionId: number,

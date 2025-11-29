@@ -21,6 +21,7 @@ import { RubricModule } from './rubric/rubric.module';
 import { MissionController } from './mission/mission.controller';
 import { RubricController } from './rubric/rubric.controller';
 import { GradingResult } from './entities/grading-result.entity';
+import { GradingCriteria } from './entities/grading-criteria';
 
 @Module({
   imports: [
@@ -37,7 +38,14 @@ import { GradingResult } from './entities/grading-result.entity';
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [UserEntity, Mission, UserMission, Rubric, GradingResult],
+        entities: [
+          UserEntity,
+          Mission,
+          UserMission,
+          Rubric,
+          GradingResult,
+          GradingCriteria,
+        ],
         synchronize: true,
       }),
     }),

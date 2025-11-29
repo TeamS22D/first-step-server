@@ -2,10 +2,12 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserMission } from './user-mission.entity';
+import { GradingCriteria } from './grading-criteria';
 
 @Entity({ name: 'grading_result' })
 export class GradingResult {
@@ -30,6 +32,12 @@ export class GradingResult {
   })
   @JoinColumn({ name: 'user_mission_id' })
   userMission: UserMission;
+
+  @OneToMany(
+    () => GradingCriteria,
+    (gradingCriteria) => gradingCriteria.gradingResult,
+  )
+  gradingCriterias: GradingCriteria[] | null;
 
   @Column()
   userId: number;
