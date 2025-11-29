@@ -84,15 +84,19 @@ export class AuthService {
         message: `이 이메일은 ${user.provider}로 가입되어 있습니다.`,
       });
     }
-
+    
     if (!user) {
       // 가입한 적이 없다면 회원가입
       return this.userService.socialSignup(userDto, userDto.provider);
     }
-
+    
     console.log('소셜 로그인 유저 정보:', userDto);
-    const payload = { email: email, sub: socialId };
-    const accessToken = this.jwtService.sign(payload);
-    return { message: '로그인 성공', accessToken };
+    const payload = { id: user.userId };
+
+    // 엑세스토큰, refresh토큰 발급
+    const accessToken = this.jwtService.sign({ payload, type: 'access' });
+    const refreshToken = this.jwtService.sign({ payload, type: 'refresh' }, { expiresIn: '7d' });
+
+    return { email, accessToken, refreshToken };
   }
 }

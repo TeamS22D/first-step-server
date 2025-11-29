@@ -34,10 +34,9 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req, @Res() res: Response) {
+  async googleAuthRedirect(@Req() req) {
     const user = req.user;
     const result = await this.authService.socialLogin(user, Provider.GOOGLE);
-
     return { ...result, user };
   }
 
@@ -47,7 +46,7 @@ export class AuthController {
 
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
-  async naverAuthRedirect(@Req() req, @Res() res: Response) {
+  async naverAuthRedirect(@Req() req) {
     const user = req.user;
     const result = await this.authService.socialLogin(user, Provider.NAVER);
 
@@ -60,7 +59,7 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuthRedirect(@Req() req, @Res() res: Response) {
+  async kakaoAuthRedirect(@Req() req) {
     const user = req.user;
     const result = await this.authService.socialLogin(user, Provider.KAKAO);
 
