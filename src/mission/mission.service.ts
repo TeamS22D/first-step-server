@@ -65,13 +65,10 @@ export class MissionService {
     return missions;
   }
 
-  async findByMissionId(missionDTO: MissionDTO.readMission) {
-    const { missionId } = missionDTO;
-
+  async findByMissionId(missionId: number) {
     const mission = await this.missionRepository.findOne({
       where: { missionId },
     });
-
     if (!mission) {
       throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
     }
@@ -79,12 +76,10 @@ export class MissionService {
     return mission;
   }
 
-  async updateMission(missionDTO: MissionDTO.updateMission) {
-    const { missionId, rubricId, ...rest } = missionDTO;
+  async updateMission(missionId: number, missionDTO: MissionDTO.updateMission) {
+    const { rubricId, ...rest } = missionDTO;
     const exists = await this.missionRepository.existsBy({ missionId });
-
     const rubric = await this.rubricService.getRubricById(rubricId);
-
     const updateData = {
       ...rest,
       rubric: rubric,
@@ -97,8 +92,7 @@ export class MissionService {
     return { message: '미션 업데이트', update: updateData };
   }
 
-  async deleteMission(missionDTO: MissionDTO.deleteMission) {
-    const { missionId } = missionDTO;
+  async deleteMission(missionId: number) {
     const exists = await this.missionRepository.existsBy({ missionId });
 
     if (!exists) {

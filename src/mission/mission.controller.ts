@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -27,30 +28,33 @@ export class MissionController {
     return await this.missionService.findAllMission();
   }
 
-  @Get('/find-by-name')
-  async findByMissionName(@Body() missionDTO: MissionDTO.readMission) {
-    return await this.missionService.findByMissionName(missionDTO);
-  }
+  // @Get('/find-by-name')
+  // async findByMissionName(@Body() missionDTO: MissionDTO.readMission) {
+  //   return await this.missionService.findByMissionName(missionDTO);
+  // }
+  //
+  // @Get('/find-by-theme')
+  // async findByMissionTheme(@Body() missionDTO: MissionDTO.readMission) {
+  //   return await this.missionService.findByMissionTheme(missionDTO);
+  // }
 
-  @Get('/find-by-theme')
-  async findByMissionTheme(@Body() missionDTO: MissionDTO.readMission) {
-    return await this.missionService.findByMissionTheme(missionDTO);
-  }
-
-  @Get('/find-by-id')
-  async findByMissionId(@Body() missionDTO: MissionDTO.readMission) {
-    return await this.missionService.findByMissionId(missionDTO);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('/update')
-  async updateMission(@Body() missionDTO: MissionDTO.updateMission) {
-    return this.missionService.updateMission(missionDTO);
+  @Get('/:id')
+  async findById(@Param('id') id: number) {
+    return this.missionService.findByMissionId(Number(id));
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete('/delete-mission')
-  async deleteMission(@Body() missionDTO: MissionDTO.deleteMission) {
-    return this.missionService.deleteMission(missionDTO);
+  @Patch('/update/:id')
+  async updateMission(
+    @Param('id') id: number,
+    @Body() missionDTO: MissionDTO.updateMission,
+  ) {
+    return this.missionService.updateMission(Number(id), missionDTO);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/delete/:id')
+  async deleteMission(@Param('id') id: number) {
+    return this.missionService.deleteMission(Number(id));
   }
 }
