@@ -6,9 +6,7 @@ import { Bizword } from './entities/bizword.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Bizword, UserEntity]),
-  ],
+  imports: [TypeOrmModule.forFeature([Bizword, UserEntity])],
   controllers: [BizwordsController],
   providers: [BizwordsService],
 })

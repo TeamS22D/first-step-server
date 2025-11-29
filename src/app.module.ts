@@ -13,6 +13,14 @@ import { RedisClientOptions } from 'redis';
 import { BizwordsModule } from './bizwords/bizwords.module';
 import { Bizword } from './bizwords/entities/bizword.entity';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { MissionModule } from './mission/mission.module';
+import { UserMissionModule } from './user-mission/user-mission.module';
+import { Mission } from './mission/entities/mission.entity';
+import { UserMission } from './user-mission/entities/user-mission.entity';
+import { Rubric } from './rubric/entities/rubric.entity';
+import { RubricModule } from './rubric/rubric.module';
+import { GradingResult } from './user-mission/entities/grading-result.entity';
+import { GradingCriteria } from './user-mission/entities/grading-criteria';
 
 @Module({
   imports: [
@@ -29,15 +37,27 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: false,
+        entities: [
+          UserEntity,
+          Mission,
+          UserMission,
+          Rubric,
+          GradingResult,
+          GradingCriteria,
+          Bizword,
+        ],
+        synchronize: true,
       }),
     }),
-    
+
     AuthModule,
     UserModule,
     MailModule,
-    
+    MissionModule,
+    RubricModule,
+    BizwordsModule,
+    RedisModule,
+    UserMissionModule,
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
@@ -50,9 +70,6 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         ttl: configService.getOrThrow<number>('REDIS_TTL'),
       }),
     }),
-    
-    BizwordsModule, 
-    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

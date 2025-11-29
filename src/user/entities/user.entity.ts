@@ -1,53 +1,57 @@
 import {
-    Column,
-    BeforeInsert,
-    Entity,
-    PrimaryGeneratedColumn,
-    ManyToMany,
-    JoinTable,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
 } from 'typeorm';
 
-import * as bcrypt from 'bcrypt';
 import { Bizword } from 'src/bizwords/entities/bizword.entity';
 import { Role } from '../types/user-role.enum';
+import { UserMission } from '../../user-mission/entities/user-mission.entity';
+import { Provider } from '../../auth/dto/social-user.dto';
 
 @Entity({ name: 'users' })
 export class UserEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
-    
-    @Column()
-    name: string;
+  @PrimaryGeneratedColumn()
+  userId: number;
 
-    @Column({ nullable: true })
-    password: string;
+  @Column()
+  name: string;
 
-    @Column()
-    email: string;
+  @Column({ nullable: true })
+  password: string;
 
-    @Column({ default: false, nullable: true })
-    isVerified: boolean;
+  @Column()
+  email: string;
 
-    @Column({ nullable: true })
-    refreshToken: string;
+  @Column({ default: false, nullable: true })
+  isVerified: boolean;
 
-    @Column({ type: 'date', nullable: true })
-    lastAttendanceDate: Date;
+  @Column({ nullable: true })
+  refreshToken: string;
 
-    @Column({ default: 0 })
-    attendanceStreak: number;
+  @Column({ type: 'date', nullable: true })
+  lastAttendanceDate: Date;
 
-    @Column({ type: 'enum', enum: Role, default: Role.USER })
-    role: Role;
+  @Column({ default: 0 })
+  attendanceStreak: number;
 
-    @ManyToMany(() => Bizword)
-    @JoinTable({ name: 'user_favorites' })
-    favorites: Bizword[];
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
 
-    @BeforeInsert()
-    private before() {
-        if (this.password) {
-            this.password = bcrypt.hashSync(this.password, 10);
-        }
-    }
+  @Column({
+    type: 'enum',
+    enum: Provider,
+    default: Provider.LOCAL,
+  })
+  provider: Provider;
+
+  @OneToMany(() => UserMission, (userMission) => userMission.user)
+  userMissions: UserMission[];
+
+  @ManyToMany(() => Bizword)
+  @JoinTable({ name: 'user_favorites' })
+  favorites: Bizword[];
 }

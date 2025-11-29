@@ -23,7 +23,7 @@ import { Role } from '../user/types/user-role.enum';
 export class BizwordsController {
   constructor(private readonly bizwordsService: BizwordsService) {}
 
-  @UseGuards(AuthGuard, RolesGuard) 
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Post()
   create(@Body() createBizwordDto: CreateBizwordDto) {
@@ -38,7 +38,7 @@ export class BizwordsController {
   @Get('my/favorites')
   @UseGuards(AuthGuard('jwt'))
   getMyFavorites(@Req() req) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return this.bizwordsService.getMyFavorites(userId);
   }
 
@@ -47,7 +47,7 @@ export class BizwordsController {
     return this.bizwordsService.findOne(id);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Patch(':id')
   update(
@@ -57,7 +57,7 @@ export class BizwordsController {
     return this.bizwordsService.update(id, updateBizwordDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
@@ -67,14 +67,14 @@ export class BizwordsController {
   @Post(':id/favorite')
   @UseGuards(AuthGuard('jwt'))
   addFavorite(@Param('id', ParseIntPipe) wordId: number, @Req() req) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return this.bizwordsService.addFavorite(userId, wordId);
   }
 
   @Delete(':id/favorite')
   @UseGuards(AuthGuard('jwt'))
   removeFavorite(@Param('id', ParseIntPipe) wordId: number, @Req() req) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return this.bizwordsService.removeFavorite(userId, wordId);
   }
 }

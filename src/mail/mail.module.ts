@@ -5,7 +5,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
-import { ConfigModule, ConfigService} from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Module({
