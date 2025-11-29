@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { AuthDTO } from 'src/auth/dto/auth-dto';
 
@@ -14,7 +15,24 @@ export class UserService {
   constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>) {}
 
   async updateRefreshToken(userId: number, token: string) {
-    await this.userRepository.update(userId, { refreshToken: token })
+    let hashedToken: string | null = null;
+    
+    if (token) {
+      hashedToken = await bcrypt.hash(token, 10);
+    }
+
+    await this.userRepository.update(userId, { refreshToken: hashedToken as any });
+  }
+
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    const user = await this.findById(userId);
+    if (!user || !user.refreshToken) return null;
+    
+    const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (isMatch) {
+      return user;
+    }
+    return null;
   }
 
   async findById(id: number) {
