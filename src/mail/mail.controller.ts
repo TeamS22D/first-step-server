@@ -3,20 +3,18 @@ import { MailService } from './mail.service';
 
 @Controller('mail')
 export class MailController {
-    constructor(
-        private readonly mailService: MailService,
-    ) {}
+  constructor(private readonly mailService: MailService) {}
 
-    @Post(':email')
-    async sendEmail(@Param('email') email: string) {
-        return await this.mailService.sendEmail(email);
-    }
+  @Post(':email')
+  async sendEmail(@Param('email') email: string) {
+    return await this.mailService.sendEmail(email);
+  }
 
-    @Get(':verificationCode/:email')
-    async emailCertified(
-        @Param('verificationCode') verificationCode: string,
-        @Param('email') email: string,
-    ) {
-        return await this.mailService.verifyCode(verificationCode, email);
-    }
+  @Get(':email/:verificationCode')
+  async emailCertified(
+    @Param('verificationCode') verificationCode: string,
+    @Param('email') email: string,
+  ) {
+    return await this.mailService.verifyCode(verificationCode, email);
+  }
 }

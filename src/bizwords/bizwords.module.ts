@@ -3,12 +3,10 @@ import { BizwordsService } from './bizwords.service';
 import { BizwordsController } from './bizwords.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Bizword } from './entities/bizword.entity';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Bizword, UserEntity]),
-  ],
+  imports: [TypeOrmModule.forFeature([Bizword, UserEntity])],
   controllers: [BizwordsController],
   providers: [BizwordsService],
 })

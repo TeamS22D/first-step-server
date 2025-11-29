@@ -33,7 +33,7 @@ export class BizwordsController {
   @Get('my/favorites')
   @UseGuards(AuthGuard('jwt'))
   getMyFavorites(@Req() req) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return this.bizwordsService.getMyFavorites(userId);
   }
 
@@ -58,14 +58,14 @@ export class BizwordsController {
   @Post(':id/favorite')
   @UseGuards(AuthGuard('jwt'))
   addFavorite(@Param('id', ParseIntPipe) wordId: number, @Req() req) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return this.bizwordsService.addFavorite(userId, wordId);
   }
 
   @Delete(':id/favorite')
   @UseGuards(AuthGuard('jwt'))
   removeFavorite(@Param('id', ParseIntPipe) wordId: number, @Req() req) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return this.bizwordsService.removeFavorite(userId, wordId);
   }
 }

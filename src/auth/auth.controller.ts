@@ -4,19 +4,19 @@ import {
   Body,
 } from '@nestjs/common';
 
-import { AuthDTO } from './dto/auth-dto';
 import { AuthService } from './auth.service';
+import { SignInDto } from '../dto/auth-dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/signin')
-  async signin(@Body() authDTO: AuthDTO.SignIn) {
+  async signin(@Body() authDTO: SignInDto) {
     return this.authService.signin(authDTO);
   }
   
-    @Post('refresh')
+  @Post('refresh')
   async refresh(@Body() body: { userId: number; refreshToken: string }) {
     return this.authService.refresh(body.userId, body.refreshToken);
   }

@@ -1,19 +1,18 @@
 import {
   Injectable,
   NotFoundException,
-  OnModuleInit,
   Logger,
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, DataSource } from 'typeorm';
 import { Bizword } from './entities/bizword.entity';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 import { CreateBizwordDto } from './dto/create-bizword.dto';
 import { UpdateBizwordDto } from './dto/update-bizword.dto';
 
 @Injectable()
-export class BizwordsService implements OnModuleInit {
+export class BizwordsService {
   private readonly logger = new Logger(BizwordsService.name);
 
   constructor(
@@ -25,15 +24,6 @@ export class BizwordsService implements OnModuleInit {
 
     private readonly dataSource: DataSource,
   ) {}
-
-  async onModuleInit() {
-    try {
-      await this.dataSource.query('SELECT 1');
-      this.logger.log('Database connection successful.');
-    } catch (error) {
-      this.logger.error('Database connection failed.', error);
-    }
-  }
 
   async create(createBizwordDto: CreateBizwordDto): Promise<Bizword> {
     const bizword = this.bizwordRepository.create({
@@ -90,7 +80,7 @@ export class BizwordsService implements OnModuleInit {
 
   async addFavorite(userId: number, wordId: number) {
     const user = await this.userRepository.findOne({
-      where: { id: userId },
+      where: { userId },
       relations: ['favorites'],
     });
 
@@ -111,7 +101,7 @@ export class BizwordsService implements OnModuleInit {
 
   async removeFavorite(userId: number, wordId: number) {
     const user = await this.userRepository.findOne({
-      where: { id: userId },
+      where: { userId },
       relations: ['favorites'],
     });
 
@@ -126,7 +116,7 @@ export class BizwordsService implements OnModuleInit {
 
   async getMyFavorites(userId: number) {
     const user = await this.userRepository.findOne({
-      where: { id: userId },
+      where: { userId },
       relations: ['favorites'],
     });
 
