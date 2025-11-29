@@ -46,8 +46,8 @@ export class AuthService {
     const payload = { id: user.userId };
 
     // 엑세스토큰, refresh토큰 발급
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign({ payload, type: 'access' });
+    const refreshToken = this.jwtService.sign({ payload, type: 'refresh' }, { expiresIn: '7d' });
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.userService.updateRefreshToken(user.userId, hashedRefreshToken);
@@ -70,7 +70,7 @@ export class AuthService {
     }
 
     const payload = { id: user.userId };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign({ payload, type: 'access' });
     return { accessToken };
   }
 
