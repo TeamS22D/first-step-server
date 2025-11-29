@@ -44,9 +44,4 @@ export class UserEntity {
   @ManyToMany(() => Bizword)
   @JoinTable({ name: 'user_favorites' })
   favorites: Bizword[];
-
-  @BeforeInsert()
-  private before() {
-    this.password = bcrypt.hashSync(this.password, 10);
-  }
 }
