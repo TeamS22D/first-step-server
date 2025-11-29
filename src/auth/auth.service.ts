@@ -70,7 +70,7 @@ export class AuthService {
     }
 
     const payload = { id: user.userId };
-    const accessToken = this.jwtService.sign({ payload, type: 'access' });
+    const accessToken = this.jwtService.sign({ type: 'access', ...payload });
     return { accessToken };
   }
 
@@ -94,8 +94,8 @@ export class AuthService {
     const payload = { id: user.userId };
 
     // 엑세스토큰, refresh토큰 발급
-    const accessToken = this.jwtService.sign({ payload, type: 'access' });
-    const refreshToken = this.jwtService.sign({ payload, type: 'refresh' }, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign({ ...payload, type: 'access' });
+    const refreshToken = this.jwtService.sign({ ...payload, type: 'refresh' }, { expiresIn: '7d' });
 
     return { email, accessToken, refreshToken };
   }
