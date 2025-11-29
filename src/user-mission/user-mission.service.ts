@@ -116,8 +116,33 @@ export class UserMissionService {
     const userMission = await this.userMissionRepository.findOne({
       where: { userMissionId },
     });
+    if (!userMission) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
+    }
     await this.userMissionRepository.update(userMissionId, dto);
 
-
+    // 평가 시스템 예시
+    const gradingResult = this.resultRepository.create({
+      totalScore: 100,
+      grade: 'A',
+      summeryFeedback: '너무 멋져요',
+      missionId: userMission.mission.missionId,
+      userId: userMission.user.userId,
+      userMission,
+    });
+    await this.resultRepository.save(gradingResult);
+    for (let i = 0; i < 5; i++) {
+      const gradingCriteria = await this.criteriaRepository.create({
+        index: i + 1,
+        score: 100,
+        maxScore: 100,
+        gradingResult,
+      });
+      await this.criteriaRepository.save(gradingCriteria);
+    }
+    return await this.resultRepository.findOne({
+      where: { id: gradingResult.id },
+      relations: ['criteria'],
+    });
   }
 }
