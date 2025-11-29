@@ -200,7 +200,9 @@ export class UserService {
       throw new BadRequestException({ message: '변경할 정보가 없습니다.' });
     }
 
-    await this.userRepository.update(userId, updateData);
+    Object.assign(user, updateData);
+
+    await this.userRepository.save(user);
 
     return { message: '사용자 정보가 정상적으로 업데이트되었습니다.' };
   }
