@@ -4,11 +4,11 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThan } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
-import { AuthDTO } from 'src/dto/auth-dto';
+import * as bcrypt from 'bcrypt';
+import { CheckEmailDto, SignUpDto } from '../dto/auth-dto';
 
 @Injectable()
 export class UserService {
@@ -30,7 +30,7 @@ export class UserService {
   }
 
   // 이메일 중복 확인
-  async checkEmail(authDTO: AuthDTO.CheckEmail) {
+  async checkEmail(authDTO: CheckEmailDto) {
     const { email } = authDTO;
 
     const has = await this.findByEmail(email);
@@ -42,7 +42,7 @@ export class UserService {
   }
 
   // 회원가입
-  async signup(authDTO: AuthDTO.SignUp) {
+  async signup(authDTO: SignUpDto) {
     const { email, password, checkPassword } = authDTO;
 
     if (await this.findByEmail(email)) {
@@ -84,7 +84,11 @@ export class UserService {
       });
     }
 
-    const user = this.userRepository.create(authDTO);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = this.userRepository.create({
+      ...authDTO,
+      password: hashedPassword,
+    });
     const saved = await this.userRepository.save(user);
 
     return {
@@ -105,7 +109,7 @@ export class UserService {
     return { message: '사용자가 정상적으로 삭제되었습니다.' };
   }
 
-  async updateUser(userId: number, authDTO: Partial<AuthDTO.SignUp>) {
+  async updateUser(userId: number, authDTO: Partial<SignUpDto>) {
     const { email, name, password, checkPassword } = authDTO;
 
     const user = await this.findById(userId);
@@ -173,7 +177,7 @@ export class UserService {
         });
       }
 
-      updateData['password'] = password;
+      updateData['password'] = await bcrypt.hash(password, 10);
     }
 
     // 변경할 데이터가 하나도 없으면
@@ -184,5 +188,76 @@ export class UserService {
     await this.userRepository.update(userId, updateData);
 
     return { message: '사용자 정보가 정상적으로 업데이트되었습니다.' };
+  }
+
+  async checkAttendance(userId: number) {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const lastDate = user.lastAttendanceDate
+      ? new Date(user.lastAttendanceDate)
+      : null;
+
+    if (lastDate) {
+      lastDate.setHours(0, 0, 0, 0);
+
+      const timeDiff = today.getTime() - lastDate.getTime();
+      const dayDiff = timeDiff / (1000 * 3600 * 24);
+
+      if (dayDiff === 0) {
+        throw new BadRequestException('이미 오늘 출석체크를 완료했습니다.');
+      }
+
+      if (dayDiff === 1) {
+        user.attendanceStreak += 1;
+      } else {
+        user.attendanceStreak = 1;
+      }
+    } else {
+      user.attendanceStreak = 1;
+    }
+
+    user.lastAttendanceDate = today;
+    await this.userRepository.save(user);
+
+    return {
+      message: '출석체크 완료!',
+      streak: user.attendanceStreak,
+    };
+  }
+
+  async getAttendanceRank(userId: number) {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    const myStreak = user.attendanceStreak;
+
+    const totalUsers = await this.userRepository.count();
+
+    const betterThanMe = await this.userRepository.count({
+      where: {
+        attendanceStreak: MoreThan(myStreak),
+      },
+    });
+
+    const myRank = betterThanMe + 1;
+
+    const percentile = (myRank / totalUsers) * 100;
+
+    return {
+      name: user.name,
+      streak: myStreak,
+      rank: myRank,
+      totalUsers: totalUsers,
+      percentile: percentile.toFixed(2),
+    };
   }
 }

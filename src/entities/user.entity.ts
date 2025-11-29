@@ -4,10 +4,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
 import { UserMission } from './user-mission.entity';
+import { Bizword } from '../bizwords/entities/bizword.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -31,6 +34,16 @@ export class UserEntity {
 
   @OneToMany(() => UserMission, (userMission) => userMission.user)
   userMissions: UserMission[];
+
+  @Column({ type: 'date', nullable: true })
+  lastAttendanceDate: Date;
+
+  @Column({ default: 0 })
+  attendanceStreak: number;
+
+  @ManyToMany(() => Bizword)
+  @JoinTable({ name: 'user_favorites' })
+  favorites: Bizword[];
 
   @BeforeInsert()
   private before() {

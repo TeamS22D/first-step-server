@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Rubric } from './rubric.entity';
 import { UserMission } from './user-mission.entity';
+import { forwardRef } from '@nestjs/common';
 
 @Entity({ name: 'mission' })
 export class Mission {

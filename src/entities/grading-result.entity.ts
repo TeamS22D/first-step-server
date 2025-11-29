@@ -26,7 +26,7 @@ export class GradingResult {
   @Column({ name: 'internal_note' })
   internalNote: string;
 
-  @OneToOne(() => UserMission, (userMission) => userMission.gradingResult, {
+  @OneToOne(() => UserMission, (userMission) => userMission.gradingResults, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
