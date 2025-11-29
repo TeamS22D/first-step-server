@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from './user/entities/user.entity';
 import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
@@ -15,12 +15,12 @@ import { Bizword } from './bizwords/entities/bizword.entity';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { MissionModule } from './mission/mission.module';
 import { UserMissionModule } from './user-mission/user-mission.module';
-import { Mission } from './entities/mission.entity';
-import { UserMission } from './entities/user-mission.entity';
-import { Rubric } from './entities/rubric.entity';
+import { Mission } from './mission/entities/mission.entity';
+import { UserMission } from './user-mission/entities/user-mission.entity';
+import { Rubric } from './rubric/entities/rubric.entity';
 import { RubricModule } from './rubric/rubric.module';
-import { GradingResult } from './entities/grading-result.entity';
-import { GradingCriteria } from './entities/grading-criteria';
+import { GradingResult } from './user-mission/entities/grading-result.entity';
+import { GradingCriteria } from './user-mission/entities/grading-criteria';
 
 @Module({
   imports: [

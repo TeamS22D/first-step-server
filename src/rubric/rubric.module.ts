@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Rubric } from '../entities/rubric.entity';
+import { Rubric } from './entities/rubric.entity';
 import { RubricController } from './rubric.controller';
 import { RubricService } from './rubric.service';
 

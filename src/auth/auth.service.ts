@@ -10,7 +10,7 @@ import { SocialUserDto } from './dto/social-user.dto';
 import { Provider } from './dto/social-user.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
-import { SignInDto } from '../dto/auth-dto';
+import { SignInDto } from './dto/auth-dto';
 
 @Injectable()
 export class AuthService {
@@ -46,8 +46,8 @@ export class AuthService {
     const payload = { id: user.userId };
 
     // 엑세스토큰, refresh토큰 발급
-    const accessToken = this.jwtService.sign({ payload, type: 'access' });
-    const refreshToken = this.jwtService.sign({ payload, type: 'refresh' }, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign({ type: 'access', ...payload });
+    const refreshToken = this.jwtService.sign({ type: 'refresh', ...payload }, { expiresIn: '7d' });
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.userService.updateRefreshToken(user.userId, hashedRefreshToken);

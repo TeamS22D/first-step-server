@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Mission } from './mission.entity';
+import { Mission } from '../../mission/entities/mission.entity';
 
 @Entity({ name: 'rubrics' })
 export class Rubric {

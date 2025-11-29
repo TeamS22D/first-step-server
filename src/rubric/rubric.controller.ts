@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { RubricService } from './rubric.service';
 import { AuthGuard } from '@nestjs/passport';
-import { RubricDto } from '../dto/rubric-dto';
+import { RubricDto } from './dto/rubric-dto';
 
 @Controller('rubric')
 export class RubricController {

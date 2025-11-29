@@ -9,8 +9,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Mission } from './mission.entity';
-import { UserEntity } from './user.entity';
+import { Mission } from '../../mission/entities/mission.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { GradingResult } from './grading-result.entity';
 
 @Entity({ name: 'users_missions' })

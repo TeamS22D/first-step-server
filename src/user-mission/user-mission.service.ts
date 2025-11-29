@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserMissionDTO } from 'src/dto/user-mission-dto';
-import { UserMission } from '../entities/user-mission.entity';
+import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
+import { UserMission } from './entities/user-mission.entity';
 import { MoreThan, Repository } from 'typeorm';
-import { GradingCriteria } from '../entities/grading-criteria';
-import { GradingResult } from '../entities/grading-result.entity';
+import { GradingCriteria } from './entities/grading-criteria';
+import { GradingResult } from './entities/grading-result.entity';
 
 @Injectable()
 export class UserMissionService {

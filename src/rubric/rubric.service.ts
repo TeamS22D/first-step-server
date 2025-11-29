@@ -1,12 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Rubric } from '../entities/rubric.entity';
+import { Rubric } from './entities/rubric.entity';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { RubricDto } from '../dto/rubric-dto';
+import { RubricDto } from './dto/rubric-dto';
 
 @Injectable()
 export class RubricService {

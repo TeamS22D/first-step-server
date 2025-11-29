@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, DataSource } from 'typeorm';
 import { Bizword } from './entities/bizword.entity';
-import { UserEntity } from '../entities/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { CreateBizwordDto } from './dto/create-bizword.dto';
 import { UpdateBizwordDto } from './dto/update-bizword.dto';
 
@@ -34,6 +34,7 @@ export class BizwordsService {
   }
 
   async findAll(searchTerm?: string): Promise<Bizword[]> {
+    const selectColumns: (keyof Bizword)[] = ['id', 'word', 'desc', 'example'];
     if (searchTerm) {
       const lowerCaseSearch = searchTerm.toLowerCase();
       return this.bizwordRepository.find({
@@ -42,9 +43,10 @@ export class BizwordsService {
           { example: Like(`%${lowerCaseSearch}%`) },
           { desc_searchable: Like(`%${lowerCaseSearch}%`) },
         ],
+        select: selectColumns,
       });
     }
-    return this.bizwordRepository.find();
+    return this.bizwordRepository.find({ select: selectColumns });
   }
 
   async findOne(id: number): Promise<Bizword> {
