@@ -45,18 +45,20 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch('/update-user-mission')
+  @Patch('/:id')
   async updateUserMission(
+    @Param('id') id: number,
     @Body() userMissionDTO: UserMissionDTO.updateUserMission,
   ) {
-    return this.userMissionService.updateUserMission(userMissionDTO);
+    return this.userMissionService.updateUserMission(
+      Number(id),
+      userMissionDTO,
+    );
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete('/delete-user-mission')
-  async deleteUserMission(
-    @Body() userMissionDTO: UserMissionDTO.deleteUserMission,
-  ) {
-    return this.userMissionService.deleteUserMission(userMissionDTO);
+  @Delete('/:id')
+  async deleteUserMission(@Param('id') id: number) {
+    return this.userMissionService.deleteUserMission(Number(id));
   }
 }
