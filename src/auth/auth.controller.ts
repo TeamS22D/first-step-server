@@ -1,29 +1,31 @@
-import { 
-  Controller, 
-  Get,
-  Post, 
+import {
+  Controller,
+  Post,
   Body,
+  Get,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 
+import { SignInDto } from '../dto/auth-dto';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthDTO } from './dto/auth-dto';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import { Provider } from './dto/social-user.dto';
 
-
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('/signin')
-  async signin(@Body() authDTO: AuthDTO.SignIn) {
-      return this.authService.signin(authDTO)
+  async signin(@Body() authDTO: SignInDto) {
+    return this.authService.signin(authDTO);
+  }
+
+  @Post('refresh')
+  async refresh(@Body() body: { userId: number; refreshToken: string }) {
+    return this.authService.refresh(body.userId, body.refreshToken);
   }
 
   @Get('google')
@@ -35,7 +37,7 @@ export class AuthController {
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
     const result = await this.authService.socialLogin(user, Provider.GOOGLE);
-    
+
     return { ...result, user };
   }
 
@@ -48,7 +50,7 @@ export class AuthController {
   async naverAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
     const result = await this.authService.socialLogin(user, Provider.NAVER);
-  
+
     return { ...result, user };
   }
 
@@ -61,10 +63,7 @@ export class AuthController {
   async kakaoAuthRedirect(@Req() req, @Res() res: Response) {
     const user = req.user;
     const result = await this.authService.socialLogin(user, Provider.KAKAO);
-    
-    return {...result, user};
+
+    return { ...result, user };
   }
-
-
 }
-
