@@ -1,4 +1,4 @@
-import { IsDate, IsInt, IsNumber } from 'class-validator';
+import { IsDate, IsInt, IsNumber, IsString } from 'class-validator';
 
 export namespace UserMissionDTO {
   export class createUserMission {
@@ -7,6 +7,11 @@ export namespace UserMissionDTO {
 
     @IsInt()
     missionId: number;
+  }
+
+  export class createAnswer {
+    @IsString()
+    answer: string;
   }
 
   export class readUserMission {

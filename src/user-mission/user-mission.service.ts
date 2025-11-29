@@ -4,12 +4,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserMissionDTO } from 'src/dto/user-mission-dto';
 import { UserMission } from '../entities/user-mission.entity';
 import { MoreThan, Repository } from 'typeorm';
+import { GradingCriteria } from '../entities/grading-criteria';
+import { GradingResult } from '../entities/grading-result.entity';
 
 @Injectable()
 export class UserMissionService {
   constructor(
     @InjectRepository(UserMission)
     private userMissionRepository: Repository<UserMission>,
+    @InjectRepository(GradingCriteria)
+    private criteriaRepository: Repository<GradingCriteria>,
+    @InjectRepository(GradingResult)
+    private resultRepository: Repository<GradingResult>,
   ) {}
 
   async createUserMission(dto: UserMissionDTO.createUserMission) {
@@ -104,5 +110,14 @@ export class UserMissionService {
     await this.userMissionRepository.delete(userMissionId);
 
     return { message: '유저 미션 삭제 완료' };
+  }
+
+  async createAnswer(userMissionId: number, dto: UserMissionDTO.createAnswer) {
+    const userMission = await this.userMissionRepository.findOne({
+      where: { userMissionId },
+    });
+    await this.userMissionRepository.update(userMissionId, dto);
+
+
   }
 }

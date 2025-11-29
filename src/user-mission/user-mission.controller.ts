@@ -61,4 +61,13 @@ export class UserMissionController {
   async deleteUserMission(@Param('id') id: number) {
     return this.userMissionService.deleteUserMission(Number(id));
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/answer/:id')
+  async createAnswer(
+    @Param('id') id: number,
+    @Body() userMissionDto: UserMissionDTO.createAnswer,
+  ) {
+    return this.userMissionService.createAnswer(id, userMissionDto);
+  }
 }
