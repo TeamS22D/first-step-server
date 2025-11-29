@@ -9,6 +9,7 @@ import {
 
 import * as bcrypt from 'bcrypt';
 import { Bizword } from 'src/bizwords/entities/bizword.entity';
+import { Role } from '../types/user-role.enum';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -35,6 +36,9 @@ export class UserEntity {
 
     @Column({ default: 0 })
     attendanceStreak: number;
+
+    @Column({ type: 'enum', enum: Role, default: Role.USER })
+    role: Role;
 
     @ManyToMany(() => Bizword)
     @JoinTable({ name: 'user_favorites' })
