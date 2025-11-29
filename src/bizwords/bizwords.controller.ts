@@ -15,11 +15,16 @@ import { AuthGuard } from '@nestjs/passport';
 import { BizwordsService } from './bizwords.service';
 import { CreateBizwordDto } from './dto/create-bizword.dto';
 import { UpdateBizwordDto } from './dto/update-bizword.dto';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../user/types/user-role.enum';
 
 @Controller('bizwords')
 export class BizwordsController {
   constructor(private readonly bizwordsService: BizwordsService) {}
 
+  @UseGuards(AuthGuard, RolesGuard) 
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() createBizwordDto: CreateBizwordDto) {
     return this.bizwordsService.create(createBizwordDto);
@@ -42,6 +47,8 @@ export class BizwordsController {
     return this.bizwordsService.findOne(id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -50,6 +57,8 @@ export class BizwordsController {
     return this.bizwordsService.update(id, updateBizwordDto);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.bizwordsService.remove(id);
