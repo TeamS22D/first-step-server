@@ -68,6 +68,6 @@ export class UserMissionController {
     @Param('id') id: number,
     @Body() userMissionDto: UserMissionDTO.createAnswer,
   ) {
-    return this.userMissionService.createAnswer(id, userMissionDto);
+    return this.userMissionService.createAnswer(Number(id), userMissionDto);
   }
 }
