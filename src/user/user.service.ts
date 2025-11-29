@@ -108,6 +108,7 @@ export class UserService {
       email,
       provider,
       name,
+      isVerified: true,
     });
 
     return await this.userRepository.save(userEntity);

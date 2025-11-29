@@ -10,6 +10,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     super({
       clientID: configService.get('KAKAO_CLIENT_ID')!,
       callbackURL: configService.get('KAKAO_CALLBACK_URL')!,
+      scope: ['profile_nickname', 'account_email'], // 이메일 요청
     });
   }
 
@@ -29,11 +30,13 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     }
 
     const { id, _json } = profile;
+    const email = _json.kakao_account?.email || null;
+
     const user: SocialUserDto = {
       socialId: id.toString(),
-      email: _json.kakao_account.email,
-      name: _json.properties.nickname,
-      profileImage: _json.properties.profile_image,
+      email: email, // null 가능
+      name: _json.properties?.nickname || 'Unknown',
+      profileImage: _json.properties?.profile_image || null,
       provider: Provider.KAKAO,
     };
     done(null, user);
