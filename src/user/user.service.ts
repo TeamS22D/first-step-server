@@ -9,7 +9,7 @@ import { Repository, MoreThan } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { Provider, SocialUserDto } from 'src/auth/dto/social-user.dto';
-import { CheckEmailDto, SignUpDto } from '../auth/dto/auth-dto';
+import { CheckEmailDto, SignUpDto, UpdateUserDto } from '../auth/dto/auth-dto';
 
 @Injectable()
 export class UserService {
@@ -143,7 +143,7 @@ export class UserService {
     return { message: '사용자가 정상적으로 삭제되었습니다.' };
   }
 
-  async updateUser(userId: number, authDTO: Partial<SignUpDto>) {
+  async updateUser(userId: number, authDTO: Partial<UpdateUserDto>) {
     const { email, name, password, checkPassword } = authDTO;
 
     const user = await this.findById(userId);

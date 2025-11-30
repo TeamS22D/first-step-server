@@ -1,8 +1,8 @@
 export enum Occupation {
-  IT = 'IT',
-  VIDEO = 'VIDEO',
-  MANAGE = 'MANAGE',
-  FINANCE = 'FINANCE',
-  FACTORY = 'FACTORY',
+  IT = 'it',
+  VIDEO = 'video',
+  MANAGE = 'manage',
+  FINANCE = 'finance',
+  FACTORY = 'factory',
 }
 

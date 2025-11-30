@@ -1,4 +1,4 @@
-import { 
+import {
   Controller,
   Body,
   ConflictException,
@@ -14,7 +14,7 @@ import {
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import type { Request } from 'express';
-import { CheckEmailDto, SignUpDto } from 'src/auth/dto/auth-dto';
+import { CheckEmailDto, SignUpDto, UpdateUserDto } from 'src/auth/dto/auth-dto';
 
 @Controller('user')
 export class UserController {
@@ -45,7 +45,7 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Patch('/update-user')
-  async updateUser(@Req() req: Request, @Body() dto: Partial<SignUpDto>) {
+  async updateUser(@Req() req: Request, @Body() dto: Partial<UpdateUserDto>) {
     const userId = req.user?.['userId'];
     return this.userService.updateUser(userId, dto); // 유저 업데이트
   }
@@ -62,5 +62,22 @@ export class UserController {
   async getAttendanceRank(@Req() req: Request) {
     const userId = (req.user as any).id;
     return await this.userService.getAttendanceRank(userId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/occupation')
+  async updateOccupation(
+    @Req() req: Request,
+    @Body() dto: Partial<UpdateUserDto>,
+  ) {
+    const userId = req.user?.['userId'];
+    return await this.userService.updateUser(userId, dto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/job')
+  async updateJob(@Req() req: Request, @Body() dto: Partial<UpdateUserDto>) {
+    const userId = req.user?.['userId'];
+    return await this.userService.updateUser(userId, dto);
   }
 }
