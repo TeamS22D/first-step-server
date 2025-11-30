@@ -1,6 +1,6 @@
 import {
   IsBoolean,
-  IsEmail, IsEnum,
+  IsEmail, IsEnum, IsOptional,
   IsString,
   Length,
 } from 'class-validator';
@@ -40,10 +40,12 @@ export class UpdateUserDto {
   checkPassword: string;
 
   @IsEnum(Job)
-  job?: Job | null;
+  @IsOptional()
+  job?: Job;
 
   @IsEnum(Occupation)
-  occupation?: Occupation | null;
+  @IsOptional()
+  occupation?: Occupation;
 }
 
 export class SignInDto {

@@ -144,7 +144,7 @@ export class UserService {
   }
 
   async updateUser(userId: number, authDTO: Partial<UpdateUserDto>) {
-    const { email, name, password, checkPassword } = authDTO;
+    const { email, name, password, checkPassword, job, occupation } = authDTO;
 
     const user = await this.findById(userId);
 
@@ -180,6 +180,13 @@ export class UserService {
       }
 
       updateData['email'] = emailTrim;
+    }
+
+    if (job !== undefined) {
+      updateData['job'] = job.trim();
+    }
+    if (occupation !== undefined) {
+      updateData['occupation'] = occupation.trim();
     }
 
     // 이름 업데이트 (선택)
