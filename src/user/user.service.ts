@@ -10,6 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { Provider, SocialUserDto } from 'src/auth/dto/social-user.dto';
 import { CheckEmailDto, SignUpDto, UpdateUserDto } from '../auth/dto/auth-dto';
+import { Job } from './types/job.enum';
+import { Occupation } from './types/occupation.enum';
 
 @Injectable()
 export class UserService {
@@ -182,11 +184,18 @@ export class UserService {
       updateData['email'] = emailTrim;
     }
 
-    if (job !== undefined) {
-      updateData['job'] = job.trim();
+    if (job) {
+      const trimmed = job.trim();
+      if (Object.values(Job).includes(trimmed as Job)) {
+        updateData['job'] = trimmed as Job;
+      }
     }
-    if (occupation !== undefined) {
-      updateData['occupation'] = occupation.trim();
+
+    if (occupation) {
+      const trimmed = occupation.trim();
+      if (Object.values(Occupation).includes(trimmed as Occupation)) {
+        updateData['occupation'] = trimmed as Occupation;
+      }
     }
 
     // 이름 업데이트 (선택)
