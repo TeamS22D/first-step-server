@@ -54,7 +54,7 @@ export class BizwordsService {
     const rawWords = await this.bizwordRepository
       .createQueryBuilder('bizword')
       .orderBy('RAND()')
-      .take(10) 
+      .take(10)
       .getMany();
 
     const uniqueWords: Bizword[] = [];
@@ -62,7 +62,7 @@ export class BizwordsService {
 
     for (const word of rawWords) {
       const description = word.desc[0];
-      
+
       if (!seenDescriptions.has(description)) {
         seenDescriptions.add(description);
         uniqueWords.push(word);
@@ -91,6 +91,53 @@ export class BizwordsService {
       },
       options: options,
     };
+  }
+
+  async addWrongWord(userId: number, wordId: number) {
+    const user = await this.userRepository.findOne({
+      where: { userId },
+      relations: ['wrongWords'],
+    });
+
+    if (!user) throw new NotFoundException('User not found.');
+
+    const isExist = user.wrongWords.some((w) => w.id === wordId);
+    if (!isExist) {
+      const word = await this.findOne(wordId);
+      user.wrongWords.push(word);
+      await this.userRepository.save(user);
+    }
+
+    return { message: 'Saved to wrong answer note.' };
+  }
+
+    async getWrongWords(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { userId },
+      relations: ['wrongWords'],
+    });
+
+    if (!user) throw new NotFoundException('User not found.');
+
+    return user.wrongWords.map((word) => ({
+      word: word.word,
+      desc: word.desc,
+      example: word.example,
+    }));
+  }
+
+  async removeWrongWord(userId: number, wordId: number) {
+    const user = await this.userRepository.findOne({
+      where: { userId },
+      relations: ['wrongWords'],
+    });
+
+    if (!user) throw new NotFoundException('User not found.');
+
+    user.wrongWords = user.wrongWords.filter((w) => w.id !== wordId);
+    await this.userRepository.save(user);
+
+    return { message: 'Removed from wrong answer note.' };
   }
 
   async findOne(id: number): Promise<Bizword> {
