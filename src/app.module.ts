@@ -21,6 +21,7 @@ import { Rubric } from './rubric/entities/rubric.entity';
 import { RubricModule } from './rubric/rubric.module';
 import { GradingResult } from './user-mission/entities/grading-result.entity';
 import { GradingCriteria } from './user-mission/entities/grading-criteria';
+import { EmailMissionModule } from './email-mission/email-mission.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { GradingCriteria } from './user-mission/entities/grading-criteria';
         ttl: configService.getOrThrow<number>('REDIS_TTL'),
       }),
     }),
+    EmailMissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
