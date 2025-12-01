@@ -56,7 +56,7 @@ export class UserEntity {
     default: Occupation.IT,
     nullable: true,
   })
-  Occupation?: Occupation | null;
+  occupation: Occupation;
 
   @Column({
     type: 'enum',
@@ -64,7 +64,7 @@ export class UserEntity {
     default: Job.DEVELOPER,
     nullable: true,
   })
-  Job?: Job | null;
+  job: Job;
 
   @OneToMany(() => UserMission, (userMission) => userMission.user)
   userMissions: UserMission[];
