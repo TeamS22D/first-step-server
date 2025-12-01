@@ -66,6 +66,7 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Post('/occupation')
+  @HttpCode(200)
   async updateOccupation(
     @Req() req: Request,
     @Body() dto: Partial<UpdateUserDto>,
@@ -76,8 +77,18 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Post('/job')
+  @HttpCode(200)
   async updateJob(@Req() req: Request, @Body() dto: Partial<UpdateUserDto>) {
     const userId = req.user?.['userId'];
     return await this.userService.updateUser(userId, dto);
   }
+
+  @UseGuards(AuthGuard)
+  @Post('/profile/percent')
+  @HttpCode(200)
+  getPercent(@Req req: Request) {
+    const userId = req.user?.['userId'];
+    return 1; // 임시 설정
+  }
+
 }
