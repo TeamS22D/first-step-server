@@ -23,7 +23,7 @@ export class AuthController {
     return this.authService.signin(authDTO);
   }
 
-  @Post('refresh')
+  @Get('refresh')
   async refresh(@Body() body: { userId: number; refreshToken: string }) {
     return this.authService.refresh(body.userId, body.refreshToken);
   }
