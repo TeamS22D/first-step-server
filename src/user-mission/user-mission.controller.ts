@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user-mission')
 export class UserMissionController {
@@ -44,7 +44,7 @@ export class UserMissionController {
     );
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Patch('/:id')
   async updateUserMission(
     @Param('id') id: number,
@@ -56,13 +56,13 @@ export class UserMissionController {
     );
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Delete('/:id')
   async deleteUserMission(@Param('id') id: number) {
     return this.userMissionService.deleteUserMission(Number(id));
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Post('/answer/:id')
   async createAnswer(
     @Param('id') id: number,
