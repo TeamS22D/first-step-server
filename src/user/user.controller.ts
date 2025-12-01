@@ -84,7 +84,7 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/profile/percent')
+  @Get('/profile/percent')
   @HttpCode(200)
   getPercent(@Req req: Request) {
     const userId = req.user?.['userId'];
