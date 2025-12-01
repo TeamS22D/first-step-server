@@ -2,15 +2,15 @@ import { Mission } from "src/mission/entities/mission.entity";
 import { UserMission } from "src/user-mission/entities/user-mission.entity";
 import { Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({ name: 'email_mission' })
+@Entity({ name: 'email_missions' })
 export class EmailMission {
     @PrimaryGeneratedColumn()
     emailMissionId: number;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     title: string;
 
-    @Column()
+    @Column({ nullable: true })
     SendAt: Date;
 
     @Column({ nullable: true })
