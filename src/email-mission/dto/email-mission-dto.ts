@@ -8,8 +8,8 @@ export namespace EmailMissionDTO {
         @IsString()
         title: string;
     
-        @IsString()
-        sender: string;
+        @IsNumber()
+        userMissionId: number;
     }
 
     export class updateDTO {
@@ -20,9 +20,9 @@ export namespace EmailMissionDTO {
         title: string;
 
         @IsString()
-        sender: string;
-
-        @IsString()
         emailContent: string;
+
+        @IsNumber()
+        userMissionId: number;
     }
 }

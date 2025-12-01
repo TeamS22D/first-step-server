@@ -1,5 +1,6 @@
 import { Mission } from "src/mission/entities/mission.entity";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { UserMission } from "src/user-mission/entities/user-mission.entity";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'email_mission' })
 export class EmailMission {
@@ -9,16 +10,17 @@ export class EmailMission {
     @Column({ nullable: false })
     title: string;
 
-    @Column({ nullable: false })
-    sender: string;
-
     @Column()
     SendAt: Date;
 
-    @Column()
+    @Column({ nullable: true })
     emailContent: string;
 
     @OneToOne(() => Mission, mission => mission.missionId)
-    @JoinColumn({ name: 'missionId' })
+    @JoinColumn({ name: 'mission_id' })
     mission: Mission;
+
+    @ManyToMany(() => UserMission, userMission => userMission.userMissionId)
+    @JoinColumn({ name: 'user_mission_id'})
+    userMission: UserMission;
 }
