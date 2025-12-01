@@ -8,6 +8,7 @@ import { EmailMissionDTO } from './dto/email-mission-dto';
 export class EmailMissionService {
     constructor(@InjectRepository(EmailMission) private emailMissionRepository: Repository<EmailMission>) {}
 
+    // 이거 유저가 email 보내는 거임
     async createEmailMission(Dto: EmailMissionDTO.createDTO) {
         return await this.emailMissionRepository.save(Dto);
     }
@@ -22,6 +23,7 @@ export class EmailMissionService {
         return emailMission;
     }
 
+    // 이건 유저가 저장 눌러서 저장하는 거임
     async updateEmailMission(emailMissionId: number, Dto: EmailMissionDTO.updateDTO) {
         const exists = await this.emailMissionRepository.existsBy({ emailMissionId })
 
@@ -30,7 +32,7 @@ export class EmailMissionService {
         }
 
         const update = await this.emailMissionRepository.update(emailMissionId, Dto);
-        return { message: "이메일 미션 업데이트", update: update };
+        return { message: "이메일 업데이트", update: update };
     }
 
     async deleteEmailMission(emailMissionId: number) {

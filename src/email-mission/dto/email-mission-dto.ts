@@ -7,6 +7,9 @@ export namespace EmailMissionDTO {
 
         @IsString()
         title: string;
+
+        @IsString()
+        emailContent: string;
     
         @IsNumber()
         userMissionId: number;
