@@ -12,16 +12,19 @@ export class EmailMissionController {
     }
 
     @Get('/:emailMissionId')
-    async findEmailMission(@Param() emailMissionId: number) {
+    async findEmailMission(
+        @Param() emailMissionId: number
+    ) {
         return await this.emailMissionService.findEmailMission(emailMissionId);
     }
 
     @Patch('/update/:emailMissionId')
     async updateEmailMission(
         @Param() emailMisisonId: number,
-        @Body() Dto: EmailMissionDTO.updateDTO) {
+        @Body() Dto: EmailMissionDTO.updateDTO
+    ) {
             return await this.emailMissionService.updateEmailMission(emailMisisonId, Dto);
-        }
+    }
 
     @Delete('/delete/:emailMissionId')
     async deleteEmailMission(@Param() emailMissionId: number) {

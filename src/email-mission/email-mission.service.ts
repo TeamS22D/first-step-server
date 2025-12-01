@@ -13,13 +13,13 @@ export class EmailMissionService {
     }
 
     async findEmailMission(emailMissionId: number) {
-        const emailMission = await this.emailMissionRepository.findOne({where: { emailMissionId }})
+        const emailMission = await this.emailMissionRepository.findOne({ where: { emailMissionId } });
 
         if (!emailMission) {
             throw new BadRequestException({ message: "이메일 미션을 찾을 수 없습니다." })
         }
 
-        return emailMission; 
+        return emailMission;
     }
 
     async updateEmailMission(emailMissionId: number, Dto: EmailMissionDTO.updateDTO) {
@@ -41,6 +41,6 @@ export class EmailMissionService {
         }
 
         const deleteEmailMission = this.emailMissionRepository.delete(emailMissionId);
-        return { message: "이메일 미션 삭제", delete: emailMissionId};
+        return { message: "이메일 미션 삭제", delete: deleteEmailMission};
     }
 }
