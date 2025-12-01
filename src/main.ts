@@ -7,12 +7,13 @@ async function bootstrap() {
   const origins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
   : [];
-
+  
+  //TODO: CORS 설정 수정 필요!!!!
   // enableCors 메소드를 사용하여 CORS 활성화 및 세부적인 설정 적용
   app.enableCors({
-    origin: origins,
+    origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
+    allowedHeaders: '*',
     // 브라우저에 응답으로 보낼 헤더
     exposedHeaders: 'Authorization',
     // 클라이언트와 서버 간에 인증 정보를 주고받을 수 있도록 함
