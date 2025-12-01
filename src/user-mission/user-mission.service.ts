@@ -47,6 +47,7 @@ export class UserMissionService {
         user: { userId },
         endDate: MoreThan(now),
       },
+      relations: ['mission'],
     });
 
     if (!missions || missions.length === 0) {

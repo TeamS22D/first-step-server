@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  Post, Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
@@ -23,9 +23,10 @@ export class UserMissionController {
     return this.userMissionService.createUserMission(userMissionDTO);
   }
 
-  @Get('/user/:userId')
-  async findAllUserMission(@Param('userId') userId: number) {
-    return this.userMissionService.findAllUserMission(Number(userId));
+  @Get('/mission/')
+  async findAllMission(@Req() req) {
+    const userId = req.user["userId"];
+    return this.userMissionService.findAllUserMission(userId);
   }
 
   @Get('/mission/:userMissionId')
