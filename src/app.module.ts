@@ -22,6 +22,7 @@ import { RubricModule } from './rubric/rubric.module';
 import { GradingResult } from './user-mission/entities/grading-result.entity';
 import { GradingCriteria } from './user-mission/entities/grading-criteria';
 import { EmailMissionModule } from './email-mission/email-mission.module';
+import { EmailMission } from './email-mission/entities/email-mission.entity';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { EmailMissionModule } from './email-mission/email-mission.module';
           GradingResult,
           GradingCriteria,
           Bizword,
+          EmailMission
         ],
         synchronize: true,
       }),

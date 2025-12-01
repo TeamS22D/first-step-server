@@ -53,5 +53,5 @@ export class UserMission {
   updatedAt: Date;
 
   @ManyToMany(() => EmailMission, emailMission => emailMission.emailMissionId)
-  EmailMisison: number;
+  EmailMission: number;
 }
