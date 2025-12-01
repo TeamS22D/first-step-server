@@ -22,7 +22,8 @@ export class UserMissionController {
   ) {
     return this.userMissionService.createUserMission(userMissionDTO);
   }
-
+  
+  @UseGuards(AuthGuard)
   @Get('/mission/')
   async findAllMission(@Req() req) {
     const userId = req.user["userId"];
