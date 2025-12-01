@@ -46,7 +46,7 @@ import { GradingCriteria } from './user-mission/entities/grading-criteria';
           GradingCriteria,
           Bizword,
         ],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
 

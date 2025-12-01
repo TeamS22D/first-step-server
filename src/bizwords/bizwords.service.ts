@@ -3,6 +3,7 @@ import {
   NotFoundException,
   Logger,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, DataSource } from 'typeorm';
@@ -47,6 +48,49 @@ export class BizwordsService {
       });
     }
     return this.bizwordRepository.find({ select: selectColumns });
+  }
+
+  async getQuiz() {
+    const rawWords = await this.bizwordRepository
+      .createQueryBuilder('bizword')
+      .orderBy('RAND()')
+      .take(10) 
+      .getMany();
+
+    const uniqueWords: Bizword[] = [];
+    const seenDescriptions = new Set<string>();
+
+    for (const word of rawWords) {
+      const description = word.desc[0];
+      
+      if (!seenDescriptions.has(description)) {
+        seenDescriptions.add(description);
+        uniqueWords.push(word);
+      }
+
+      if (uniqueWords.length === 4) break;
+    }
+
+    if (uniqueWords.length < 4) {
+      throw new BadRequestException('Not enough unique words for a quiz');
+    }
+
+    const answerWord = uniqueWords[0];
+
+    const options = uniqueWords.map((word) => ({
+      wordId: word.id,
+      description: word.desc[0],
+    }));
+
+    options.sort(() => Math.random() - 0.5);
+
+    return {
+      quiz: {
+        id: answerWord.id,
+        word: answerWord.word,
+      },
+      options: options,
+    };
   }
 
   async findOne(id: number): Promise<Bizword> {

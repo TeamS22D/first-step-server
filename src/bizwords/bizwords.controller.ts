@@ -42,6 +42,11 @@ export class BizwordsController {
     return this.bizwordsService.getMyFavorites(userId);
   }
 
+  @Get('quiz')
+  getQuiz() {
+    return this.bizwordsService.getQuiz();
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.bizwordsService.findOne(id);
