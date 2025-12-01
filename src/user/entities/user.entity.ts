@@ -54,4 +54,8 @@ export class UserEntity {
   @ManyToMany(() => Bizword)
   @JoinTable({ name: 'user_favorites' })
   favorites: Bizword[];
+
+  @ManyToMany(() => Bizword)
+  @JoinTable({ name: 'user_wrong_words' })
+  wrongWords: Bizword[];
 }
