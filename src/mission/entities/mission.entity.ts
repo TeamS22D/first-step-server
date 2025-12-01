@@ -12,6 +12,7 @@ import { Rubric } from '../../rubric/entities/rubric.entity';
 import { UserMission } from '../../user-mission/entities/user-mission.entity';
 import { forwardRef } from '@nestjs/common';
 import { Provider } from '../../auth/dto/social-user.dto';
+import { MissionTheme } from '../types/missoin-theme.enum';
 
 @Entity({ name: 'mission' })
 export class Mission {
@@ -31,8 +32,12 @@ export class Mission {
   @Column({ nullable: false })
   missionName: string;
 
-  @Column()
-  missionTheme: string;
+  @Column({
+    type: 'enum',
+    enum: MissionTheme,
+    default: 'document',
+  })
+  missionTheme: MissionTheme;
 
   @Column({ type: 'text', nullable: false })
   body: string;
