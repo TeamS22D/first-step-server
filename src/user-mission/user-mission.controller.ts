@@ -5,14 +5,15 @@ import {
   Get,
   Param,
   Patch,
-  Post, Req,
+  Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import type { Request } from 'express';
-
+import { MissionTheme } from '../mission/types/missoin-theme.enum';
 
 @Controller('user-mission')
 export class UserMissionController {
@@ -25,9 +26,24 @@ export class UserMissionController {
     return this.userMissionService.createUserMission(userMissionDTO);
   }
 
-  @Get('/user/:userId')
-  async findAllUserMission(@Param('userId') userId: number) {
-    return this.userMissionService.findAllUserMission(Number(userId));
+  @UseGuards(AuthGuard)
+  @Get('/mission/')
+  async findAllMission(@Req() req) {
+    const userId = req.user['userId'];
+    return this.userMissionService.findAllUserMission(userId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/mission/:MissionTheme')
+  async findAllDocumentMission(
+    @Req() req,
+    @Param('MissionTheme') missionTheme: MissionTheme,
+  ) {
+    const userId = req.user['userId'];
+    return this.userMissionService.findAllUserMissionByTheme(
+      userId,
+      missionTheme,
+    );
   }
 
   @Get('/mission/:userMissionId')
@@ -78,7 +94,10 @@ export class UserMissionController {
     @Body() userMissionDto: UserMissionDTO.createAnswer,
   ) {
     const userId = req.user?.['userId'];
-    return this.userMissionService.createAnswer(userId, userMissionId, userMissionDto);
-
+    return this.userMissionService.createAnswer(
+      userId,
+      userMissionId,
+      userMissionDto,
+    );
   }
 }

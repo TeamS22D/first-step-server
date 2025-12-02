@@ -10,16 +10,16 @@ import {
 } from '@nestjs/common';
 
 import { MissionService } from './mission.service';
-import { AuthGuard } from '@nestjs/passport';
-import { MissionDTO } from 'src/mission/dto/mission-dto';
+import { createMissionDto, updateMissionDto } from './dto/mission-dto';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('mission')
 export class MissionController {
   constructor(private readonly missionService: MissionService) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @Post('/create')
-  async createMission(@Body() dto: MissionDTO.createMission) {
+  async createMission(@Body() dto: createMissionDto) {
     return this.missionService.createMission(dto);
   }
 
@@ -43,16 +43,11 @@ export class MissionController {
     return this.missionService.findByMissionId(Number(id));
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Patch('/update/:id')
-  async updateMission(
-    @Param('id') id: number,
-    @Body() missionDTO: MissionDTO.updateMission,
-  ) {
-    return this.missionService.updateMission(Number(id), missionDTO);
+  async updateMission(@Param('id') id: number, @Body() dto: updateMissionDto) {
+    return this.missionService.updateMission(Number(id), dto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Delete('/delete/:id')
   async deleteMission(@Param('id') id: number) {
     return this.missionService.deleteMission(Number(id));

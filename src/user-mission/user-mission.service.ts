@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
@@ -6,6 +10,7 @@ import { UserMission } from './entities/user-mission.entity';
 import { MoreThan, Repository } from 'typeorm';
 import { GradingCriteria } from './entities/grading-criteria';
 import { GradingResult } from './entities/grading-result.entity';
+import { MissionTheme } from '../mission/types/missoin-theme.enum';
 
 @Injectable()
 export class UserMissionService {
@@ -38,6 +43,7 @@ export class UserMissionService {
   async findAllUserMission(userId: number) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
+    //TODO: count 제외
     const count = await this.userMissionRepository.count({
       where: { user: { userId } },
     });
@@ -47,6 +53,7 @@ export class UserMissionService {
         user: { userId },
         endDate: MoreThan(now),
       },
+      relations: ['mission'],
     });
 
     if (!missions || missions.length === 0) {
@@ -54,6 +61,25 @@ export class UserMissionService {
     }
 
     return { count, missions };
+  }
+
+  async findAllUserMissionByTheme(userId: number, theme: MissionTheme) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const missions = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+        mission: { missionTheme: theme },
+      },
+      relations: ['mission'],
+    });
+
+    if (!missions || missions.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    return missions;
   }
 
   async findUserMissionById(userMissionId: number) {
@@ -118,7 +144,7 @@ export class UserMissionService {
 
     return { message: '유저 미션 삭제 완료' };
   }
-
+  //TODO: 트랜젝션 설정
   async createAnswer(
     userId: number,
     userMissionId: number,
@@ -133,6 +159,11 @@ export class UserMissionService {
     }
     if (userMission.user.userId !== userId) {
       throw new ForbiddenException({ message: '접근할 수 없습니다.' });
+    }
+    if (userMission.gradingResult) {
+      throw new BadRequestException({
+        message: '이미 결과가 나온 미션입니다.',
+      });
     }
     await this.userMissionRepository.update(userMissionId, dto);
     // 평가 시스템 예시
@@ -149,9 +180,15 @@ export class UserMissionService {
     for (let i = 0; i < 5; i++) {
       const gradingCriteria = this.criteriaRepository.create({
         index: i + 1,
+        item: `${i + 1}d`,
         score: 100,
         maxScore: 100,
         gradingResult,
+        feedback: {
+          goodPoints: '1',
+          improvementPoints: '2',
+          suggestedFix: '3',
+        },
       });
       await this.criteriaRepository.save(gradingCriteria);
     }
@@ -159,6 +196,5 @@ export class UserMissionService {
       where: { id: gradingResult.id },
       relations: ['gradingCriterias'],
     });
-
   }
 }
