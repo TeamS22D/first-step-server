@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
@@ -44,4 +45,7 @@ export class GradingResult {
 
   @Column()
   missionId: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
