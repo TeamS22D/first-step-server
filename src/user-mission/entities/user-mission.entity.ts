@@ -12,6 +12,7 @@ import { Mission } from '../../mission/entities/mission.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { GradingResult } from './grading-result.entity';
 
+//TODO: userMission status 추가
 @Entity({ name: 'users_missions' })
 export class UserMission {
   @PrimaryGeneratedColumn()

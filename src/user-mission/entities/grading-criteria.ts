@@ -25,7 +25,7 @@ export class GradingCriteria {
   @Column({ name: 'max_score' })
   maxScore: number;
 
-  @Column((type) => Feedback)
+  @Column(() => Feedback)
   feedback: Feedback;
 
   @ManyToOne(

@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
@@ -135,6 +139,11 @@ export class UserMissionService {
     if (userMission.user.userId !== userId) {
       throw new ForbiddenException({ message: '접근할 수 없습니다.' });
     }
+    if (!userMission.gradingResult) {
+      throw new BadRequestException({
+        message: '이미 결과가 나온 미션입니다.',
+      });
+    }
     await this.userMissionRepository.update(userMissionId, dto);
     // 평가 시스템 예시
     const gradingResult = this.resultRepository.create({
@@ -153,6 +162,11 @@ export class UserMissionService {
         score: 100,
         maxScore: 100,
         gradingResult,
+        feedback: {
+          goodPoints: '1',
+          improvementPoints: '2',
+          suggestedFix: '3',
+        },
       });
       await this.criteriaRepository.save(gradingCriteria);
     }
@@ -160,6 +174,5 @@ export class UserMissionService {
       where: { id: gradingResult.id },
       relations: ['gradingCriterias'],
     });
-
   }
 }
