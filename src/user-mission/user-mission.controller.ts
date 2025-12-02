@@ -13,6 +13,7 @@ import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import type { Request } from 'express';
 
+
 @Controller('user-mission')
 export class UserMissionController {
   constructor(private readonly userMissionService: UserMissionService) {}
@@ -32,6 +33,12 @@ export class UserMissionController {
   @Get('/mission/:userMissionId')
   async findUserMissionById(@Param('userMissionId') userMissionId: number) {
     return this.userMissionService.findUserMissionById(userMissionId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/:userMissionId/result')
+  async getMissionResult(@Param('userMissionId') userMissionId: number) {
+    return this.userMissionService.findAnswerByUserMissionId(userMissionId);
   }
 
   @Get('/:userId/:missionId')

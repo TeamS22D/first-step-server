@@ -11,7 +11,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from '../auth/guard/auth.guard';
 import { BizwordsService } from './bizwords.service';
 import { CreateBizwordDto } from './dto/create-bizword.dto';
 import { UpdateBizwordDto } from './dto/update-bizword.dto';
@@ -23,7 +23,7 @@ import { Role } from '../user/types/user-role.enum';
 export class BizwordsController {
   constructor(private readonly bizwordsService: BizwordsService) {}
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Post()
   create(@Body() createBizwordDto: CreateBizwordDto) {
@@ -35,11 +35,37 @@ export class BizwordsController {
     return this.bizwordsService.findAll(searchTerm);
   }
 
+  @Get('quiz')
+  getQuiz() {
+    return this.bizwordsService.getQuiz();
+  }
+
   @Get('my/favorites')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard)
   getMyFavorites(@Req() req) {
     const userId = req.user.userId;
     return this.bizwordsService.getMyFavorites(userId);
+  }
+
+  @Post('my/wrong-words')
+  @UseGuards(AuthGuard)
+  addWrongWord(@Body('wordId') wordId: number, @Req() req) {
+    const userId = req.user.userId;
+    return this.bizwordsService.addWrongWord(userId, wordId);
+  }
+
+  @Get('my/wrong-words')
+  @UseGuards(AuthGuard)
+  getWrongWords(@Req() req) {
+    const userId = req.user.userId;
+    return this.bizwordsService.getWrongWords(userId);
+  }
+
+  @Delete('my/wrong-words/:id')
+  @UseGuards(AuthGuard)
+  removeWrongWord(@Param('id', ParseIntPipe) wordId: number, @Req() req) {
+    const userId = req.user.userId;
+    return this.bizwordsService.removeWrongWord(userId, wordId);
   }
 
   @Get(':id')
@@ -47,7 +73,7 @@ export class BizwordsController {
     return this.bizwordsService.findOne(id);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Patch(':id')
   update(
@@ -57,7 +83,7 @@ export class BizwordsController {
     return this.bizwordsService.update(id, updateBizwordDto);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
@@ -65,14 +91,14 @@ export class BizwordsController {
   }
 
   @Post(':id/favorite')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard)
   addFavorite(@Param('id', ParseIntPipe) wordId: number, @Req() req) {
     const userId = req.user.userId;
     return this.bizwordsService.addFavorite(userId, wordId);
   }
 
   @Delete(':id/favorite')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard)
   removeFavorite(@Param('id', ParseIntPipe) wordId: number, @Req() req) {
     const userId = req.user.userId;
     return this.bizwordsService.removeFavorite(userId, wordId);

@@ -68,6 +68,13 @@ export class UserMissionService {
     return userMission;
   }
 
+  async findAnswerByUserMissionId(userMissionId: number) {
+    return await this.resultRepository.findOne({
+      where: { userMission: { userMissionId } },
+      relations: ['gradingCriterias'],
+    });
+  }
+
   async findUserMissionByMissionId(userId: number, missionId: number) {
     const userMission = await this.userMissionRepository.findOne({
       where: {
@@ -152,5 +159,6 @@ export class UserMissionService {
       where: { id: gradingResult.id },
       relations: ['gradingCriterias'],
     });
+
   }
 }
