@@ -76,7 +76,10 @@ export class AuthService {
     }
 
     const payload = { id: user.userId };
-    const accessToken = this.jwtService.sign({ type: 'access', ...payload });
+    const accessToken = this.jwtService.sign(
+      { type: 'access', ...payload },
+      { expiresIn: '15m' },
+    );
     return { accessToken };
   }
 
@@ -100,9 +103,12 @@ export class AuthService {
     const payload = { id: user.userId };
 
     // 엑세스토큰, refresh토큰 발급
-    const accessToken = this.jwtService.sign({ ...payload, type: 'access' });
+    const accessToken = this.jwtService.sign(
+      { type: 'access', ...payload },
+      { expiresIn: '15m' },
+    );
     const refreshToken = this.jwtService.sign(
-      { ...payload, type: 'refresh' },
+      { type: 'refresh', ...payload },
       { expiresIn: '7d' },
     );
 
