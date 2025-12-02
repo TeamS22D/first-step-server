@@ -5,12 +5,14 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  Post, Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
-import { AuthGuard } from '../auth/guard/auth.guard';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import type { Request } from 'express';
+
 
 @Controller('user-mission')
 export class UserMissionController {
@@ -71,9 +73,12 @@ export class UserMissionController {
   @UseGuards(AuthGuard)
   @Post('/answer/:id')
   async createAnswer(
-    @Param('id') id: number,
+    @Req() req: Request,
+    @Param('id') userMissionId: number,
     @Body() userMissionDto: UserMissionDTO.createAnswer,
   ) {
-    return this.userMissionService.createAnswer(id, userMissionDto);
+    const userId = req.user?.['userId'];
+    return this.userMissionService.createAnswer(userId, userMissionId, userMissionDto);
+
   }
 }

@@ -4,7 +4,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -35,8 +34,12 @@ export class UserMission {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @OneToMany(() => GradingResult, (gradingResult) => gradingResult.userMission)
-  gradingResults: GradingResult[];
+  @OneToOne(() => GradingResult, (gradingResult) => gradingResult.userMission, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'grading_result_id' })
+  gradingResult: GradingResult;
 
   @Column()
   startDate: Date;
