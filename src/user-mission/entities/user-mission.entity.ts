@@ -41,7 +41,7 @@ export class UserMission {
   })
   @JoinColumn({ name: 'grading_result_id' })
   gradingResult: GradingResult;
-
+// db삭제하고 다시 만들어봅시다잉
   @Column()
   startDate: Date;
 

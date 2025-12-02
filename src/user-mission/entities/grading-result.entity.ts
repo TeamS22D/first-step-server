@@ -26,7 +26,7 @@ export class GradingResult {
   @Column({ name: 'internal_note' })
   internalNote: string;
 
-  @OneToOne(() => UserMission, (userMission) => userMission.gradingResults, {
+  @OneToOne(() => UserMission, (userMission) => userMission.gradingResult, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
@@ -37,7 +37,7 @@ export class GradingResult {
     () => GradingCriteria,
     (gradingCriteria) => gradingCriteria.gradingResult,
   )
-  gradingCriterias: GradingCriteria[] | null;
+  gradingCriterias: GradingCriteria[];
 
   @Column()
   userId: number;
