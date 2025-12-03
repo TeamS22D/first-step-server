@@ -54,4 +54,7 @@ export class UserMission {
 
   @ManyToMany(() => EmailMission, emailMission => emailMission.emailMissionId)
   EmailMission: number;
+
+  @OneToOne(() => EmailMission, emailMission => emailMission.userMission)
+  emailMission: EmailMission;
 }

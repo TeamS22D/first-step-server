@@ -20,6 +20,7 @@ export class EmailMission {
     @JoinColumn({ name: 'mission_id' })
     mission: Mission;
 
-    @ManyToMany(() => UserMission, userMission => userMission.userMissionId)
+    @OneToOne(() => UserMission, userMission => userMission.userMissionId)
+    @JoinColumn({ name: 'user_mission_id' })
     userMission: UserMission;
 }

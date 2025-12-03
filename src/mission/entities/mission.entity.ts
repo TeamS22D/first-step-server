@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -12,6 +13,7 @@ import { Rubric } from '../../rubric/entities/rubric.entity';
 import { UserMission } from '../../user-mission/entities/user-mission.entity';
 import { forwardRef } from '@nestjs/common';
 import { Provider } from '../../auth/dto/social-user.dto';
+import { EmailMission } from 'src/email-mission/entities/email-mission.entity';
 
 @Entity({ name: 'mission' })
 export class Mission {
@@ -48,4 +50,7 @@ export class Mission {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => EmailMission, emailMission => emailMission.mission)
+  emailMission: EmailMission;
 }

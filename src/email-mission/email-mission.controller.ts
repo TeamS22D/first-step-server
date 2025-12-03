@@ -39,7 +39,7 @@ export class EmailMissionController {
     }
 
     @UseGuards(AuthGuard)
-    @Patch('send/:emailMissionId')
+    @Post('send/:emailMissionId')
     async sendEmail(
         @Param() emailMissionId: number,
         @Body() Dto: EmailMissionDTO.sendDTO
