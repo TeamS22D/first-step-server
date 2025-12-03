@@ -12,7 +12,7 @@ export class EmailMissionController {
     @UseGuards(AuthGuard)
     @Post('/create')
     async createEmailMission(@Body() Dto: EmailMissionDTO.createDTO) {
-        return await this.emailMissionService.createEmailMission(Dto);
+        return this.emailMissionService.createEmailMission(Dto);
     }
 
     @UseGuards(AuthGuard)
@@ -42,8 +42,7 @@ export class EmailMissionController {
     @Post('send/:emailMissionId')
     async sendEmail(
         @Param() emailMissionId: number,
-        @Body() Dto: EmailMissionDTO.sendDTO
-    ) {
+        @Body() Dto: EmailMissionDTO.sendDTO) {
         return await this.emailMissionService.sendEmail(emailMissionId, Dto);
     }
 

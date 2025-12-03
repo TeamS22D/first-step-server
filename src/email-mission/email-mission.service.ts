@@ -10,7 +10,7 @@ export class EmailMissionService {
 
     // 이거 유저가 처음 미션 들어오자 마자 실행
     async createEmailMission(Dto: EmailMissionDTO.createDTO) {
-        this.emailMissionRepository.create(Dto);
+        return this.emailMissionRepository.create(Dto);
     }
 
     async findEmailMission(emailMissionId: number) {

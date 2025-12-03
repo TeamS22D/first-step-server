@@ -2,6 +2,9 @@ import { IsNumber, IsString } from "class-validator";
 
 export namespace EmailMissionDTO {
     export class createDTO {
+        @IsNumber()
+        emailMissionId: number;
+
         @IsString()
         title: string;
 
