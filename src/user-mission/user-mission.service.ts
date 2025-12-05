@@ -11,6 +11,11 @@ import { MoreThan, Repository } from 'typeorm';
 import { GradingCriteria } from './entities/grading-criteria';
 import { GradingResult } from './entities/grading-result.entity';
 import { MissionTheme } from '../mission/types/missoin-theme.enum';
+import { GraphRange } from './enums/graph-range.enum';
+import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
+
+dayjs.extend(isoWeek);
 
 @Injectable()
 export class UserMissionService {
@@ -38,6 +43,29 @@ export class UserMissionService {
     });
 
     return await this.userMissionRepository.save(entity);
+  }
+
+  async getGraph(userId: number, range: GraphRange) {
+    const now = new Date();
+    switch (range) {
+      case GraphRange.WEEK: {
+        const week = new Date();
+        week.setDate(week.getDate() - 7);
+        const graphResult = this.resultRepository
+          .createQueryBuilder('r')
+          .innerJoin('r.mission', 'm')
+          .select('m.missionTheme', 'missionTheme')
+          .addSelect('AVG(r.total_score)', 'averageScore')
+          .where('r.userId = :userId', { userId })
+          .andWhere('r.createdAt BETWEEN :start and :end', {
+            start: week,
+            end: now,
+          });
+        break;
+      }
+      default:
+        console.log('hello word');
+    }
   }
 
   async findAllUserMission(userId: number) {

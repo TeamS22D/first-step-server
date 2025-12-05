@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  Post, Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +14,7 @@ import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import type { Request } from 'express';
 import { MissionTheme } from '../mission/types/missoin-theme.enum';
+import { ProfileGraphDto } from './dto/profile-graph-dto';
 
 @Controller('user-mission')
 export class UserMissionController {
@@ -24,6 +25,13 @@ export class UserMissionController {
     @Body() userMissionDTO: UserMissionDTO.createUserMission,
   ) {
     return this.userMissionService.createUserMission(userMissionDTO);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get("/grpah")
+  async getGrpah(@Req() req, @Query() query: ProfileGraphDto) {
+    const userId = req.user['userId'];
+    return this.userMissionService.getGraph(userId, query.range);
   }
 
   @UseGuards(AuthGuard)
