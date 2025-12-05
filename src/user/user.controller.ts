@@ -53,7 +53,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Post('/attendance')
   async attendance(@Req() req: Request) {
-    const userId = (req.user as any).id;
+    const userId = (req.user as any).userId;
     return await this.userService.checkAttendance(userId);
   }
 
