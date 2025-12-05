@@ -69,7 +69,7 @@ export class AuthService {
         message: '유저가 존재하지 않거나 토큰이 없습니다.',
       });
     }
-
+    console.log(user.refreshToken);
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!isMatch) {
       throw new UnauthorizedException({ message: '토큰이 일치하지 않습니다.' });
@@ -111,6 +111,9 @@ export class AuthService {
       { type: 'refresh', ...payload },
       { expiresIn: '7d' },
     );
+
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userService.updateRefreshToken(user.userId, hashedRefreshToken);
 
     return { email, accessToken, refreshToken };
   }
