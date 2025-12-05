@@ -9,7 +9,7 @@ import { GradingResult } from './grading-result.entity';
 import { Feedback } from './feedback.entity';
 
 @Entity({ name: 'grading_criteria' })
-export class GradingCriteria {
+export class GradingCriteriaEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

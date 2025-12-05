@@ -4,11 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserMissionController } from './user-mission.controller';
 import { UserMission } from './entities/user-mission.entity';
 import { GradingResult } from './entities/grading-result.entity';
-import { GradingCriteria } from './entities/grading-criteria';
+import { GradingCriteriaEntity } from './entities/grading-criteria.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserMission, GradingCriteria, GradingResult]),
+    TypeOrmModule.forFeature([UserMission, GradingCriteriaEntity, GradingResult]),
   ],
   providers: [UserMissionService],
   controllers: [UserMissionController],

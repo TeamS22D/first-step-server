@@ -28,7 +28,7 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard)
-  @Get("/grpah")
+  @Get("/graph")
   async getGrpah(@Req() req, @Query() query: ProfileGraphDto) {
     const userId = req.user['userId'];
     return this.userMissionService.getGraph(userId, query.range);

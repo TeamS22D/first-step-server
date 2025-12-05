@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
 import { UserMission } from './entities/user-mission.entity';
 import { MoreThan, Repository } from 'typeorm';
-import { GradingCriteria } from './entities/grading-criteria';
+import { GradingCriteriaEntity } from './entities/grading-criteria.entity';
 import { GradingResult } from './entities/grading-result.entity';
 import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { GraphRange } from './enums/graph-range.enum';
@@ -22,8 +22,8 @@ export class UserMissionService {
   constructor(
     @InjectRepository(UserMission)
     private userMissionRepository: Repository<UserMission>,
-    @InjectRepository(GradingCriteria)
-    private criteriaRepository: Repository<GradingCriteria>,
+    @InjectRepository(GradingCriteriaEntity)
+    private criteriaRepository: Repository<GradingCriteriaEntity>,
     @InjectRepository(GradingResult)
     private resultRepository: Repository<GradingResult>,
   ) {}
@@ -47,26 +47,129 @@ export class UserMissionService {
 
   async getGraph(userId: number, range: GraphRange) {
     const now = new Date();
-    switch (range) {
-      case GraphRange.WEEK: {
-        const week = new Date();
-        week.setDate(week.getDate() - 7);
-        const graphResult = this.resultRepository
-          .createQueryBuilder('r')
-          .innerJoin('r.mission', 'm')
-          .select('m.missionTheme', 'missionTheme')
-          .addSelect('AVG(r.total_score)', 'averageScore')
-          .where('r.userId = :userId', { userId })
-          .andWhere('r.createdAt BETWEEN :start and :end', {
-            start: week,
-            end: now,
-          });
-        break;
+
+    const getDateRange = (range: GraphRange) => {
+      switch (range) {
+        case GraphRange.WEEK:
+          return [
+            new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+            new Date(now.getTime() + 24 * 60 * 60 * 1000),
+          ];
+
+        case GraphRange.MONTH:
+          return [
+            new Date(now.getFullYear(), now.getMonth(), 1),
+            new Date(now.getFullYear(), now.getMonth() + 1, 1),
+          ];
+
+        case GraphRange.YEAR:
+          return [
+            new Date(now.getFullYear(), 0, 1),
+            new Date(now.getFullYear() + 1, 0, 1),
+          ];
+
+        default:
+          return [null, null];
       }
-      default:
-        console.log('hello word');
+    };
+
+    const [start, end] = getDateRange(range);
+
+    /** -----------------------------------------------------
+     * ① 날짜를 YYYY-MM-DD로 강제 포맷 (중요!)
+     * ----------------------------------------------------- */
+    const raw = await this.resultRepository
+      .createQueryBuilder('r')
+      .innerJoin('r.mission', 'm')
+      .select('m.missionTheme', 'theme')
+      .addSelect(`DATE_FORMAT(r.createdAt, '%Y-%m-%d')`, 'date')
+      .addSelect('AVG(r.total_score)', 'avgScore')
+      .where('r.userId = :userId', { userId })
+      .andWhere('r.createdAt >= :start', { start })
+      .andWhere('r.createdAt < :end', { end })
+      .groupBy('theme, DATE_FORMAT(r.createdAt, "%Y-%m-%d")')
+      .orderBy('date')
+      .getRawMany();
+
+    /** -----------------------------------------------------
+     * ② historyMap 생성
+     * ----------------------------------------------------- */
+    const historyMap: any = {};
+
+    raw.forEach(({ date, avgScore, theme }) => {
+      if (!historyMap[date]) {
+        historyMap[date] = {
+          index: date, // 날짜가 항상 YYYY-MM-DD
+          document: 0,
+          chat: 0,
+          mail: 0,
+        };
+      }
+      historyMap[date][theme.toLowerCase()] = Number(avgScore) ?? 0;
+    });
+
+    /** -----------------------------------------------------
+     * YEAR → 12개월 강제 생성
+     * ----------------------------------------------------- */
+    if (range === GraphRange.YEAR) {
+      const year = now.getFullYear();
+      const filled: any[] = [];
+
+      // 날짜 "YYYY-MM"로 축소
+      const normalized = Object.values(historyMap).map((h: any) => {
+        const [y, m] = h.index.split('-');
+        const ym = `${y}-${m}`;
+
+        return {
+          index: ym,
+          document: h.document,
+          chat: h.chat,
+          mail: h.mail,
+        };
+      });
+
+      for (let month = 0; month < 12; month++) {
+        const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+        const matches = normalized.filter((h) => h.index === key);
+
+        if (matches.length > 0) {
+          const combined = {
+            index: key,
+            document:
+              matches.reduce((a, b) => a + (b.document ?? 0), 0) /
+              matches.length,
+            chat:
+              matches.reduce((a, b) => a + (b.chat ?? 0), 0) /
+              matches.length,
+            mail:
+              matches.reduce((a, b) => a + (b.mail ?? 0), 0) /
+              matches.length,
+          };
+          filled.push(combined);
+        } else {
+          filled.push({
+            index: key,
+            document: 0,
+            chat: 0,
+            mail: 0,
+          });
+        }
+      }
+
+      return {
+        range: 'year',
+        history: filled,
+      };
     }
+
+    return {
+      range: range.toLowerCase(),
+      history: Object.values(historyMap),
+    };
   }
+
+
 
   async findAllUserMission(userId: number) {
     const now = new Date();
@@ -200,7 +303,7 @@ export class UserMissionService {
       grade: 'A',
       summeryFeedback: '너무 멋져요',
       internalNote: 'a',
-      missionId: userMission.mission.missionId,
+      mission: { missionId: userMission.mission.missionId },
       userId: userMission.user.userId,
       userMission,
     });
