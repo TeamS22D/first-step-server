@@ -50,7 +50,4 @@ export class Mission {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @OneToOne(() => EmailMission, emailMission => emailMission.mission)
-  emailMission: EmailMission;
 }

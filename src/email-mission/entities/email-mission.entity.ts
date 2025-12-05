@@ -16,10 +16,6 @@ export class EmailMission {
     @Column({ nullable: true })
     emailContent: string;
 
-    @OneToOne(() => Mission, mission => mission.missionId)
-    @JoinColumn({ name: 'mission_id' })
-    mission: Mission;
-
     @OneToOne(() => UserMission, userMission => userMission.userMissionId)
     @JoinColumn({ name: 'user_mission_id' })
     userMission: UserMission;

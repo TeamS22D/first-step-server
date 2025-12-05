@@ -10,9 +10,6 @@ export namespace EmailMissionDTO {
 
         @IsString()
         emailContent: string;
-
-        @IsString()
-        missionId: number;
     }
 
     export class updateDTO {
@@ -24,10 +21,7 @@ export namespace EmailMissionDTO {
 
         @IsString()
         emailContent: string;
-
-        @IsNumber()
-        missionId: number;
-
+        
         @IsNumber()
         userMissionId: number;
     }
