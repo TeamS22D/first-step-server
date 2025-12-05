@@ -57,7 +57,7 @@ export class AuthService {
 
     await this.userService.updateRefreshToken(user.userId, refreshToken);
 
-    return { email, accessToken, refreshToken };
+    return { email, accessToken, refreshToken, userId: user.userId };
   }
 
   // 엑세스 토큰 재발급
@@ -112,6 +112,6 @@ export class AuthService {
 
     await this.userService.updateRefreshToken(user.userId, refreshToken);
 
-    return { email, accessToken, refreshToken };
+    return { email, accessToken, refreshToken, userId: user.userId };
   }
 }
