@@ -5,12 +5,16 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  Post, Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import type { Request } from 'express';
+import { MissionTheme } from '../mission/types/missoin-theme.enum';
+import { ProfileGraphDto } from './dto/profile-graph-dto';
 
 @Controller('user-mission')
 export class UserMissionController {
@@ -23,14 +27,42 @@ export class UserMissionController {
     return this.userMissionService.createUserMission(userMissionDTO);
   }
 
-  @Get('/user/:userId')
-  async findAllUserMission(@Param('userId') userId: number) {
-    return this.userMissionService.findAllUserMission(Number(userId));
+  @UseGuards(AuthGuard)
+  @Get("/graph")
+  async getGrpah(@Req() req, @Query() query: ProfileGraphDto) {
+    const userId = req.user['userId'];
+    return this.userMissionService.getGraph(userId, query.range);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/mission/')
+  async findAllMission(@Req() req) {
+    const userId = req.user['userId'];
+    return this.userMissionService.findAllUserMission(userId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/mission/:MissionTheme')
+  async findAllDocumentMission(
+    @Req() req,
+    @Param('MissionTheme') missionTheme: MissionTheme,
+  ) {
+    const userId = req.user['userId'];
+    return this.userMissionService.findAllUserMissionByTheme(
+      userId,
+      missionTheme,
+    );
   }
 
   @Get('/mission/:userMissionId')
   async findUserMissionById(@Param('userMissionId') userMissionId: number) {
     return this.userMissionService.findUserMissionById(userMissionId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/:userMissionId/result')
+  async getMissionResult(@Param('userMissionId') userMissionId: number) {
+    return this.userMissionService.findAnswerByUserMissionId(userMissionId);
   }
 
   @Get('/:userId/:missionId')
@@ -44,7 +76,7 @@ export class UserMissionController {
     );
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard)
   @Patch('/:id')
   async updateUserMission(
     @Param('id') id: number,
@@ -56,18 +88,24 @@ export class UserMissionController {
     );
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard)
   @Delete('/:id')
   async deleteUserMission(@Param('id') id: number) {
     return this.userMissionService.deleteUserMission(Number(id));
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard)
   @Post('/answer/:id')
   async createAnswer(
-    @Param('id') id: number,
+    @Req() req: Request,
+    @Param('id') userMissionId: number,
     @Body() userMissionDto: UserMissionDTO.createAnswer,
   ) {
-    return this.userMissionService.createAnswer(id, userMissionDto);
+    const userId = req.user?.['userId'];
+    return this.userMissionService.createAnswer(
+      userId,
+      userMissionId,
+      userMissionDto,
+    );
   }
 }

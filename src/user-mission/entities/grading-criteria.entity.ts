@@ -6,9 +6,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { GradingResult } from './grading-result.entity';
+import { Feedback } from './feedback.entity';
 
 @Entity({ name: 'grading_criteria' })
-export class GradingCriteria {
+export class GradingCriteriaEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,12 +17,21 @@ export class GradingCriteria {
   index: number;
 
   @Column()
+  item: string; // 세부평가항목의 이름
+
+  @Column()
   score: number;
 
   @Column({ name: 'max_score' })
   maxScore: number;
 
-  @ManyToOne(() => GradingResult, (gradingResult) => gradingResult.gradingCriterias)
+  @Column(() => Feedback)
+  feedback: Feedback;
+
+  @ManyToOne(
+    () => GradingResult,
+    (gradingResult) => gradingResult.gradingCriterias,
+  )
   @JoinColumn({ name: 'grading_result_id' })
   gradingResult: GradingResult;
 }

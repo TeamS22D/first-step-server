@@ -9,7 +9,9 @@ import { Repository, MoreThan } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { Provider, SocialUserDto } from 'src/auth/dto/social-user.dto';
-import { CheckEmailDto, SignUpDto } from '../auth/dto/auth-dto';
+import { CheckEmailDto, SignUpDto, UpdateUserDto } from '../auth/dto/auth-dto';
+import { Job } from './types/job.enum';
+import { Occupation } from './types/occupation.enum';
 
 @Injectable()
 export class UserService {
@@ -143,8 +145,8 @@ export class UserService {
     return { message: '사용자가 정상적으로 삭제되었습니다.' };
   }
 
-  async updateUser(userId: number, authDTO: Partial<SignUpDto>) {
-    const { email, name, password, checkPassword } = authDTO;
+  async updateUser(userId: number, authDTO: Partial<UpdateUserDto>) {
+    const { email, name, password, checkPassword, job, occupation } = authDTO;
 
     const user = await this.findById(userId);
 
@@ -180,6 +182,20 @@ export class UserService {
       }
 
       updateData['email'] = emailTrim;
+    }
+
+    if (job) {
+      const trimmed = job.trim();
+      if (Object.values(Job).includes(trimmed as Job)) {
+        updateData['job'] = trimmed as Job;
+      }
+    }
+
+    if (occupation) {
+      const trimmed = occupation.trim();
+      if (Object.values(Occupation).includes(trimmed as Occupation)) {
+        updateData['occupation'] = trimmed as Occupation;
+      }
     }
 
     // 이름 업데이트 (선택)

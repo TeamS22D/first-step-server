@@ -1,64 +1,57 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { MissionTheme } from '../types/missoin-theme.enum';
 
-export namespace MissionDTO {
-  export class createMission {
-    @IsString()
-    missionName: string;
+export class createMissionDto {
+  @IsString()
+  missionName: string;
 
-    @IsString()
-    missionTheme: string;
+  @IsEnum(MissionTheme)
+  missionTheme: MissionTheme;
 
-    @IsString()
-    body: string;
+  @IsString()
+  body: string;
 
-    @IsOptional()
-    @IsString()
-    description?: string | null;
+  @IsOptional()
+  @IsString()
+  description?: string | null;
 
-    @IsOptional()
-    @IsString()
-    referenceAnswer?: string | null;
+  @IsOptional()
+  @IsString()
+  referenceAnswer?: string | null;
 
-    @IsNumber()
-    rubricId: number;
-  }
+  @IsNumber()
+  rubricId: number;
+}
 
-  export class readMission {
-    @IsNumber()
-    missionId: number;
+export class readMissionDto {
+  @IsNumber()
+  missionId: number;
 
-    @IsString()
-    missionName: string;
+  @IsString()
+  missionName: string;
 
-    @IsString()
-    missionTheme: string;
-  }
+  @IsString()
+  missionTheme: string;
+}
 
-  export class updateMission {
-    @IsNumber()
-    missionId: number;
+export class updateMissionDto {
+  @IsEnum(MissionTheme, { message: "Invalid MissionTheme'})" })
+  @IsOptional()
+  missionTheme?: MissionTheme;
 
-    @IsString()
-    missionName: string;
+  @IsString()
+  @IsOptional()
+  rubricId?: number;
 
-    @IsString()
-    missionTheme: string;
+  @IsString()
+  @IsOptional()
+  body?: string;
 
-    @IsString()
-    rubricId: number;
+  @IsString()
+  @IsOptional()
+  referenceAnswer?: string;
 
-    @IsString()
-    body: string;
-
-    @IsString()
-    referenceAnswer: string;
-
-    @IsString()
-    description: string;
-  }
-
-  export class deleteMission {
-    @IsNumber()
-    missionId: number;
-  }
+  @IsString()
+  @IsOptional()
+  description?: string;
 }

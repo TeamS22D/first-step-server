@@ -4,7 +4,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,6 +12,7 @@ import { Mission } from '../../mission/entities/mission.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { GradingResult } from './grading-result.entity';
 
+//TODO: userMission status 추가
 @Entity({ name: 'users_missions' })
 export class UserMission {
   @PrimaryGeneratedColumn()
@@ -35,9 +35,13 @@ export class UserMission {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @OneToMany(() => GradingResult, (gradingResult) => gradingResult.userMission)
-  gradingResults: GradingResult[];
-
+  @OneToOne(() => GradingResult, (gradingResult) => gradingResult.userMission, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'grading_result_id' })
+  gradingResult: GradingResult;
+// db삭제하고 다시 만들어봅시다잉
   @Column()
   startDate: Date;
 

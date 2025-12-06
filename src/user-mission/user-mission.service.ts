@@ -1,19 +1,29 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
 import { UserMission } from './entities/user-mission.entity';
 import { MoreThan, Repository } from 'typeorm';
-import { GradingCriteria } from './entities/grading-criteria';
+import { GradingCriteriaEntity } from './entities/grading-criteria.entity';
 import { GradingResult } from './entities/grading-result.entity';
+import { MissionTheme } from '../mission/types/missoin-theme.enum';
+import { GraphRange } from './enums/graph-range.enum';
+import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
+
+dayjs.extend(isoWeek);
 
 @Injectable()
 export class UserMissionService {
   constructor(
     @InjectRepository(UserMission)
     private userMissionRepository: Repository<UserMission>,
-    @InjectRepository(GradingCriteria)
-    private criteriaRepository: Repository<GradingCriteria>,
+    @InjectRepository(GradingCriteriaEntity)
+    private criteriaRepository: Repository<GradingCriteriaEntity>,
     @InjectRepository(GradingResult)
     private resultRepository: Repository<GradingResult>,
   ) {}
@@ -35,9 +45,136 @@ export class UserMissionService {
     return await this.userMissionRepository.save(entity);
   }
 
+  async getGraph(userId: number, range: GraphRange) {
+    const now = new Date();
+
+    const getDateRange = (range: GraphRange) => {
+      switch (range) {
+        case GraphRange.WEEK:
+          return [
+            new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+            new Date(now.getTime() + 24 * 60 * 60 * 1000),
+          ];
+
+        case GraphRange.MONTH:
+          return [
+            new Date(now.getFullYear(), now.getMonth(), 1),
+            new Date(now.getFullYear(), now.getMonth() + 1, 1),
+          ];
+
+        case GraphRange.YEAR:
+          return [
+            new Date(now.getFullYear(), 0, 1),
+            new Date(now.getFullYear() + 1, 0, 1),
+          ];
+
+        default:
+          return [null, null];
+      }
+    };
+
+    const [start, end] = getDateRange(range);
+
+    /** -----------------------------------------------------
+     * ① 날짜를 YYYY-MM-DD로 강제 포맷 (중요!)
+     * ----------------------------------------------------- */
+    const raw = await this.resultRepository
+      .createQueryBuilder('r')
+      .innerJoin('r.mission', 'm')
+      .select('m.missionTheme', 'theme')
+      .addSelect(`DATE_FORMAT(r.createdAt, '%Y-%m-%d')`, 'date')
+      .addSelect('AVG(r.total_score)', 'avgScore')
+      .where('r.userId = :userId', { userId })
+      .andWhere('r.createdAt >= :start', { start })
+      .andWhere('r.createdAt < :end', { end })
+      .groupBy('theme, DATE_FORMAT(r.createdAt, "%Y-%m-%d")')
+      .orderBy('date')
+      .getRawMany();
+
+    /** -----------------------------------------------------
+     * ② historyMap 생성
+     * ----------------------------------------------------- */
+    const historyMap: any = {};
+
+    raw.forEach(({ date, avgScore, theme }) => {
+      if (!historyMap[date]) {
+        historyMap[date] = {
+          index: date, // 날짜가 항상 YYYY-MM-DD
+          document: 0,
+          chat: 0,
+          mail: 0,
+        };
+      }
+      historyMap[date][theme.toLowerCase()] = Number(avgScore) ?? 0;
+    });
+
+    /** -----------------------------------------------------
+     * YEAR → 12개월 강제 생성
+     * ----------------------------------------------------- */
+    if (range === GraphRange.YEAR) {
+      const year = now.getFullYear();
+      const filled: any[] = [];
+
+      // 날짜 "YYYY-MM"로 축소
+      const normalized = Object.values(historyMap).map((h: any) => {
+        const [y, m] = h.index.split('-');
+        const ym = `${y}-${m}`;
+
+        return {
+          index: ym,
+          document: h.document,
+          chat: h.chat,
+          mail: h.mail,
+        };
+      });
+
+      for (let month = 0; month < 12; month++) {
+        const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+        const matches = normalized.filter((h) => h.index === key);
+
+        if (matches.length > 0) {
+          const combined = {
+            index: key,
+            document:
+              matches.reduce((a, b) => a + (b.document ?? 0), 0) /
+              matches.length,
+            chat:
+              matches.reduce((a, b) => a + (b.chat ?? 0), 0) /
+              matches.length,
+            mail:
+              matches.reduce((a, b) => a + (b.mail ?? 0), 0) /
+              matches.length,
+          };
+          filled.push(combined);
+        } else {
+          filled.push({
+            index: key,
+            document: 0,
+            chat: 0,
+            mail: 0,
+          });
+        }
+      }
+
+      return {
+        range: 'year',
+        history: filled,
+      };
+    }
+
+    return {
+      range: range.toLowerCase(),
+      history: Object.values(historyMap),
+    };
+  }
+
+
+
   async findAllUserMission(userId: number) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
+    //TODO: count 제외
     const count = await this.userMissionRepository.count({
       where: { user: { userId } },
     });
@@ -47,6 +184,7 @@ export class UserMissionService {
         user: { userId },
         endDate: MoreThan(now),
       },
+      relations: ['mission'],
     });
 
     if (!missions || missions.length === 0) {
@@ -54,6 +192,25 @@ export class UserMissionService {
     }
 
     return { count, missions };
+  }
+
+  async findAllUserMissionByTheme(userId: number, theme: MissionTheme) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const missions = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+        mission: { missionTheme: theme },
+      },
+      relations: ['mission'],
+    });
+
+    if (!missions || missions.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    return missions;
   }
 
   async findUserMissionById(userMissionId: number) {
@@ -66,6 +223,13 @@ export class UserMissionService {
     }
 
     return userMission;
+  }
+
+  async findAnswerByUserMissionId(userMissionId: number) {
+    return await this.resultRepository.findOne({
+      where: { userMission: { userMissionId } },
+      relations: ['gradingCriterias'],
+    });
   }
 
   async findUserMissionByMissionId(userId: number, missionId: number) {
@@ -111,13 +275,57 @@ export class UserMissionService {
 
     return { message: '유저 미션 삭제 완료' };
   }
-
-  async createAnswer(userMissionId: number, dto: UserMissionDTO.createAnswer) {
+  //TODO: 트랜젝션 설정
+  async createAnswer(
+    userId: number,
+    userMissionId: number,
+    dto: UserMissionDTO.createAnswer,
+  ) {
     const userMission = await this.userMissionRepository.findOne({
       where: { userMissionId },
+      relations: ['mission', 'user'],
     });
+    if (!userMission) {
+      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
+    }
+    if (userMission.user.userId !== userId) {
+      throw new ForbiddenException({ message: '접근할 수 없습니다.' });
+    }
+    if (userMission.gradingResult) {
+      throw new BadRequestException({
+        message: '이미 결과가 나온 미션입니다.',
+      });
+    }
     await this.userMissionRepository.update(userMissionId, dto);
-
-
+    // 평가 시스템 예시
+    const gradingResult = this.resultRepository.create({
+      totalScore: 100,
+      grade: 'A',
+      summeryFeedback: '너무 멋져요',
+      internalNote: 'a',
+      mission: { missionId: userMission.mission.missionId },
+      userId: userMission.user.userId,
+      userMission,
+    });
+    await this.resultRepository.save(gradingResult);
+    for (let i = 0; i < 5; i++) {
+      const gradingCriteria = this.criteriaRepository.create({
+        index: i + 1,
+        item: `${i + 1}d`,
+        score: 100,
+        maxScore: 100,
+        gradingResult,
+        feedback: {
+          goodPoints: '1',
+          improvementPoints: '2',
+          suggestedFix: '3',
+        },
+      });
+      await this.criteriaRepository.save(gradingCriteria);
+    }
+    return await this.resultRepository.findOne({
+      where: { id: gradingResult.id },
+      relations: ['gradingCriterias'],
+    });
   }
 }

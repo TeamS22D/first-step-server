@@ -11,6 +11,8 @@ import { Bizword } from 'src/bizwords/entities/bizword.entity';
 import { Role } from '../types/user-role.enum';
 import { UserMission } from '../../user-mission/entities/user-mission.entity';
 import { Provider } from '../../auth/dto/social-user.dto';
+import { Occupation } from '../types/occupation.enum';
+import { Job } from '../types/job.enum';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -47,6 +49,22 @@ export class UserEntity {
     default: Provider.LOCAL,
   })
   provider: Provider;
+
+  @Column({
+    type: 'enum',
+    enum: Occupation,
+    default: Occupation.IT,
+    nullable: true,
+  })
+  occupation: Occupation;
+
+  @Column({
+    type: 'enum',
+    enum: Job,
+    default: Job.DEVELOPER,
+    nullable: true,
+  })
+  job: Job;
 
   @OneToMany(() => UserMission, (userMission) => userMission.user)
   userMissions: UserMission[];

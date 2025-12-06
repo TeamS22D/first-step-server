@@ -59,14 +59,16 @@ export class AuthService {
         message: '유저가 존재하지 않거나 토큰이 없습니다.',
       });
     }
-
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!isMatch) {
       throw new UnauthorizedException({ message: '토큰이 일치하지 않습니다.' });
     }
 
     const payload = { id: user.userId };
-    const accessToken = this.jwtService.sign({ type: 'access', ...payload });
+    const accessToken = this.jwtService.sign(
+      { type: 'access', ...payload },
+      { expiresIn: '15m' },
+    );
     return { accessToken };
   }
 
