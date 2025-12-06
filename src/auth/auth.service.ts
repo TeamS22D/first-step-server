@@ -82,7 +82,7 @@ export class AuthService {
   }
 
   async socialLogin(userDto: SocialUserDto, provider: Provider) {
-    const { email, socialId } = userDto;
+    const { email } = userDto;
 
     const user = await this.userService.findByEmail(email);
     // console.log(user?.provider, provider);

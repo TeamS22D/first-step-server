@@ -1,13 +1,16 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserMission } from './user-mission.entity';
-import { GradingCriteria } from './grading-criteria';
+import { GradingCriteriaEntity } from './grading-criteria.entity';
+import { Mission } from '../../mission/entities/mission.entity';
 
 @Entity({ name: 'grading_result' })
 export class GradingResult {
@@ -34,14 +37,18 @@ export class GradingResult {
   userMission: UserMission;
 
   @OneToMany(
-    () => GradingCriteria,
+    () => GradingCriteriaEntity,
     (gradingCriteria) => gradingCriteria.gradingResult,
   )
-  gradingCriterias: GradingCriteria[];
+  gradingCriterias: GradingCriteriaEntity[];
 
   @Column()
   userId: number;
 
-  @Column()
-  missionId: number;
+  @ManyToOne(() => Mission, (mission) => mission.userMissions)
+  @JoinColumn({ name: 'missionId' })
+  mission: Mission;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
