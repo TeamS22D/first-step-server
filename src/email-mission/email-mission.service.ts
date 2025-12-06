@@ -10,7 +10,13 @@ export class EmailMissionService {
 
     // 이거 유저가 처음 미션 들어오자 마자 실행
     async createEmailMission(Dto: EmailMissionDTO.createDTO) {
-        return this.emailMissionRepository.create(Dto);
+        const emailMission = this.emailMissionRepository.create(Dto);
+        const saved = await this.emailMissionRepository.save(emailMission);
+        return { 
+            emailMissionId: saved.emailMissionId,
+            title: saved.title,
+            emailContent: saved.emailContent
+        }
     }
 
     async findEmailMission(emailMissionId: number) {
@@ -32,7 +38,11 @@ export class EmailMissionService {
         }
 
         const update = await this.emailMissionRepository.update(emailMissionId, Dto);
-        return { message: "이메일 업데이트", update: update };
+        return { 
+            message: "이메일 업데이트", 
+            emailMissionId: emailMissionId, 
+            update: Dto 
+        };
     }
 
     async deleteEmailMission(emailMissionId: number) {
@@ -43,7 +53,10 @@ export class EmailMissionService {
         }
 
         const deleteEmailMission = this.emailMissionRepository.delete(emailMissionId);
-        return { message: "이메일 미션 삭제", delete: deleteEmailMission};
+        return { 
+            message: "이메일 미션 삭제", 
+            delete: emailMissionId
+        };
     }
 
     // 유저가 이메일 쓴 거 제출
@@ -59,8 +72,11 @@ export class EmailMissionService {
                 ...Dto,
                 SendAt
             });
-            
-        return { message: "이메일이 제출되었습니다." };
+
+        return { 
+            message: "이메일이 제출되었습니다.", 
+            send: Dto
+        };
     }
 
     // 유저가 이메일 쓴 거 저장
@@ -72,6 +88,9 @@ export class EmailMissionService {
         }
 
         await this.emailMissionRepository.update(emailMissionId, Dto);
-        return { message: "이메일이 저장되었습니다." };
+        return { 
+            message: "이메일이 저장되었습니다.", 
+            save: Dto 
+        };
     }
 }

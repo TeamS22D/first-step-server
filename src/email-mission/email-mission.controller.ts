@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { EmailMissionDTO } from './dto/email-mission-dto';
 import { EmailMissionService } from './email-mission.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
@@ -18,7 +18,7 @@ export class EmailMissionController {
     @UseGuards(AuthGuard)
     @Get('/:emailMissionId')
     async findEmailMission(
-        @Param() emailMissionId: number
+        @Param('emailMissionId') emailMissionId: number
     ) {
         return await this.emailMissionService.findEmailMission(emailMissionId);
     }
@@ -26,7 +26,7 @@ export class EmailMissionController {
     @Patch('/update/:emailMissionId')
     @Roles(Role.ADMIN)
     async updateEmailMission(
-        @Param() emailMisisonId: number,
+        @Param('emailMissionId') emailMisisonId: number,
         @Body() Dto: EmailMissionDTO.updateDTO
     ) {
             return await this.emailMissionService.updateEmailMission(emailMisisonId, Dto);
@@ -34,14 +34,15 @@ export class EmailMissionController {
 
     @Delete('/delete/:emailMissionId')
     @Roles(Role.ADMIN)
-    async deleteEmailMission(@Param() emailMissionId: number) {
+    async deleteEmailMission(@Param('emailMissionId') emailMissionId: number) {
         return this.emailMissionService.deleteEmailMission(emailMissionId);
     }
 
     @UseGuards(AuthGuard)
     @Post('send/:emailMissionId')
+    @HttpCode(HttpStatus.OK)
     async sendEmail(
-        @Param() emailMissionId: number,
+        @Param('emailMissionId') emailMissionId: number,
         @Body() Dto: EmailMissionDTO.sendDTO) {
         return await this.emailMissionService.sendEmail(emailMissionId, Dto);
     }
@@ -49,7 +50,7 @@ export class EmailMissionController {
     @UseGuards(AuthGuard)
     @Patch('save/:emailMissionId')
     async saveEmail(
-        @Param() emailMissionId: number,
+        @Param('emailMissionId') emailMissionId: number,
         @Body() Dto: EmailMissionDTO.sendDTO
         ) {
             return await this.emailMissionService.saveEmail(emailMissionId, Dto);
