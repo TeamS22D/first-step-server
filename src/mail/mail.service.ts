@@ -24,6 +24,15 @@ export class MailService {
   ) {}
 
   async sendEmail(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException({ message: "존재하지 않는 이메일입니다." });
+    }
+    
+    if (user.isVerified == true) {
+      return ({ message: "이미 인증이 완료된 유저입니다." });
+    }
 
     const temporaryCode = this.generateTemporaryCode(6);
 
@@ -65,12 +74,13 @@ export class MailService {
         message: '인증코드가 일치하지 않습니다.',
       }); // 인증코드가 일치하지 않다면
     }
-
     const user = await this.userService.findByEmail(email);
+
     if (!user) {
-      throw new BadRequestException({ message: '존재하지 않는 이메일입니다' });
+      throw new BadRequestException({ message: "존재하지 않는 이메일입니다." });
     }
 
+    await this.userRepository.update(user.userId, { isVerified: true });
     await this.redis.del(RedisKey);
 
     return { message: '인증이 완료되었습니다' };
