@@ -20,7 +20,7 @@ import { UserMission } from './user-mission/entities/user-mission.entity';
 import { Rubric } from './rubric/entities/rubric.entity';
 import { RubricModule } from './rubric/rubric.module';
 import { GradingResult } from './user-mission/entities/grading-result.entity';
-import { GradingCriteria } from './user-mission/entities/grading-criteria';
+import { GradingCriteriaEntity } from './user-mission/entities/grading-criteria.entity';
 
 @Module({
   imports: [
@@ -43,10 +43,10 @@ import { GradingCriteria } from './user-mission/entities/grading-criteria';
           UserMission,
           Rubric,
           GradingResult,
-          GradingCriteria,
+          GradingCriteriaEntity,
           Bizword,
         ],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
 

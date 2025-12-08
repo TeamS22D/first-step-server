@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { MissionDTO } from 'src/mission/dto/mission-dto';
 import { Mission } from './entities/mission.entity';
-import { Like, Repository } from 'typeorm';
 import { RubricService } from '../rubric/rubric.service';
+import { createMissionDto, updateMissionDto } from './dto/mission-dto';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class MissionService {
@@ -18,9 +18,12 @@ export class MissionService {
     private readonly rubricService: RubricService,
   ) {}
 
-  async createMission(missionDto: MissionDTO.createMission) {
-    const { rubricId, ...rest } = missionDto;
+  async createMission(dto: createMissionDto) {
+    const { rubricId, ...rest } = dto;
     const rubric = await this.rubricService.getRubricById(rubricId);
+    if (!rubric) {
+      throw new NotFoundException(`Rubric with id ${rubricId} not found`);
+    }
 
     const mission = this.missionRepository.create({
       ...rest,
@@ -32,38 +35,38 @@ export class MissionService {
   async findAllMission() {
     return await this.missionRepository.find();
   }
-
-  async findByMissionName(missionDTO: MissionDTO.readMission) {
-    const { missionName } = missionDTO;
-
-    const missions = await this.missionRepository.find({
-      where: {
-        missionName: Like(`%${missionName}%`),
-      },
-    });
-
-    if (missions.length === 0) {
-      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
-    }
-
-    return missions;
-  }
-
-  async findByMissionTheme(missionDTO: MissionDTO.readMission) {
-    const { missionTheme } = missionDTO;
-
-    const missions = await this.missionRepository.find({
-      where: {
-        missionTheme: Like(`%${missionTheme}%`),
-      },
-    });
-
-    if (missions.length === 0) {
-      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
-    }
-
-    return missions;
-  }
+  //
+  // async findByMissionName(missionDTO: MissionDTO.readMission) {
+  //   const { missionName } = missionDTO;
+  //
+  //   const missions = await this.missionRepository.find({
+  //     where: {
+  //       missionName: Like(`%${missionName}%`),
+  //     },
+  //   });
+  //
+  //   if (missions.length === 0) {
+  //     throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
+  //   }
+  //
+  //   return missions;
+  // }
+  //
+  // async findByMissionTheme(missionDTO: MissionDTO.readMission) {
+  //   const { missionTheme } = missionDTO;
+  //
+  //   const missions = await this.missionRepository.find({
+  //     where: {
+  //       missionTheme: Like(`%${missionTheme}%`),
+  //     },
+  //   });
+  //
+  //   if (missions.length === 0) {
+  //     throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
+  //   }
+  //
+  //   return missions;
+  // }
 
   async findByMissionId(missionId: number) {
     const mission = await this.missionRepository.findOne({
@@ -76,17 +79,24 @@ export class MissionService {
     return mission;
   }
 
-  async updateMission(missionId: number, missionDTO: MissionDTO.updateMission) {
-    const { rubricId, ...rest } = missionDTO;
-    const exists = await this.missionRepository.existsBy({ missionId });
-    const rubric = await this.rubricService.getRubricById(rubricId);
+  async updateMission(missionId: number, dto: updateMissionDto) {
+    const { rubricId, ...rest } = dto;
     const updateData = {
       ...rest,
-      rubric: rubric,
     };
-
+    const exists = await this.missionRepository.existsBy({ missionId });
     if (!exists) {
       throw new NotFoundException({ message: '미션을 찾을 수 없습니다.' });
+    }
+
+    if (rubricId) {
+      const rubric = await this.rubricService.getRubricById(rubricId);
+      if (!rubric) {
+        throw new BadRequestException({
+          message: `Rubric with id ${rubricId} not found`,
+        });
+      }
+      updateData['rubric'] = rubric;
     }
     await this.missionRepository.update(missionId, updateData);
     return { message: '미션 업데이트', update: updateData };
