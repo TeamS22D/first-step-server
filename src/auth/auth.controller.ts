@@ -38,7 +38,10 @@ export class AuthController {
       req.user,
       Provider.GOOGLE,
     );
-    res.redirect(`http://localhost:3000/login-success?token=${accessToken}`);
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
+    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   }
 
   @Get('naver')
@@ -52,7 +55,10 @@ export class AuthController {
       req.user,
       Provider.NAVER,
     );
-    res.redirect(`http://localhost:3000/login-success?token=${accessToken}`);
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
+    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   }
 
   @Get('kakao')
@@ -66,6 +72,9 @@ export class AuthController {
       req.user,
       Provider.KAKAO,
     );
-    res.redirect(`http://localhost:3000/login-success?token=${accessToken}`);
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
+    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   }
 }
