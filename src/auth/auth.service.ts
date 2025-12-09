@@ -3,6 +3,7 @@ import {
   Injectable,
   Inject,
   forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
@@ -40,6 +41,12 @@ export class AuthService {
     if (!samePassword) {
       throw new UnauthorizedException({
         message: '이메일이나 비밀번호를 확인해주십시오',
+      });
+    }
+
+      if (user.isVerified == false) {
+        throw new BadRequestException({ 
+        message: "인증이 되어 있지 않은 유저입니다.",
       });
     }
 
