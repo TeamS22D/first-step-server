@@ -140,11 +140,9 @@ export class UserMissionService {
               matches.reduce((a, b) => a + (b.document ?? 0), 0) /
               matches.length,
             chat:
-              matches.reduce((a, b) => a + (b.chat ?? 0), 0) /
-              matches.length,
+              matches.reduce((a, b) => a + (b.chat ?? 0), 0) / matches.length,
             mail:
-              matches.reduce((a, b) => a + (b.mail ?? 0), 0) /
-              matches.length,
+              matches.reduce((a, b) => a + (b.mail ?? 0), 0) / matches.length,
           };
           filled.push(combined);
         } else {
@@ -169,17 +167,11 @@ export class UserMissionService {
     };
   }
 
-
-
   async findAllUserMission(userId: number) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    //TODO: count 제외
-    const count = await this.userMissionRepository.count({
-      where: { user: { userId } },
-    });
 
-    const missions = await this.userMissionRepository.find({
+    const origin = await this.userMissionRepository.find({
       where: {
         user: { userId },
         endDate: MoreThan(now),
@@ -187,17 +179,25 @@ export class UserMissionService {
       relations: ['mission'],
     });
 
-    if (!missions || missions.length === 0) {
+    if (!origin || origin.length === 0) {
       throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
     }
 
-    return { count, missions };
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
+    return missions;
   }
 
   async findAllUserMissionByTheme(userId: number, theme: MissionTheme) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    const missions = await this.userMissionRepository.find({
+
+    const origin = await this.userMissionRepository.find({
       where: {
         user: { userId },
         endDate: MoreThan(now),
@@ -206,10 +206,17 @@ export class UserMissionService {
       relations: ['mission'],
     });
 
-    if (!missions || missions.length === 0) {
+    if (!origin || origin.length === 0) {
       throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
     }
 
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
     return missions;
   }
 
