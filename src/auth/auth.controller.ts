@@ -66,16 +66,8 @@ export class AuthController {
     );
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const maxAge = 7 * 24 * 60 * 60 * 1000;
-
-    res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        path: '/',
-        maxAge: maxAge,
-    });
     
-    const redirectUrl = `${frontendUrl}/login-success?token=${accessToken}&userId=${userId}&email=${email}`;
+    const redirectUrl = `${frontendUrl}/login-success?token=${accessToken}&refreshToken=${refreshToken}&userId=${userId}&email=${email}`;
 
     res.redirect(redirectUrl);
   }
