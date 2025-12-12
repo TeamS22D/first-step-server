@@ -35,19 +35,15 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('/missions/')
-  async findAllMission(@Req() req) {
-    const userId = req.user['userId'];
-    return this.userMissionService.findAllUserMission(userId);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('/mission/:MissionTheme')
-  async findAllDocumentMission(
+  @Get('/missions')
+  async findAllMission(
     @Req() req,
-    @Param('MissionTheme') missionTheme: MissionTheme,
+    @Query('missionTheme') missionTheme: MissionTheme,
   ) {
     const userId = req.user['userId'];
+    if (!missionTheme) {
+      return this.userMissionService.findAllUserMission(userId);
+    }
     return this.userMissionService.findAllUserMissionByTheme(
       userId,
       missionTheme,
