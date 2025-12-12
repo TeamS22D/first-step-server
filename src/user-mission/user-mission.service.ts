@@ -14,6 +14,9 @@ import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { GraphRange } from './enums/graph-range.enum';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
+import { UserMissionInfoDto } from '../bizwords/dto/user-mission-info.dto';
+import { AttendanceInfoDto } from '../bizwords/dto/attendance-info.dto';
+import { MissionInfoDto } from '../bizwords/dto/mission-info.dto';
 
 dayjs.extend(isoWeek);
 
@@ -27,6 +30,43 @@ export class UserMissionService {
     @InjectRepository(GradingResult)
     private resultRepository: Repository<GradingResult>,
   ) {}
+
+  async getUserMissionInfo(userId: number) {
+    /*
+    {"mission": {
+      "completed": 7,
+        "total": 10,
+        "remaining": 3,
+        "progressRate": 70
+    },
+      "attendance": {
+      "attendedDays": 2,
+        "totalDays": 3,
+    }
+    }
+   */
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const total = await this.userMissionRepository.count({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
+    });
+    const completed = await this.userMissionRepository.count({
+      where: {
+        user: { userId },
+        completed: true,
+        endDate: MoreThan(now),
+      },
+    });
+    const mission = new MissionInfoDto(completed, total);
+    const attendance = new AttendanceInfoDto(1, 5);
+
+    //TODO: attendance 실제값 불러와야함
+    return new UserMissionInfoDto(mission, attendance);
+  }
 
   async createUserMission(dto: UserMissionDTO.createUserMission) {
     const { userId, missionId } = dto;

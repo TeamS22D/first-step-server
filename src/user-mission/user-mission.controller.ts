@@ -15,11 +15,23 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import type { Request } from 'express';
 import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { ProfileGraphDto } from './dto/profile-graph-dto';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../user/types/user-role.enum';
 
 @Controller('user-mission')
 export class UserMissionController {
   constructor(private readonly userMissionService: UserMissionService) {}
 
+  @UseGuards(AuthGuard)
+  @Get('/')
+  async getUserMissionInfo(@Req() req) {
+    const userId = req.user['userId'];
+    return this.userMissionService.getUserMissionInfo(userId);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Post('/create')
   async createUserMission(
     @Body() userMissionDTO: UserMissionDTO.createUserMission,
