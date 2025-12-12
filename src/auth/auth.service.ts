@@ -12,6 +12,18 @@ import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from './dto/auth-dto';
 
+interface RefreshResult {
+  newAccessToken: string;
+  newRefreshToken: string;
+}
+
+interface SocialLoginResult {
+  userId: number;
+  email: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -59,7 +71,7 @@ export class AuthService {
     return { email, accessToken, refreshToken };
   }
 
-  async refresh(userId: number, refreshToken: string) {
+  async refresh(userId: number, refreshToken: string): Promise<RefreshResult> {
     const user = await this.userService.findById(userId);
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException({
@@ -72,14 +84,23 @@ export class AuthService {
     }
 
     const payload = { id: user.userId };
-    const accessToken = this.jwtService.sign(
+    
+    const newAccessToken = this.jwtService.sign(
       { type: 'access', ...payload },
       { expiresIn: '15m' },
     );
-    return { accessToken };
+    const newRefreshToken = this.jwtService.sign(
+      { type: 'refresh', ...payload },
+      { expiresIn: '7d' },
+    );
+
+    const hashedNewRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+    await this.userService.updateRefreshToken(user.userId, hashedNewRefreshToken);
+
+    return { newAccessToken, newRefreshToken };
   }
 
-  async socialLogin(userDto: SocialUserDto, provider: Provider) {
+  async socialLogin(userDto: SocialUserDto, provider: Provider): Promise<SocialLoginResult> {
     const { email } = userDto;
 
     let user = await this.userService.findByEmail(email);
@@ -102,6 +123,6 @@ export class AuthService {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.userService.updateRefreshToken(user.userId, hashedRefreshToken);
 
-    return { email, accessToken, refreshToken };
+    return { userId: user.userId, email, accessToken, refreshToken };
   }
 }
