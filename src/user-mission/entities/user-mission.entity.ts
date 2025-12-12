@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +12,7 @@ import {
 import { Mission } from '../../mission/entities/mission.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { GradingResult } from './grading-result.entity';
+import { EmailMission } from 'src/email-mission/entities/email-mission.entity';
 
 //TODO: userMission status 추가
 @Entity({ name: 'users_missions' })
@@ -53,4 +55,10 @@ export class UserMission {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToMany(() => EmailMission, emailMission => emailMission.emailMissionId)
+  EmailMission: number;
+
+  @OneToOne(() => EmailMission, emailMission => emailMission.userMission)
+  emailMission: EmailMission;
 }

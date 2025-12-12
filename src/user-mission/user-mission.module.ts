@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserMissionController } from './user-mission.controller';
