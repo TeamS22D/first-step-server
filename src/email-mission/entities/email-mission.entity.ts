@@ -13,7 +13,10 @@ export class EmailMission {
     @Column({ nullable: true })
     sendAt: Date;
 
-    @Column( { default: false })
+    @Column({ nullable: true })
+    saveAt: Date;
+
+    @Column({ default: false })
     isSend: boolean;
 
     @Column({ nullable: true })

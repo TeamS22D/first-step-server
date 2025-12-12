@@ -75,25 +75,39 @@ export class EmailMissionService {
                 isSend: true,
             });
 
+            const result = {
+                ...Dto,
+                sendAt
+            }
+
         return { 
             message: "이메일이 제출되었습니다.", 
-            send: Dto,
-            sendAt: sendAt
+            send: result
         };
     }
 
     // 유저가 이메일 쓴 거 저장
     async saveEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
         const exists = await this.emailMissionRepository.existsBy({ emailMissionId });
+        const saveAt = new Date();
 
         if (!exists) {
             throw new BadRequestException({ message: "이메일을 찾을 수 없습니다." });
         }
 
-        await this.emailMissionRepository.update(emailMissionId, Dto);
+        await this.emailMissionRepository.update(emailMissionId, { 
+            ...Dto,
+            saveAt
+        });
+
+        const save = {
+            ...Dto,
+            saveAt
+        }
+
         return { 
             message: "이메일이 저장되었습니다.", 
-            save: Dto 
+            save: save
         };
     }
 }
