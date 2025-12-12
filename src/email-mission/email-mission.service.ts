@@ -15,7 +15,8 @@ export class EmailMissionService {
         return { 
             emailMissionId: saved.emailMissionId,
             title: saved.title,
-            emailContent: saved.emailContent
+            emailContent: saved.emailContent,
+            userMIssionId: saved.userMission
         }
     }
 
@@ -76,7 +77,8 @@ export class EmailMissionService {
 
         return { 
             message: "이메일이 제출되었습니다.", 
-            send: Dto
+            send: Dto,
+            sendAt: sendAt
         };
     }
 
