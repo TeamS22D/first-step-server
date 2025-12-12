@@ -11,6 +11,12 @@ import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from './dto/auth-dto';
 
+// AuthController에서 기대하는 반환 타입
+interface RefreshResult {
+  newAccessToken: string;
+  newRefreshToken: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -52,7 +58,7 @@ export class AuthService {
     return { email, accessToken, refreshToken };
   }
 
-  async refresh(userId: number, refreshToken: string) {
+  async refresh(userId: number, refreshToken: string): Promise<RefreshResult> {
     const user = await this.userService.findById(userId);
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException({
@@ -65,11 +71,23 @@ export class AuthService {
     }
 
     const payload = { id: user.userId };
-    const accessToken = this.jwtService.sign(
+    
+    // 새 액세스 토큰과 리프레시 토큰을 모두 생성합니다.
+    const newAccessToken = this.jwtService.sign(
       { type: 'access', ...payload },
       { expiresIn: '15m' },
     );
-    return { accessToken };
+    const newRefreshToken = this.jwtService.sign(
+      { type: 'refresh', ...payload },
+      { expiresIn: '7d' },
+    );
+
+    // DB에 새로운 리프레시 토큰을 해시하여 저장합니다.
+    const hashedNewRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+    await this.userService.updateRefreshToken(user.userId, hashedNewRefreshToken);
+
+    // AuthController가 기대하는 형식으로 두 토큰을 모두 반환합니다.
+    return { newAccessToken, newRefreshToken };
   }
 
   async socialLogin(userDto: SocialUserDto, provider: Provider) {

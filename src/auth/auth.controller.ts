@@ -6,6 +6,7 @@ import {
   Req,
   Res,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SignInDto } from './dto/auth-dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -22,9 +23,51 @@ export class AuthController {
     return this.authService.signin(authDTO);
   }
 
-  @Post('/refresh')
-  async refresh(@Body() body: { userId: number; refreshToken: string }) {
-    return this.authService.refresh(body.userId, body.refreshToken);
+  @Get('/refresh') 
+  async refresh(
+    @Req() req: any,
+    @Res() res: Response,
+  ) {
+    const refreshToken = req.cookies['refreshToken'];
+    const userId = req.user?.['userId'] || req.user?.['id'];
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('리프레시 토큰이 쿠키에 없습니다.');
+    }
+
+    const { newAccessToken, newRefreshToken } = await this.authService.refresh(
+      userId, 
+      refreshToken,
+    );
+    
+    const maxAge = 7 * 24 * 60 * 60 * 1000;
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: maxAge,
+    });
+
+    return res.json({ accessToken: newAccessToken });
+  }
+
+  private async handleSocialLoginRedirect(req: any, res: Response, provider: Provider) {
+    const { accessToken, refreshToken } = await this.authService.socialLogin(
+      req.user,
+      provider,
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const maxAge = 7 * 24 * 60 * 60 * 1000;
+
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: maxAge,
+    });
+    
+    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   }
 
   @Get('google')
@@ -34,14 +77,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
-    const { accessToken } = await this.authService.socialLogin(
-      req.user,
-      Provider.GOOGLE,
-    );
-    
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    
-    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
+    await this.handleSocialLoginRedirect(req, res, Provider.GOOGLE);
   }
 
   @Get('naver')
@@ -51,14 +87,7 @@ export class AuthController {
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
   async naverAuthRedirect(@Req() req, @Res() res: Response) {
-    const { accessToken } = await this.authService.socialLogin(
-      req.user,
-      Provider.NAVER,
-    );
-    
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    
-    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
+    await this.handleSocialLoginRedirect(req, res, Provider.NAVER);
   }
 
   @Get('kakao')
@@ -68,13 +97,6 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthRedirect(@Req() req, @Res() res: Response) {
-    const { accessToken } = await this.authService.socialLogin(
-      req.user,
-      Provider.KAKAO,
-    );
-    
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    
-    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
+    await this.handleSocialLoginRedirect(req, res, Provider.KAKAO);
   }
 }
