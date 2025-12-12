@@ -25,14 +25,22 @@ export class AuthController {
 
   @Get('/refresh') 
   async refresh(
-    @Req() req: any,
+    @Req() req: any, 
     @Res() res: Response,
   ) {
-    const refreshToken = req.cookies['refreshToken'];
-    const userId = req.user?.['userId'] || req.user?.['id'];
+    const refreshToken = req.cookies['refreshToken']; 
 
-    if (!refreshToken) {
-      throw new UnauthorizedException('리프레시 토큰이 쿠키에 없습니다.');
+    let userId: number;
+    try {
+      const payload = this.authService['jwtService'].decode(refreshToken);
+      userId = payload['id'];
+    } catch (e) {
+      throw new UnauthorizedException('유효하지 않은 리프레시 토큰입니다.');
+    }
+
+
+    if (!refreshToken || !userId) {
+      throw new UnauthorizedException('리프레시 토큰이 쿠키에 없거나 유저 ID를 확인할 수 없습니다.');
     }
 
     const { newAccessToken, newRefreshToken } = await this.authService.refresh(
@@ -52,7 +60,7 @@ export class AuthController {
   }
 
   private async handleSocialLoginRedirect(req: any, res: Response, provider: Provider) {
-    const { accessToken, refreshToken } = await this.authService.socialLogin(
+    const { userId, email, accessToken, refreshToken } = await this.authService.socialLogin(
       req.user,
       provider,
     );
@@ -67,9 +75,12 @@ export class AuthController {
         maxAge: maxAge,
     });
     
-    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
+    const redirectUrl = `${frontendUrl}/login-success?token=${accessToken}&userId=${userId}&email=${email}`;
+
+    res.redirect(redirectUrl);
   }
 
+  // --- Google ---
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req) {}
@@ -80,6 +91,7 @@ export class AuthController {
     await this.handleSocialLoginRedirect(req, res, Provider.GOOGLE);
   }
 
+  // --- Naver ---
   @Get('naver')
   @UseGuards(AuthGuard('naver'))
   async naverAuth(@Req() req) {}
@@ -90,6 +102,7 @@ export class AuthController {
     await this.handleSocialLoginRedirect(req, res, Provider.NAVER);
   }
 
+  // --- Kakao ---
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuth(@Req() req) {}
