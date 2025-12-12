@@ -7,6 +7,9 @@ export namespace EmailMissionDTO {
 
         @IsString()
         emailContent: string;
+
+        @IsNumber()
+        userMissionId: number;
     }
 
     export class updateDTO {

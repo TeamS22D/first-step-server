@@ -62,7 +62,7 @@ export class EmailMissionService {
     // 유저가 이메일 쓴 거 제출
     async sendEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
         const exists = await this.emailMissionRepository.existsBy({ emailMissionId });
-        const SendAt = new Date();
+        const sendAt = new Date();
 
         if (!exists) {
             throw new BadRequestException({ message: "이메일을 찾을 수 없습니다." });
@@ -70,7 +70,8 @@ export class EmailMissionService {
 
         await this.emailMissionRepository.update(emailMissionId, {
                 ...Dto,
-                SendAt
+                sendAt,
+                isSend: true,
             });
 
         return { 

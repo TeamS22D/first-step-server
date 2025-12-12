@@ -11,7 +11,10 @@ export class EmailMission {
     title: string;
 
     @Column({ nullable: true })
-    SendAt: Date;
+    sendAt: Date;
+
+    @Column( { default: false })
+    isSend: boolean;
 
     @Column({ nullable: true })
     emailContent: string;
