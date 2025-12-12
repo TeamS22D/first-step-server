@@ -7,7 +7,7 @@ import {
 import { Job } from '../../user/types/job.enum';
 import { Occupation } from '../../user/types/occupation.enum';
 
-// 네임스페이스(namespace AuthDTO)를 제거하고 개별 클래스로 export
+
 export class SignUpDto {
   @IsEmail()
   email: string;

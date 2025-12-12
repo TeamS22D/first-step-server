@@ -7,7 +7,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-
 import { SignInDto } from './dto/auth-dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -34,10 +33,15 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req) {
-    const user = req.user;
-    const result = await this.authService.socialLogin(user, Provider.GOOGLE);
-    return { ...result, user };
+  async googleAuthRedirect(@Req() req, @Res() res: Response) {
+    const { accessToken } = await this.authService.socialLogin(
+      req.user,
+      Provider.GOOGLE,
+    );
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
+    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   }
 
   @Get('naver')
@@ -46,11 +50,15 @@ export class AuthController {
 
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
-  async naverAuthRedirect(@Req() req) {
-    const user = req.user;
-    const result = await this.authService.socialLogin(user, Provider.NAVER);
-
-    return { ...result, user };
+  async naverAuthRedirect(@Req() req, @Res() res: Response) {
+    const { accessToken } = await this.authService.socialLogin(
+      req.user,
+      Provider.NAVER,
+    );
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
+    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   }
 
   @Get('kakao')
@@ -59,10 +67,14 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuthRedirect(@Req() req) {
-    const user = req.user;
-    const result = await this.authService.socialLogin(user, Provider.KAKAO);
-
-    return { ...result, user };
+  async kakaoAuthRedirect(@Req() req, @Res() res: Response) {
+    const { accessToken } = await this.authService.socialLogin(
+      req.user,
+      Provider.KAKAO,
+    );
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
+    res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   }
 }
