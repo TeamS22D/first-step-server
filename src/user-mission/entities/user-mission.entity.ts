@@ -13,6 +13,7 @@ import { Mission } from '../../mission/entities/mission.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { GradingResult } from './grading-result.entity';
 import { EmailMission } from 'src/email-mission/entities/email-mission.entity';
+import { DocumentMission } from '../../document-mission/entities/document-mission.entity';
 
 //TODO: userMission status 추가
 @Entity({ name: 'users_missions' })
@@ -64,4 +65,7 @@ export class UserMission {
 
   @OneToOne(() => EmailMission, emailMission => emailMission.userMission)
   emailMission: EmailMission;
+
+  @OneToOne(() => DocumentMission, (documentMission) => documentMission.userMission)
+  documentMission: DocumentMission;
 }
