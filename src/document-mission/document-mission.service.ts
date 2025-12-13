@@ -15,7 +15,11 @@ export class DocumentMissionService {
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
   async createDocumentMission(Dto: DocumentMissionDto.createDTO) {
-    const documentMission = this.documentMissionRepository.create(Dto);
+    const { userMissionId, ...rest } = Dto;
+    const documentMission = this.documentMissionRepository.create({
+      ...rest,
+      userMission: { userMissionId },
+    });
     const saved = await this.documentMissionRepository.save(documentMission);
     return {
       documentMissionId: saved.documentMissionId,
