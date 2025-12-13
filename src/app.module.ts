@@ -21,6 +21,8 @@ import { Rubric } from './rubric/entities/rubric.entity';
 import { RubricModule } from './rubric/rubric.module';
 import { GradingResult } from './user-mission/entities/grading-result.entity';
 import { GradingCriteriaEntity } from './user-mission/entities/grading-criteria.entity';
+import { EmailMission } from './email-mission/entities/email-mission.entity';
+import { EmailMissionModule } from './email-mission/email-mission.module';
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { GradingCriteriaEntity } from './user-mission/entities/grading-criteria.
           GradingResult,
           GradingCriteriaEntity,
           Bizword,
+          EmailMission
         ],
         synchronize: false,
       }),
@@ -58,6 +61,7 @@ import { GradingCriteriaEntity } from './user-mission/entities/grading-criteria.
     BizwordsModule,
     RedisModule,
     UserMissionModule,
+    EmailMissionModule,
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
