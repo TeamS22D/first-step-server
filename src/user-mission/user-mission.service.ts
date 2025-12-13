@@ -14,6 +14,9 @@ import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { GraphRange } from './enums/graph-range.enum';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
+import { UserMissionInfoDto } from '../bizwords/dto/user-mission-info.dto';
+import { AttendanceInfoDto } from '../bizwords/dto/attendance-info.dto';
+import { MissionInfoDto } from '../bizwords/dto/mission-info.dto';
 
 dayjs.extend(isoWeek);
 
@@ -27,6 +30,43 @@ export class UserMissionService {
     @InjectRepository(GradingResult)
     private resultRepository: Repository<GradingResult>,
   ) {}
+
+  async getUserMissionInfo(userId: number) {
+    /*
+    {"mission": {
+      "completed": 7,
+        "total": 10,
+        "remaining": 3,
+        "progressRate": 70
+    },
+      "attendance": {
+      "attendedDays": 2,
+        "totalDays": 3,
+    }
+    }
+   */
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const total = await this.userMissionRepository.count({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
+    });
+    const completed = await this.userMissionRepository.count({
+      where: {
+        user: { userId },
+        completed: true,
+        endDate: MoreThan(now),
+      },
+    });
+    const mission = new MissionInfoDto(completed, total);
+    const attendance = new AttendanceInfoDto(1, 5);
+
+    //TODO: attendance 실제값 불러와야함
+    return new UserMissionInfoDto(mission, attendance);
+  }
 
   async createUserMission(dto: UserMissionDTO.createUserMission) {
     const { userId, missionId } = dto;
@@ -140,11 +180,9 @@ export class UserMissionService {
               matches.reduce((a, b) => a + (b.document ?? 0), 0) /
               matches.length,
             chat:
-              matches.reduce((a, b) => a + (b.chat ?? 0), 0) /
-              matches.length,
+              matches.reduce((a, b) => a + (b.chat ?? 0), 0) / matches.length,
             mail:
-              matches.reduce((a, b) => a + (b.mail ?? 0), 0) /
-              matches.length,
+              matches.reduce((a, b) => a + (b.mail ?? 0), 0) / matches.length,
           };
           filled.push(combined);
         } else {
@@ -169,17 +207,11 @@ export class UserMissionService {
     };
   }
 
-
-
   async findAllUserMission(userId: number) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    //TODO: count 제외
-    const count = await this.userMissionRepository.count({
-      where: { user: { userId } },
-    });
 
-    const missions = await this.userMissionRepository.find({
+    const origin = await this.userMissionRepository.find({
       where: {
         user: { userId },
         endDate: MoreThan(now),
@@ -187,17 +219,25 @@ export class UserMissionService {
       relations: ['mission'],
     });
 
-    if (!missions || missions.length === 0) {
+    if (!origin || origin.length === 0) {
       throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
     }
 
-    return { count, missions };
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
+    return missions;
   }
 
   async findAllUserMissionByTheme(userId: number, theme: MissionTheme) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    const missions = await this.userMissionRepository.find({
+
+    const origin = await this.userMissionRepository.find({
       where: {
         user: { userId },
         endDate: MoreThan(now),
@@ -206,10 +246,17 @@ export class UserMissionService {
       relations: ['mission'],
     });
 
-    if (!missions || missions.length === 0) {
+    if (!origin || origin.length === 0) {
       throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
     }
 
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
     return missions;
   }
 
