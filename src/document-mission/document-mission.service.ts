@@ -3,12 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DocumentMission } from './entities/document-mission.entity';
 import { Repository } from 'typeorm';
 import { DocumentMissionDto } from './dto/document-mission-dto';
+import { InternalApiService } from '../internal-api/internal-api.service';
+import { Mission } from '../mission/entities/mission.entity';
 
 @Injectable()
 export class DocumentMissionService {
   constructor(
+    private readonly internalApi: InternalApiService,
     @InjectRepository(DocumentMission)
     private documentMissionRepository: Repository<DocumentMission>,
+    @InjectRepository(Mission)
+    private missionRepository: Repository<Mission>,
   ) {}
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
@@ -36,7 +41,7 @@ export class DocumentMissionService {
     return documentMission;
   }
 
-  // 이메일 업데이트
+  // 문서 업데이트
   async updateDocumentMission(
     documentMissionId: number,
     Dto: DocumentMissionDto.updateDTO,
@@ -83,12 +88,16 @@ export class DocumentMissionService {
 
   // 유저가 이메일 쓴 거 제출
   async sendDocument(documentMissionId: number, Dto: DocumentMissionDto.sendDTO) {
-    const exists = await this.documentMissionRepository.existsBy({
-      documentMissionId,
-    });
+    const docuemtMission = await this.documentMissionRepository
+      .createQueryBuilder('dm')
+      .innerJoinAndSelect('dm.userMission', 'um')
+      .innerJoinAndSelect('um.mission', 'm')
+      .innerJoinAndSelect('m.rubric', 'r')
+      .where('dm.id = :documentMissionId', { documentMissionId })
+      .getOne();
     const sendAt = new Date();
 
-    if (!exists) {
+    if (!docuemtMission) {
       throw new BadRequestException({ message: '문서를 찾을 수 없습니다.' });
     }
 
@@ -97,6 +106,8 @@ export class DocumentMissionService {
       sendAt,
       isSend: true,
     });
+
+    console.log(docuemtMission);
 
     const result = {
       ...Dto,
