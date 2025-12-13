@@ -4,7 +4,6 @@ import { DocumentMission } from './entities/document-mission.entity';
 import { Repository } from 'typeorm';
 import { DocumentMissionDto } from './dto/document-mission-dto';
 import { InternalApiService } from '../internal-api/internal-api.service';
-import { Mission } from '../mission/entities/mission.entity';
 
 @Injectable()
 export class DocumentMissionService {
@@ -12,8 +11,6 @@ export class DocumentMissionService {
     private readonly internalApi: InternalApiService,
     @InjectRepository(DocumentMission)
     private documentMissionRepository: Repository<DocumentMission>,
-    @InjectRepository(Mission)
-    private missionRepository: Repository<Mission>,
   ) {}
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
