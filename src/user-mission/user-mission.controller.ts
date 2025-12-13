@@ -42,7 +42,7 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('/mission/:MissionTheme')
+  @Get('/mission/:MissionTheme' )
   async findAllDocumentMission(
     @Req() req,
     @Param('MissionTheme') missionTheme: MissionTheme,
