@@ -14,9 +14,8 @@ import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { GraphRange } from './enums/graph-range.enum';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { UserMissionInfoDto } from '../bizwords/dto/user-mission-info.dto';
-import { AttendanceInfoDto } from '../bizwords/dto/attendance-info.dto';
-import { MissionInfoDto } from '../bizwords/dto/mission-info.dto';
+import { UserMissionInfoDto } from './dto/user-mission-info.dto';
+import { MissionInfoDto } from './dto/mission-info.dto';
 
 dayjs.extend(isoWeek);
 
@@ -35,7 +34,19 @@ export class UserMissionService {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const defaultInfo = () => new MissionInfoDto(0, 0);
-
+    const total = await this.userMissionRepository.count({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
+    });
+    const completed = await this.userMissionRepository.count({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+        completed: true,
+      },
+    });
     const raw = await this.userMissionRepository
       .createQueryBuilder('um')
       .innerJoin('um.mission', 'm')
@@ -51,6 +62,7 @@ export class UserMissionService {
       .getRawMany();
 
     const map: Record<string, MissionInfoDto> = {
+      mission: new MissionInfoDto(completed, total),
       document: defaultInfo(),
       email: defaultInfo(),
       chat: defaultInfo(),
@@ -63,10 +75,11 @@ export class UserMissionService {
     }
 
     return new UserMissionInfoDto(
+      map.mission,
       map.document,
       map.email,
       map.chat,
-    )
+    );
   }
 
   async createUserMission(dto: UserMissionDTO.createUserMission) {
