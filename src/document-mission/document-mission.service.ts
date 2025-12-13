@@ -88,17 +88,20 @@ export class DocumentMissionService {
   }
 
   // 유저가 이메일 쓴 거 제출
-  async sendDocument(documentMissionId: number, Dto: DocumentMissionDto.sendDTO) {
-    const docuemtMission = await this.documentMissionRepository
+  async sendDocument(
+    documentMissionId: number,
+    Dto: DocumentMissionDto.sendDTO,
+  ) {
+    const documentMission = await this.documentMissionRepository
       .createQueryBuilder('dm')
       .innerJoinAndSelect('dm.userMission', 'um')
       .innerJoinAndSelect('um.mission', 'm')
       .innerJoinAndSelect('m.rubric', 'r')
-      .where('dm.id = :documentMissionId', { documentMissionId })
+      .where('dm.documentMissionId = :documentMissionId', { documentMissionId })
       .getOne();
     const sendAt = new Date();
 
-    if (!docuemtMission) {
+    if (!documentMission) {
       throw new BadRequestException({ message: '문서를 찾을 수 없습니다.' });
     }
 
@@ -108,7 +111,22 @@ export class DocumentMissionService {
       isSend: true,
     });
 
-    console.log(docuemtMission);
+    // console.log(documentMission);
+    // console.log(documentMission.documentContent);
+    // console.log(documentMission.userMission.mission.body);
+    // console.log(documentMission.userMission.mission.rubric.body);
+
+    const payload = {
+      user_answer: documentMission.documentContent,
+      question: documentMission.userMission.mission.body,
+      rubric: documentMission.userMission.mission.rubric.body,
+    };
+    const gradingResult = await this.internalApi.postToFastApi(
+      '/api/v1/document/evaluate',
+      payload,
+    );
+
+    console.log(gradingResult);
 
     const result = {
       ...Dto,
@@ -122,7 +140,10 @@ export class DocumentMissionService {
   }
 
   // 유저가 이메일 쓴 거 저장
-  async saveDocument(documentMissionId: number, Dto: DocumentMissionDto.sendDTO) {
+  async saveDocument(
+    documentMissionId: number,
+    Dto: DocumentMissionDto.sendDTO,
+  ) {
     const exists = await this.documentMissionRepository.existsBy({
       documentMissionId,
     });
