@@ -239,6 +239,7 @@ export class UserMissionService {
 
     const missions = origin.map((um) => ({
       userMissionId: um.userMissionId,
+      missionId: um.mission.missionId,
       missionName: um.mission.missionName,
       missionTheme: um.mission.missionTheme,
       startDate: um.startDate,
@@ -266,6 +267,7 @@ export class UserMissionService {
 
     const missions = origin.map((um) => ({
       userMissionId: um.userMissionId,
+      missionId: um.mission.missionId,
       missionName: um.mission.missionName,
       missionTheme: um.mission.missionTheme,
       startDate: um.startDate,
