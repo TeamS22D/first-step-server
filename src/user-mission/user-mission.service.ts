@@ -14,9 +14,8 @@ import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { GraphRange } from './enums/graph-range.enum';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { UserMissionInfoDto } from '../bizwords/dto/user-mission-info.dto';
-import { AttendanceInfoDto } from '../bizwords/dto/attendance-info.dto';
-import { MissionInfoDto } from '../bizwords/dto/mission-info.dto';
+import { UserMissionInfoDto } from './dto/user-mission-info.dto';
+import { MissionInfoDto } from './dto/mission-info.dto';
 
 dayjs.extend(isoWeek);
 
@@ -32,22 +31,9 @@ export class UserMissionService {
   ) {}
 
   async getUserMissionInfo(userId: number) {
-    /*
-    {"mission": {
-      "completed": 7,
-        "total": 10,
-        "remaining": 3,
-        "progressRate": 70
-    },
-      "attendance": {
-      "attendedDays": 2,
-        "totalDays": 3,
-    }
-    }
-   */
-
     const now = new Date();
     now.setHours(0, 0, 0, 0);
+    const defaultInfo = () => new MissionInfoDto(0, 0);
     const total = await this.userMissionRepository.count({
       where: {
         user: { userId },
@@ -57,15 +43,43 @@ export class UserMissionService {
     const completed = await this.userMissionRepository.count({
       where: {
         user: { userId },
-        completed: true,
         endDate: MoreThan(now),
+        completed: true,
       },
     });
-    const mission = new MissionInfoDto(completed, total);
-    const attendance = new AttendanceInfoDto(1, 5);
+    const raw = await this.userMissionRepository
+      .createQueryBuilder('um')
+      .innerJoin('um.mission', 'm')
+      .where('um.user = :user_id', { user_id: userId })
+      .andWhere('um.endDate > :now', { now })
+      .select('m.missionTheme', 'theme')
+      .addSelect('COUNT(*)', 'total')
+      .addSelect(
+        'SUM(CASE WHEN um.completed = true THEN 1 ELSE 0 END)',
+        'completed',
+      )
+      .groupBy('m.missionTheme')
+      .getRawMany();
 
-    //TODO: attendance 실제값 불러와야함
-    return new UserMissionInfoDto(mission, attendance);
+    const map: Record<string, MissionInfoDto> = {
+      mission: new MissionInfoDto(completed, total),
+      document: defaultInfo(),
+      email: defaultInfo(),
+      chat: defaultInfo(),
+    };
+    for (const row of raw) {
+      const total = Number(row.total);
+      const completed = Number(row.completed);
+
+      map[row.theme] = new MissionInfoDto(completed, total);
+    }
+
+    return new UserMissionInfoDto(
+      map.mission,
+      map.document,
+      map.email,
+      map.chat,
+    );
   }
 
   async createUserMission(dto: UserMissionDTO.createUserMission) {

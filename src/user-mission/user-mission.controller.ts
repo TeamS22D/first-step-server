@@ -5,7 +5,8 @@ import {
   Get,
   Param,
   Patch,
-  Post, Query,
+  Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -40,7 +41,7 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard)
-  @Get("/graph")
+  @Get('/graph')
   async getGrpah(@Req() req, @Query() query: ProfileGraphDto) {
     const userId = req.user['userId'];
     return this.userMissionService.getGraph(userId, query.range);

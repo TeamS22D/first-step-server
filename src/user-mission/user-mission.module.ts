@@ -5,7 +5,7 @@ import { UserMissionController } from './user-mission.controller';
 import { UserMission } from './entities/user-mission.entity';
 import { GradingResult } from './entities/grading-result.entity';
 import { GradingCriteriaEntity } from './entities/grading-criteria.entity';
-import { UserMissionInfoDto } from '../bizwords/dto/user-mission-info.dto';
+import { UserMissionInfoDto } from './dto/user-mission-info.dto';
 
 @Module({
   imports: [
