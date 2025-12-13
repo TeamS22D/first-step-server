@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmailMissionController } from './email-mission.controller';
 
-describe('EmailMissionController', () => {
+describe('DocumentMissionController', () => {
   let controller: EmailMissionController;
 
   beforeEach(async () => {

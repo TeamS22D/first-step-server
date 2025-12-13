@@ -23,6 +23,8 @@ import { GradingResult } from './user-mission/entities/grading-result.entity';
 import { GradingCriteriaEntity } from './user-mission/entities/grading-criteria.entity';
 import { EmailMission } from './email-mission/entities/email-mission.entity';
 import { EmailMissionModule } from './email-mission/email-mission.module';
+import { DocumentMissionModule } from './document-mission/document-mission.module';
+import { DocumentMission } from './document-mission/entities/document-mission.entity';
 
 @Module({
   imports: [
@@ -47,7 +49,8 @@ import { EmailMissionModule } from './email-mission/email-mission.module';
           GradingResult,
           GradingCriteriaEntity,
           Bizword,
-          EmailMission
+          EmailMission,
+          DocumentMission,
         ],
         synchronize: false,
       }),
@@ -62,6 +65,7 @@ import { EmailMissionModule } from './email-mission/email-mission.module';
     RedisModule,
     UserMissionModule,
     EmailMissionModule,
+    DocumentMissionModule,
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
