@@ -106,7 +106,9 @@ export class AuthService {
     let user = await this.userService.findByEmail(email);
 
     if (user) {
-      if (user.provider !== provider) {
+      if (user.provider === Provider.LOCAL) {
+        user = await this.userService.updateProvider(user.userId, provider);
+      } else if (user.provider !== provider) {
         throw new UnauthorizedException({
           message: `이 이메일은 ${user.provider}로 가입되어 있습니다.`,
         });
@@ -114,15 +116,15 @@ export class AuthService {
     } else {
       user = await this.userService.socialSignup(userDto, provider);
     }
-    
-    const payload = { id: user.userId };
+
+    const payload = { id: user!.userId };
 
     const accessToken = this.jwtService.sign({ ...payload, type: 'access' });
     const refreshToken = this.jwtService.sign({ ...payload, type: 'refresh' }, { expiresIn: '7d' });
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.userService.updateRefreshToken(user.userId, hashedRefreshToken);
+    await this.userService.updateRefreshToken(user!.userId, hashedRefreshToken);
 
-    return { userId: user.userId, email, accessToken, refreshToken };
+    return { userId: user!.userId, email, accessToken, refreshToken };
   }
 }
