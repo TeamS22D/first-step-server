@@ -7,6 +7,7 @@ import {
   Res,
   UseGuards,
   UnauthorizedException,
+  Headers,
 } from '@nestjs/common';
 import { SignInDto } from './dto/auth-dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -25,10 +26,14 @@ export class AuthController {
 
   @Get('/refresh') 
   async refresh(
-    @Req() req: any, 
+    @Headers('Authorization') authHeader: string,
     @Res() res: Response,
   ) {
-    const refreshToken = req.cookies['refreshToken']; 
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Authorization 헤더 형식이 올바르지 않습니다.');
+    }
+    
+    const refreshToken = authHeader.split(' ')[1];
 
     let userId: number;
     try {
@@ -38,9 +43,8 @@ export class AuthController {
       throw new UnauthorizedException('유효하지 않은 리프레시 토큰입니다.');
     }
 
-
     if (!refreshToken || !userId) {
-      throw new UnauthorizedException('리프레시 토큰이 쿠키에 없거나 유저 ID를 확인할 수 없습니다.');
+      throw new UnauthorizedException('토큰이 전달되지 않았거나 유저 ID를 확인할 수 없습니다.');
     }
 
     const { newAccessToken, newRefreshToken } = await this.authService.refresh(
@@ -48,15 +52,7 @@ export class AuthController {
       refreshToken,
     );
     
-    const maxAge = 7 * 24 * 60 * 60 * 1000;
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      maxAge: maxAge,
-    });
-
-    return res.json({ accessToken: newAccessToken });
+    return res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
   }
 
   private async handleSocialLoginRedirect(req: any, res: Response, provider: Provider) {
@@ -72,7 +68,6 @@ export class AuthController {
     res.redirect(redirectUrl);
   }
 
-  // --- Google ---
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req) {}
@@ -83,7 +78,6 @@ export class AuthController {
     await this.handleSocialLoginRedirect(req, res, Provider.GOOGLE);
   }
 
-  // --- Naver ---
   @Get('naver')
   @UseGuards(AuthGuard('naver'))
   async naverAuth(@Req() req) {}
@@ -94,7 +88,6 @@ export class AuthController {
     await this.handleSocialLoginRedirect(req, res, Provider.NAVER);
   }
 
-  // --- Kakao ---
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuth(@Req() req) {}
