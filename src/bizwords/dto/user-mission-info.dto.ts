@@ -1,12 +1,13 @@
 import { MissionInfoDto } from './mission-info.dto';
-import { AttendanceInfoDto } from './attendance-info.dto';
 
 export class UserMissionInfoDto {
-  mission: MissionInfoDto;
-  attendance: AttendanceInfoDto;
+  document: MissionInfoDto;
+  email: MissionInfoDto;
+  chat: MissionInfoDto;
 
-  constructor(mission: MissionInfoDto, attendance: AttendanceInfoDto) {
-    this.mission = mission;
-    this.attendance = attendance;
+  constructor(document: MissionInfoDto, email: MissionInfoDto, chat: MissionInfoDto) {
+    this.document = document;
+    this.email = email;
+    this.chat = chat;
   }
 }

@@ -32,40 +32,41 @@ export class UserMissionService {
   ) {}
 
   async getUserMissionInfo(userId: number) {
-    /*
-    {"mission": {
-      "completed": 7,
-        "total": 10,
-        "remaining": 3,
-        "progressRate": 70
-    },
-      "attendance": {
-      "attendedDays": 2,
-        "totalDays": 3,
-    }
-    }
-   */
-
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    const total = await this.userMissionRepository.count({
-      where: {
-        user: { userId },
-        endDate: MoreThan(now),
-      },
-    });
-    const completed = await this.userMissionRepository.count({
-      where: {
-        user: { userId },
-        completed: true,
-        endDate: MoreThan(now),
-      },
-    });
-    const mission = new MissionInfoDto(completed, total);
-    const attendance = new AttendanceInfoDto(1, 5);
+    const defaultInfo = () => new MissionInfoDto(0, 0);
 
-    //TODO: attendance 실제값 불러와야함
-    return new UserMissionInfoDto(mission, attendance);
+    const raw = await this.userMissionRepository
+      .createQueryBuilder('um')
+      .innerJoin('um.mission', 'm')
+      .where('um.user = :user_id', { user_id: userId })
+      .andWhere('um.endDate > :now', { now })
+      .select('m.missionTheme', 'theme')
+      .addSelect('COUNT(*)', 'total')
+      .addSelect(
+        'SUM(CASE WHEN um.completed = true THEN 1 ELSE 0 END)',
+        'completed',
+      )
+      .groupBy('m.missionTheme')
+      .getRawMany();
+
+    const map: Record<string, MissionInfoDto> = {
+      document: defaultInfo(),
+      email: defaultInfo(),
+      chat: defaultInfo(),
+    };
+    for (const row of raw) {
+      const total = Number(row.total);
+      const completed = Number(row.completed);
+
+      map[row.theme] = new MissionInfoDto(completed, total);
+    }
+
+    return new UserMissionInfoDto(
+      map.document,
+      map.email,
+      map.chat,
+    )
   }
 
   async createUserMission(dto: UserMissionDTO.createUserMission) {
