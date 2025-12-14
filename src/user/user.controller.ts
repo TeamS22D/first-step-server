@@ -9,7 +9,6 @@ import {
   Delete,
   Patch,
   HttpCode,
-  Param,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
@@ -94,7 +93,8 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get('/todaysMission/:userId')
-  async todaysMission(@Param('userId') userId: number) {
+  async todaysMission(@Req() req: Request) {
+    const userId = (req.user as any).id;
     return await this.userService.todaysMission(userId);
   }
 }
