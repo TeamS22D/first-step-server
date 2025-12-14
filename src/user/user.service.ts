@@ -337,15 +337,13 @@ export class UserService {
     return missions;
   }
 
-  async timeLine(userId: number) {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
+  async timeLine(userId: number, present: Date) {
     const origin = await this.userMissionRepository.find({
       where: {
         user: { userId },
-        endDate: MoreThan(now),
+        endDate: MoreThan(present),
       },
+      relations: ['mission']
     });
 
     if (!origin || origin.length === 0) {
@@ -355,7 +353,7 @@ export class UserService {
     const missions = origin.map((um) => ({
       userMissionId: um.userMissionId,
       missionName: um.mission.missionName,
-      compeleted: um.completed
+      compeleted: um.completed,
     }));
     return missions;
   }

@@ -9,6 +9,7 @@ import {
   Delete,
   Patch,
   HttpCode,
+  Param,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
@@ -98,9 +99,9 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('/timeLine')
-  async timeLine(@Req() req: Request) {
+  @Get('/timeLine/:present')
+  async timeLine(@Req() req: Request, @Param() present: Date) {
     const userId = (req.user as any).id;
-    return await this.userService.timeLine(userId);
+    return await this.userService.timeLine(userId, present);
   }
 }
