@@ -322,6 +322,7 @@ export class UserService {
         user: { userId },
         endDate: MoreThan(now),
       },
+      relations: ['mission']
     });
 
     if (!origin || origin.length === 0) {
