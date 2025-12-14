@@ -6,6 +6,9 @@ export namespace EmailMissionDTO {
         title: string;
 
         @IsString()
+        receiver:string;
+
+        @IsString()
         emailContent: string;
 
         @IsNumber()
@@ -20,6 +23,9 @@ export namespace EmailMissionDTO {
         title: string;
 
         @IsString()
+        receiver: string;
+
+        @IsString()
         emailContent: string;
 
         @IsNumber()
@@ -29,6 +35,9 @@ export namespace EmailMissionDTO {
     export class sendDTO {
         @IsString()
         title: string;
+
+        @IsString()
+        receiver: string;
 
         @IsString()
         emailContent: string;
