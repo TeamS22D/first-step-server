@@ -91,4 +91,10 @@ export class UserController {
     return 1; // 임시 설정
   }
 
+  @UseGuards(AuthGuard)
+  @Get('/todaysMission')
+  async todaysMission(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    return await this.userService.todaysMission(userId);
+  }
 }

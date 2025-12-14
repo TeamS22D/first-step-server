@@ -12,12 +12,15 @@ import { Provider, SocialUserDto } from 'src/auth/dto/social-user.dto';
 import { CheckEmailDto, SignUpDto, UpdateUserDto } from '../auth/dto/auth-dto';
 import { Job } from './types/job.enum';
 import { Occupation } from './types/occupation.enum';
+import { UserMission } from 'src/user-mission/entities/user-mission.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(UserMission)
+    private userMissionRepository: Repository<UserMission>,
   ) {}
 
   async updateRefreshToken(userId: number, token: string) {
@@ -308,5 +311,28 @@ export class UserService {
       totalUsers: totalUsers,
       percentile: percentile.toFixed(2),
     };
+  }
+
+  async todaysMission(userId: number) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
+    });
+
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      endDate: um.endDate,
+    }));
+    return missions;
   }
 }
