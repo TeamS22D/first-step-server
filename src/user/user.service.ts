@@ -335,4 +335,27 @@ export class UserService {
     }));
     return missions;
   }
+
+  async timeLine(userId: number) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
+    });
+
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      compeleted: um.completed
+    }));
+    return missions;
+  }
 }

@@ -97,4 +97,11 @@ export class UserController {
     const userId = (req.user as any).id;
     return await this.userService.todaysMission(userId);
   }
+
+  @UseGuards(AuthGuard)
+  @Get('/timeLine')
+  async timeLine(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    return await this.userService.timeLine(userId);
+  }
 }
