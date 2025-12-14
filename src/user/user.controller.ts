@@ -92,7 +92,7 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('/todaysMission/:userId')
+  @Get('/todaysMission')
   async todaysMission(@Req() req: Request) {
     const userId = (req.user as any).id;
     return await this.userService.todaysMission(userId);
