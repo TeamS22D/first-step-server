@@ -63,6 +63,22 @@ export class UserMissionController {
     );
   }
 
+  // @UseGuards(AuthGuard)
+  // @Get('/missions/feedback')
+  // async findAllMission(
+  //   @Req() req,
+  //   @Query('missionTheme') missionTheme: MissionTheme,
+  // ) {
+  //   const userId = req.user['userId'];
+  //   if (!missionTheme) {
+  //     return this.userMissionService.findAllUserMission(userId);
+  //   }
+  //   return this.userMissionService.findAllUserMissionByTheme(
+  //     userId,
+  //     missionTheme,
+  //   );
+  // }
+
   @Get('/mission/:userMissionId')
   async findUserMissionById(@Param('userMissionId') userMissionId: number) {
     return this.userMissionService.findUserMissionById(userMissionId);

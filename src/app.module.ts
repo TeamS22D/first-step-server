@@ -21,6 +21,7 @@ import { Rubric } from './rubric/entities/rubric.entity';
 import { RubricModule } from './rubric/rubric.module';
 import { GradingResult } from './user-mission/entities/grading-result.entity';
 import { GradingCriteriaEntity } from './user-mission/entities/grading-criteria.entity';
+import { InternalApiModule } from './internal-api/internal-api.module';
 import { EmailMission } from './email-mission/entities/email-mission.entity';
 import { EmailMissionModule } from './email-mission/email-mission.module';
 import { DocumentMissionModule } from './document-mission/document-mission.module';
@@ -66,6 +67,7 @@ import { DocumentMission } from './document-mission/entities/document-mission.en
     UserMissionModule,
     EmailMissionModule,
     DocumentMissionModule,
+    InternalApiModule,
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],

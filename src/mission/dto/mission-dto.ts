@@ -13,11 +13,19 @@ export class createMissionDto {
 
   @IsOptional()
   @IsString()
-  description?: string | null;
+  description?: string;
 
   @IsOptional()
   @IsString()
-  referenceAnswer?: string | null;
+  situation?: string;
+
+  @IsOptional()
+  @IsString()
+  tip?: string;
+
+  @IsOptional()
+  @IsString()
+  referenceAnswer?: string;
 
   @IsNumber()
   rubricId: number;
