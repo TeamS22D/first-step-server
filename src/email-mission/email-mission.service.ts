@@ -15,6 +15,7 @@ export class EmailMissionService {
         return { 
             emailMissionId: saved.emailMissionId,
             title: saved.title,
+            receiver: saved.receiver,
             emailContent: saved.emailContent,
             userMIssionId: saved.userMission
         }

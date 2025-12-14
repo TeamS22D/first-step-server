@@ -16,6 +16,9 @@ export class EmailMission {
     @Column({ nullable: true })
     saveAt: Date;
 
+    @Column({ nullable: true })
+    receiver: string;
+
     @Column({ default: false })
     isSend: boolean;
 
