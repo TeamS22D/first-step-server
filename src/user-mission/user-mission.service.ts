@@ -276,22 +276,76 @@ export class UserMissionService {
     return missions;
   }
 
-  async findUserMissionById(userMissionId: number) {
-    const userMission = await this.userMissionRepository.findOne({
-      where: { userMissionId },
+  async findAllCompletedUserMission(userId: number) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        completed: true,
+        endDate: MoreThan(now),
+      },
+      relations: ['mission'],
     });
 
-    if (!userMission) {
-      throw new BadRequestException({ message: '미션이 없습니다.' });
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
     }
 
-    return userMission;
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionId: um.mission.missionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
+    return missions;
+  }
+
+  async findAllCompletedUserMissionByTheme(
+    userId: number,
+    theme: MissionTheme,
+  ) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        completed: true,
+        endDate: MoreThan(now),
+        mission: { missionTheme: theme },
+      },
+      relations: ['mission'],
+    });
+
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionId: um.mission.missionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
+    return missions;
   }
 
   async findAnswerByUserMissionId(userMissionId: number) {
     return await this.resultRepository.findOne({
       where: { userMission: { userMissionId } },
       relations: ['gradingCriterias'],
+    });
+  }
+
+  async findUserMissionById(userMissionId: number) {
+    return await this.userMissionRepository.findOne({
+      where: { userMissionId },
     });
   }
 
