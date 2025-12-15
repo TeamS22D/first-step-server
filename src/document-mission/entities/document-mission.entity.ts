@@ -19,7 +19,7 @@ export class DocumentMission {
     @Column({ nullable: true })
     documentContent: string;
 
-    @OneToOne(() => UserMission, userMission => userMission.userMissionId)
+    @OneToOne(() => UserMission, userMission => userMission.documentMission)
     @JoinColumn({ name: 'user_mission_id' })
     userMission: UserMission;
 }

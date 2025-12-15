@@ -42,6 +42,12 @@ export class Mission {
   body: string;
 
   @Column({ type: 'text', nullable: true })
+  situation: string;
+
+  @Column({ type: 'text', nullable: true })
+  tip: string;
+
+  @Column({ type: 'text', nullable: true })
   description?: string | null;
 
   @Column({ type: 'text', nullable: true })

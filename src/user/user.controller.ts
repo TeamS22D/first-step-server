@@ -85,10 +85,22 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get('/profile/percent')
-  @HttpCode(200)
   getPercent(@Req() req: Request) {
-    const userId = req.user?.['userId'];
-    return 1; // 임시 설정
+    const userId = (req.user as any).id;
+    return this.userService.getAttendanceRank(userId);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('/todaysMission')
+  async todaysMission(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    return await this.userService.todaysMission(userId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/timeLine')
+  async timeLine(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    return await this.userService.timeLine(userId);
+  }
 }

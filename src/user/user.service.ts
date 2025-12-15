@@ -12,16 +12,18 @@ import { Provider, SocialUserDto } from 'src/auth/dto/social-user.dto';
 import { CheckEmailDto, SignUpDto, UpdateUserDto } from '../auth/dto/auth-dto';
 import { Job } from './types/job.enum';
 import { Occupation } from './types/occupation.enum';
+import { UserMission } from 'src/user-mission/entities/user-mission.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(UserMission)
+    private userMissionRepository: Repository<UserMission>,
   ) {}
 
   async updateRefreshToken(userId: number, token: string) {
-    await this.userRepository.update(userId, { refreshToken: token });
     let hashedToken: string | null = null;
     
     if (token) {
@@ -50,7 +52,6 @@ export class UserService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
-  // 이메일 중복 확인
   async checkEmail(authDTO: CheckEmailDto) {
     const { email } = authDTO;
 
@@ -62,43 +63,36 @@ export class UserService {
     return { message: '사용 가능한 이메일입니다.' };
   }
 
-  // 회원가입
   async signup(authDTO: SignUpDto) {
     const { email, password, checkPassword } = authDTO;
 
     if (await this.findByEmail(email)) {
-      throw new ConflictException({ message: '이메일이 이미 사용 중입니다.' }); // 이메일 중복
+      throw new ConflictException({ message: '이메일이 이미 사용 중입니다.' });
     }
 
-    // 이메일 정규식 (간단 버전)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // 비밀번호 정규식
     const pwdRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*~₩])[A-Za-z\d!@#$%^&*~₩]{7,20}$/;
 
-    // 이메일/비밀번호 필수값 체크
     if (!email || !password || !checkPassword) {
       throw new BadRequestException({
         message: '이메일과 비밀번호를 모두 입력해 주세요.',
       });
     }
 
-    // 이메일 형식 체크 (@, 도메인 포함)
     if (!emailRegex.test(email)) {
       throw new BadRequestException({
         message: '이메일 형식과 맞지 않습니다.',
       });
     }
 
-    // 비밀번호 동일 여부
     if (password !== checkPassword) {
       throw new BadRequestException({
         message: '비밀번호가 일치하지 않습니다.',
       });
     }
 
-    // 비밀번호 형식 체크
     if (!pwdRegex.test(password)) {
       throw new BadRequestException({
         message: '비밀번호는 7~20자, 영문/숫자/특수문자 조합이어야 합니다.',
@@ -109,6 +103,7 @@ export class UserService {
     const user = this.userRepository.create({
       ...authDTO,
       password: hashedPassword,
+      provider: Provider.LOCAL,
     });
     const saved = await this.userRepository.save(user);
 
@@ -119,11 +114,24 @@ export class UserService {
     };
   }
 
+  async updateProvider(userId: number, provider: Provider) {
+    await this.userRepository.update(userId, { provider: provider });
+    return this.findById(userId);
+  }
+
   async socialSignup(userDto: SocialUserDto, provider: Provider) {
     const { email, name } = userDto;
-    if (await this.findByEmail(email)) {
-      throw new ConflictException({ message: '이메일이 이미 사용 중입니다.' }); // 이메일 중복
+    
+    let user = await this.findByEmail(email);
+
+    if (user) {
+        if (user.provider === Provider.LOCAL) {
+            user = await this.updateProvider(user.userId, provider);
+            return user;
+        }
+        throw new ConflictException({ message: `이미 ${user.provider} 계정으로 사용 중인 이메일입니다.` });
     }
+
     const userEntity = this.userRepository.create({
       email,
       provider,
@@ -155,7 +163,6 @@ export class UserService {
 
     const updateData: Partial<UserEntity> = {};
 
-    // 이메일 업데이트 (선택)
     if (email !== undefined) {
       const emailTrim = email.trim();
 
@@ -165,7 +172,6 @@ export class UserService {
         });
       }
 
-      // 이메일 형식 체크
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(emailTrim)) {
         throw new BadRequestException({
@@ -173,7 +179,6 @@ export class UserService {
         });
       }
 
-      // 중복 체크 (본인 제외)
       const existing = await this.findByEmail(emailTrim);
       if (existing && existing.userId !== userId) {
         throw new ConflictException({
@@ -198,14 +203,11 @@ export class UserService {
       }
     }
 
-    // 이름 업데이트 (선택)
     if (typeof name === 'string' && name.trim().length > 0) {
       updateData['name'] = name.trim();
     }
 
-    // 비밀번호 업데이트 (선택)
     if (password !== undefined || checkPassword !== undefined) {
-      // 둘 중 하나라도 비어있으면 오류
       if (!password || !checkPassword) {
         throw new BadRequestException({
           message: '비밀번호와 확인 비밀번호를 모두 입력해 주세요.',
@@ -218,7 +220,6 @@ export class UserService {
         });
       }
 
-      // 비밀번호 정규식
       const pwdRegex =
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*~₩])[A-Za-z\d!@#$%^&*~₩]{7,20}$/;
       if (!pwdRegex.test(password)) {
@@ -230,7 +231,6 @@ export class UserService {
       updateData['password'] = await bcrypt.hash(password, 10);
     }
 
-    // 변경할 데이터가 하나도 없으면
     if (Object.keys(updateData).length === 0) {
       throw new BadRequestException({ message: '변경할 정보가 없습니다.' });
     }
@@ -311,5 +311,52 @@ export class UserService {
       totalUsers: totalUsers,
       percentile: percentile.toFixed(2),
     };
+  }
+
+  async todaysMission(userId: number) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
+      relations: ['mission']
+    });
+
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      endDate: um.endDate,
+    }));
+    return missions;
+  }
+
+  async timeLine(userId: number) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        endDate: MoreThan(now),
+      },
+    });
+
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionName: um.mission.missionName,
+      compeleted: um.completed
+    }));
+    return missions;
   }
 }

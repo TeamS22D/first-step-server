@@ -43,6 +43,9 @@ export class UserEntity {
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;
 
+  @Column({ default: '인턴' })
+  rank: string;
+
   @Column({
     type: 'enum',
     enum: Provider,

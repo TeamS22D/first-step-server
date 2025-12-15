@@ -3,17 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DocumentMission } from './entities/document-mission.entity';
 import { Repository } from 'typeorm';
 import { DocumentMissionDto } from './dto/document-mission-dto';
+import { InternalApiService } from '../internal-api/internal-api.service';
 
 @Injectable()
 export class DocumentMissionService {
   constructor(
+    private readonly internalApi: InternalApiService,
     @InjectRepository(DocumentMission)
     private documentMissionRepository: Repository<DocumentMission>,
   ) {}
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
   async createDocumentMission(Dto: DocumentMissionDto.createDTO) {
-    const documentMission = this.documentMissionRepository.create(Dto);
+    const { userMissionId, ...rest } = Dto;
+    const documentMission = this.documentMissionRepository.create({
+      ...rest,
+      userMission: { userMissionId },
+    });
     const saved = await this.documentMissionRepository.save(documentMission);
     return {
       documentMissionId: saved.documentMissionId,
@@ -36,7 +42,7 @@ export class DocumentMissionService {
     return documentMission;
   }
 
-  // 이메일 업데이트
+  // 문서 업데이트
   async updateDocumentMission(
     documentMissionId: number,
     Dto: DocumentMissionDto.updateDTO,
@@ -82,13 +88,20 @@ export class DocumentMissionService {
   }
 
   // 유저가 이메일 쓴 거 제출
-  async sendDocument(documentMissionId: number, Dto: DocumentMissionDto.sendDTO) {
-    const exists = await this.documentMissionRepository.existsBy({
-      documentMissionId,
-    });
+  async sendDocument(
+    documentMissionId: number,
+    Dto: DocumentMissionDto.sendDTO,
+  ) {
+    const documentMission = await this.documentMissionRepository
+      .createQueryBuilder('dm')
+      .innerJoinAndSelect('dm.userMission', 'um')
+      .innerJoinAndSelect('um.mission', 'm')
+      .innerJoinAndSelect('m.rubric', 'r')
+      .where('dm.documentMissionId = :documentMissionId', { documentMissionId })
+      .getOne();
     const sendAt = new Date();
 
-    if (!exists) {
+    if (!documentMission) {
       throw new BadRequestException({ message: '문서를 찾을 수 없습니다.' });
     }
 
@@ -97,6 +110,23 @@ export class DocumentMissionService {
       sendAt,
       isSend: true,
     });
+
+    // console.log(documentMission);
+    // console.log(documentMission.documentContent);
+    // console.log(documentMission.userMission.mission.body);
+    // console.log(documentMission.userMission.mission.rubric.body);
+
+    const payload = {
+      user_answer: documentMission.documentContent,
+      question: documentMission.userMission.mission.body,
+      rubric: documentMission.userMission.mission.rubric.body,
+    };
+    const gradingResult = await this.internalApi.postToFastApi(
+      '/api/v1/document/evaluate',
+      payload,
+    );
+
+    console.log(gradingResult);
 
     const result = {
       ...Dto,
@@ -110,7 +140,10 @@ export class DocumentMissionService {
   }
 
   // 유저가 이메일 쓴 거 저장
-  async saveDocument(documentMissionId: number, Dto: DocumentMissionDto.sendDTO) {
+  async saveDocument(
+    documentMissionId: number,
+    Dto: DocumentMissionDto.sendDTO,
+  ) {
     const exists = await this.documentMissionRepository.existsBy({
       documentMissionId,
     });
