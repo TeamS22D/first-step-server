@@ -4,7 +4,6 @@ import { DocumentMission } from './entities/document-mission.entity';
 import { Repository } from 'typeorm';
 import { DocumentMissionDto } from './dto/document-mission-dto';
 import { InternalApiService } from '../internal-api/internal-api.service';
-import { UserMission } from '../user-mission/entities/user-mission.entity';
 import { UserMissionService } from '../user-mission/user-mission.service';
 import { RawGradingResult } from '../user-mission/dto/raw-grading-result.dto';
 
@@ -15,8 +14,6 @@ export class DocumentMissionService {
     private readonly internalApi: InternalApiService,
     @InjectRepository(DocumentMission)
     private documentMissionRepository: Repository<DocumentMission>,
-    @InjectRepository(UserMission)
-    private userMissionRepository: Repository<UserMission>,
   ) {}
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
@@ -127,10 +124,6 @@ export class DocumentMissionService {
         '/api/v1/document/evaluate',
         payload,
       );
-    await this.userMissionRepository.update(
-      documentMission.userMission.userMissionId,
-      { completed: true },
-    );
 
     return await this.userMissionService.saveGradingResult(
       gradingResult,
