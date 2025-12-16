@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EmailMission } from './entities/email-mission.entity';
 import { Repository } from 'typeorm';
 import { EmailMissionDTO } from './dto/email-mission-dto';
+import { UserMission } from 'src/user-mission/entities/user-mission.entity';
 
 @Injectable()
 export class EmailMissionService {
@@ -22,13 +23,13 @@ export class EmailMissionService {
     }
 
     async findEmailMission(emailMissionId: number) {
-        const emailMission = await this.emailMissionRepository.findOne({ where: { emailMissionId } });
+        const emailMission = await this.emailMissionRepository.findOne({ where: { emailMissionId }, relations:['user_mission'] });
 
         if (!emailMission) {
             throw new BadRequestException({ message: "이메일 미션을 찾을 수 없습니다." });
         }
 
-        return emailMission;
+        return { emailMission };
     }
 
     // 이메일 업데이트
