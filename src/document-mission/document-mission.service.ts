@@ -117,11 +117,6 @@ export class DocumentMissionService {
       isSend: true,
     });
 
-    // console.log(documentMission);
-    // console.log(documentMission.documentContent);
-    // console.log(documentMission.userMission.mission.body);
-    // console.log(documentMission.userMission.mission.rubric.body);
-
     const payload = {
       user_answer: documentMission.documentContent,
       question: documentMission.userMission.mission.body,
@@ -132,9 +127,6 @@ export class DocumentMissionService {
         '/api/v1/document/evaluate',
         payload,
       );
-
-    console.log(gradingResult);
-
     await this.userMissionRepository.update(
       documentMission.userMission.userMissionId,
       { completed: true },
