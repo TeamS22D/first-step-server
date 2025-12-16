@@ -1,12 +1,12 @@
 import { Column } from 'typeorm';
 
 export class Feedback {
-  @Column({ nullable: true })
+  @Column({ name: 'good_points', nullable: true })
   goodPoints: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'improvement_points', nullable: true })
   improvementPoints: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'suggested_fix', nullable: true })
   suggestedFix: string;
 }
