@@ -48,29 +48,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
+  #deploy:
+    #needs: build-and-test
+    #runs-on: ubuntu-latest
 
     # main 브랜치 push일 때만 CD 실행
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    #if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    steps:
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
+    #steps:
+      #- name: Deploy to EC2 via SSH
+        #uses: appleboy/ssh-action@v1.0.3
+        #with:
+          #host: ${{ secrets.EC2_HOST }}
+          #username: ${{ secrets.EC2_USER }}
+          #key: ${{ secrets.EC2_SSH_KEY }}
+          #script: |
+            #docker pull ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
 
-            docker stop nestjs-app || true
-            docker rm nestjs-app || true
+            #docker stop nestjs-app || true
+            #docker rm nestjs-app || true
 
-            docker run -d \
-              --name nestjs-app \
-              -p 3000:3000 \
-              --env-file .env \
-              --restart always \
-              ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
+            #docker run -d \
+             # --name nestjs-app \
+              #-p 3000:3000 \
+              #--env-file .env \
+              #--restart always \
+              #${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
