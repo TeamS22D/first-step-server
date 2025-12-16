@@ -16,7 +16,7 @@ export class Rubric {
   @Column()
   rubricName: string;
 
-  @Column()
+  @Column({ type: 'text' })
   body: string;
 
   @OneToMany(() => Mission, (mission) => mission.rubric)
