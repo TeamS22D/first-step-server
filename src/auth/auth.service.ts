@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { SocialUserDto } from './dto/social-user.dto';
 import { Provider } from './dto/social-user.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from './dto/auth-dto';
 
