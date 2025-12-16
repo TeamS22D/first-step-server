@@ -24,7 +24,7 @@ export class AuthController {
     return this.authService.signin(authDTO);
   }
 
-  @Get('/refresh') 
+  @Post('/refresh') 
   async refresh(
     @Headers('Authorization') authHeader: string,
     @Res() res: Response,
