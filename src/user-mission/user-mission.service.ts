@@ -17,6 +17,7 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 import { UserMissionInfoDto } from './dto/user-mission-info.dto';
 import { MissionInfoDto } from './dto/mission-info.dto';
 import { RawGradingResult } from './dto/raw-grading-result.dto'
+import { FeedbackResponseDto } from './dto/feedback-response.dto';
 
 dayjs.extend(isoWeek);
 
@@ -396,7 +397,7 @@ export class UserMissionService {
 
   async saveGradingResult(rawResult: RawGradingResult, userMissionId: number) {
     const gradingResult = await this.resultRepository.save({
-      userMissionId,
+      userMissionId: userMissionId,
       totalScore: rawResult.total_score,
       grade: rawResult.grade,
       summeryFeedback: rawResult.general_feedback,
@@ -426,6 +427,19 @@ export class UserMissionService {
         gradingCriterias: true,
       },
     });
+  }
+
+  async getFeedback(userMissionId: number) {
+    const response = await this.resultRepository.findOne({
+      where: {
+        userMission: { userMissionId: userMissionId },
+      },
+      relations: { gradingCriterias: true },
+    });
+    if (!response) {
+      throw new BadRequestException({ message: '결과가 존재하지 않습니다.' });
+    }
+    return FeedbackResponseDto.fromEntity(response);
   }
 
   //TODO: 트랜젝션 설정
