@@ -343,6 +343,7 @@ export class UserMissionService {
     });
   }
 
+
   async findUserMissionById(userMissionId: number) {
     return await this.userMissionRepository.findOne({
       where: { userMissionId },
