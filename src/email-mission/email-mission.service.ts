@@ -7,109 +7,144 @@ import { UserMission } from 'src/user-mission/entities/user-mission.entity';
 
 @Injectable()
 export class EmailMissionService {
-    constructor(@InjectRepository(EmailMission) private emailMissionRepository: Repository<EmailMission>) {}
+  constructor(
+    @InjectRepository(EmailMission)
+    private emailMissionRepository: Repository<EmailMission>,
+  ) {}
 
-    // 이거 유저가 처음 미션 들어오자 마자 실행
-    async createEmailMission(Dto: EmailMissionDTO.createDTO) {
-        const emailMission = this.emailMissionRepository.create(Dto);
-        const saved = await this.emailMissionRepository.save(emailMission);
-        return { 
-            emailMissionId: saved.emailMissionId,
-            title: saved.title,
-            receiver: saved.receiver,
-            emailContent: saved.emailContent,
-            userMIssionId: saved.userMission
-        }
+  // 이거 유저가 처음 미션 들어오자 마자 실행
+  async createEmailMission(Dto: EmailMissionDTO.createDTO) {
+    const emailMission = this.emailMissionRepository.create(Dto);
+    const saved = await this.emailMissionRepository.save(emailMission);
+    return {
+      emailMissionId: saved.emailMissionId,
+      title: saved.title,
+      receiver: saved.receiver,
+      emailContent: saved.emailContent,
+      userMIssionId: saved.userMission,
+    };
+  }
+
+  async findEmailMission(emailMissionId: number) {
+    const emailMission = await this.emailMissionRepository.findOne({
+      where: { emailMissionId },
+      relations: ['userMission'],
+    });
+
+    if (!emailMission) {
+      throw new BadRequestException({
+        message: '이메일 미션을 찾을 수 없습니다.',
+      });
     }
 
-    async findEmailMission(emailMissionId: number) {
-        const emailMission = await this.emailMissionRepository.findOne({ where: { emailMissionId }, relations:['userMission'] });
+    return {
+      emailMissionId: emailMission.emailMissionId,
+      title: emailMission.title,
+      sendAt: emailMission.sendAt,
+      receiver: emailMission.receiver,
+      emailContent: emailMission.emailContent,
+      userMissionId: emailMission.userMission.userMissionId,
+      isSend: emailMission.isSend,
+    };
+  }
 
-        if (!emailMission) {
-            throw new BadRequestException({ message: "이메일 미션을 찾을 수 없습니다." });
-        }
+  // 이메일 업데이트
+  async updateEmailMission(
+    emailMissionId: number,
+    Dto: EmailMissionDTO.updateDTO,
+  ) {
+    const exists = await this.emailMissionRepository.existsBy({
+      emailMissionId,
+    });
 
-        return { emailMission };
+    if (!exists) {
+      throw new BadRequestException({
+        message: '이메일 미션을 찾을 수 없습니다.',
+      });
     }
 
-    // 이메일 업데이트
-    async updateEmailMission(emailMissionId: number, Dto: EmailMissionDTO.updateDTO) {
-        const exists = await this.emailMissionRepository.existsBy({ emailMissionId });
+    const update = await this.emailMissionRepository.update(
+      emailMissionId,
+      Dto,
+    );
+    return {
+      message: '이메일 업데이트',
+      emailMissionId: emailMissionId,
+      update: Dto,
+    };
+  }
 
-        if (!exists) {
-            throw new BadRequestException({ message: "이메일 미션을 찾을 수 없습니다." });
-        }
+  async deleteEmailMission(emailMissionId: number) {
+    const exists = await this.emailMissionRepository.existsBy({
+      emailMissionId,
+    });
 
-        const update = await this.emailMissionRepository.update(emailMissionId, Dto);
-        return { 
-            message: "이메일 업데이트", 
-            emailMissionId: emailMissionId, 
-            update: Dto 
-        };
+    if (!exists) {
+      throw new BadRequestException({
+        message: '이메일 미션을 찾을 수 없습니다.',
+      });
     }
 
-    async deleteEmailMission(emailMissionId: number) {
-        const exists = await this.emailMissionRepository.existsBy({ emailMissionId });
+    const deleteEmailMission =
+      this.emailMissionRepository.delete(emailMissionId);
+    return {
+      message: '이메일 미션 삭제',
+      delete: emailMissionId,
+    };
+  }
 
-        if (!exists) {
-            throw new BadRequestException({ message: "이메일 미션을 찾을 수 없습니다." });
-        }
+  // 유저가 이메일 쓴 거 제출
+  async sendEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
+    const exists = await this.emailMissionRepository.existsBy({
+      emailMissionId,
+    });
+    const sendAt = new Date();
 
-        const deleteEmailMission = this.emailMissionRepository.delete(emailMissionId);
-        return { 
-            message: "이메일 미션 삭제", 
-            delete: emailMissionId
-        };
+    if (!exists) {
+      throw new BadRequestException({ message: '이메일을 찾을 수 없습니다.' });
     }
 
-    // 유저가 이메일 쓴 거 제출
-    async sendEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
-        const exists = await this.emailMissionRepository.existsBy({ emailMissionId });
-        const sendAt = new Date();
+    await this.emailMissionRepository.update(emailMissionId, {
+      ...Dto,
+      sendAt,
+      isSend: true,
+    });
 
-        if (!exists) {
-            throw new BadRequestException({ message: "이메일을 찾을 수 없습니다." });
-        }
+    const result = {
+      ...Dto,
+      sendAt,
+    };
 
-        await this.emailMissionRepository.update(emailMissionId, {
-                ...Dto,
-                sendAt,
-                isSend: true,
-            });
+    return {
+      message: '이메일이 제출되었습니다.',
+      send: result,
+    };
+  }
 
-            const result = {
-                ...Dto,
-                sendAt
-            }
+  // 유저가 이메일 쓴 거 저장
+  async saveEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
+    const exists = await this.emailMissionRepository.existsBy({
+      emailMissionId,
+    });
+    const saveAt = new Date();
 
-        return { 
-            message: "이메일이 제출되었습니다.", 
-            send: result
-        };
+    if (!exists) {
+      throw new BadRequestException({ message: '이메일을 찾을 수 없습니다.' });
     }
 
-    // 유저가 이메일 쓴 거 저장
-    async saveEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
-        const exists = await this.emailMissionRepository.existsBy({ emailMissionId });
-        const saveAt = new Date();
+    await this.emailMissionRepository.update(emailMissionId, {
+      ...Dto,
+      saveAt,
+    });
 
-        if (!exists) {
-            throw new BadRequestException({ message: "이메일을 찾을 수 없습니다." });
-        }
+    const save = {
+      ...Dto,
+      saveAt,
+    };
 
-        await this.emailMissionRepository.update(emailMissionId, { 
-            ...Dto,
-            saveAt
-        });
-
-        const save = {
-            ...Dto,
-            saveAt
-        }
-
-        return { 
-            message: "이메일이 저장되었습니다.", 
-            save: save
-        };
-    }
+    return {
+      message: '이메일이 저장되었습니다.',
+      save: save,
+    };
+  }
 }
