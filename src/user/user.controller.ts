@@ -12,9 +12,9 @@ import {
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 import type { Request } from 'express';
-import { CheckEmailDto, SignUpDto, UpdateUserDto } from 'src/auth/dto/auth-dto';
+import { CheckEmailDto, SignUpDto, UpdateUserDto } from '../auth/dto/auth-dto';
 
 @Controller('user')
 export class UserController {

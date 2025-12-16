@@ -11,9 +11,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { DocumentMissionService } from './document-mission.service';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { Role } from 'src/user/types/user-role.enum';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../user/types/user-role.enum';
 import { DocumentMissionDto } from './dto/document-mission-dto';
 
 @Controller('document-mission')

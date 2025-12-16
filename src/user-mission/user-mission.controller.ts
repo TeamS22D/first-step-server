@@ -11,8 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserMissionService } from './user-mission.service';
-import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { UserMissionDTO } from '../user-mission/dto/user-mission-dto';
+import { AuthGuard } from '../auth/guard/auth.guard';
 import type { Request } from 'express';
 import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { ProfileGraphDto } from './dto/profile-graph-dto';

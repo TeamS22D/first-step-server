@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { EmailMissionDTO } from './dto/email-mission-dto';
 import { EmailMissionService } from './email-mission.service';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { Role } from 'src/user/types/user-role.enum';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../user/types/user-role.enum';
 
 @Controller('email-mission')
 export class EmailMissionController {

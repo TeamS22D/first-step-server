@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, DataSource } from 'typeorm';
 import { Bizword } from './entities/bizword.entity';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserEntity } from '../user/entities/user.entity';
 import { CreateBizwordDto } from './dto/create-bizword.dto';
 import { UpdateBizwordDto } from './dto/update-bizword.dto';
 

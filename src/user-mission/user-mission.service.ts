@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
+import { UserMissionDTO } from '../user-mission/dto/user-mission-dto';
 import { UserMission } from './entities/user-mission.entity';
 import { MoreThan, Repository } from 'typeorm';
 import { GradingCriteriaEntity } from './entities/grading-criteria.entity';

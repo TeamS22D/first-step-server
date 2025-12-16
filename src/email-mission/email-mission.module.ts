@@ -3,8 +3,7 @@ import { EmailMissionService } from './email-mission.service';
 import { EmailMissionController } from './email-mission.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmailMission } from './entities/email-mission.entity';
-import { UserMission } from 'src/user-mission/entities/user-mission.entity';
-import { UserMissionModule } from 'src/user-mission/user-mission.module';
+import { UserMissionModule } from '../user-mission/user-mission.module';
 
 @Module({
     imports: [

@@ -8,11 +8,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
-import { Provider, SocialUserDto } from 'src/auth/dto/social-user.dto';
+import { Provider, SocialUserDto } from '../auth/dto/social-user.dto';
 import { CheckEmailDto, SignUpDto, UpdateUserDto } from '../auth/dto/auth-dto';
 import { Job } from './types/job.enum';
 import { Occupation } from './types/occupation.enum';
-import { UserMission } from 'src/user-mission/entities/user-mission.entity';
+import { UserMission } from '../user-mission/entities/user-mission.entity';
 
 @Injectable()
 export class UserService {
