@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EmailMission } from './entities/email-mission.entity';
 import { Repository } from 'typeorm';
 import { EmailMissionDTO } from './dto/email-mission-dto';
+import { UserMission } from 'src/user-mission/entities/user-mission.entity';
 
 @Injectable()
 export class EmailMissionService {
