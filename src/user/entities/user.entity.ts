@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { Bizword } from 'src/bizwords/entities/bizword.entity';
+import { Bizword } from '../../bizwords/entities/bizword.entity';
 import { Role } from '../types/user-role.enum';
 import { UserMission } from '../../user-mission/entities/user-mission.entity';
 import { Provider } from '../../auth/dto/social-user.dto';
