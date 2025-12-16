@@ -28,7 +28,15 @@ export class EmailMissionService {
             throw new BadRequestException({ message: "이메일 미션을 찾을 수 없습니다." });
         }
 
-        return emailMission;
+        return {
+          emailMissionId: emailMission.emailMissionId,
+          title: emailMission.title,
+          sendAt:  emailMission.sendAt,
+          receiver: emailMission.receiver,
+          emailContent: emailMission.emailContent,
+          userMissionId: emailMission.userMission.userMissionId,
+          isSend: emailMission.isSend,
+        };
     }
 
     // 이메일 업데이트
