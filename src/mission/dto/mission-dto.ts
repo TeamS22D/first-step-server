@@ -19,6 +19,9 @@ export class createMissionDto {
   @IsString()
   situation?: string;
 
+  @IsString()
+  requirement: string;
+
   @IsOptional()
   @IsString()
   tip?: string;
@@ -50,6 +53,10 @@ export class updateMissionDto {
   @IsString()
   @IsOptional()
   rubricId?: number;
+
+  @IsString()
+  @IsOptional()
+  requirement?: string;
 
   @IsString()
   @IsOptional()
