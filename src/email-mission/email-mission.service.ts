@@ -23,7 +23,7 @@ export class EmailMissionService {
     }
 
     async findEmailMission(emailMissionId: number) {
-        const emailMission = await this.emailMissionRepository.findOne({ where: { emailMissionId }, relations:['user_mission'] });
+        const emailMission = await this.emailMissionRepository.findOne({ where: { emailMissionId }, relations:['userMission'] });
 
         if (!emailMission) {
             throw new BadRequestException({ message: "이메일 미션을 찾을 수 없습니다." });
