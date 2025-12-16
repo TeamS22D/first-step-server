@@ -4,13 +4,19 @@ import { DocumentMission } from './entities/document-mission.entity';
 import { Repository } from 'typeorm';
 import { DocumentMissionDto } from './dto/document-mission-dto';
 import { InternalApiService } from '../internal-api/internal-api.service';
+import { UserMission } from '../user-mission/entities/user-mission.entity';
+import { UserMissionService } from '../user-mission/user-mission.service';
+import { RawGradingResult } from '../user-mission/dto/raw-grading-result.dto';
 
 @Injectable()
 export class DocumentMissionService {
   constructor(
+    private readonly userMissionService: UserMissionService,
     private readonly internalApi: InternalApiService,
     @InjectRepository(DocumentMission)
     private documentMissionRepository: Repository<DocumentMission>,
+    @InjectRepository(UserMission)
+    private userMissionRepository: Repository<UserMission>,
   ) {}
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
@@ -121,22 +127,25 @@ export class DocumentMissionService {
       question: documentMission.userMission.mission.body,
       rubric: documentMission.userMission.mission.rubric.body,
     };
-    const gradingResult = await this.internalApi.postToFastApi(
-      '/api/v1/document/evaluate',
-      payload,
-    );
+    const gradingResult =
+      await this.internalApi.postToFastApi<RawGradingResult>(
+        '/api/v1/document/evaluate',
+        payload,
+      );
 
     console.log(gradingResult);
 
-    const result = {
-      ...Dto,
-      sendAt,
-    };
+    await this.userMissionRepository.update(
+      documentMission.userMission.userMissionId,
+      { completed: true },
+    );
 
-    return {
-      message: '문서가 제출되었습니다.',
-      send: result,
-    };
+    const result = await this.userMissionService.saveGradingResult(
+      gradingResult,
+      documentMission.userMission.userMissionId,
+    );
+
+    return result;
   }
 
   // 유저가 이메일 쓴 거 저장

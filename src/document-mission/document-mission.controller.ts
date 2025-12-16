@@ -63,7 +63,10 @@ export class DocumentMissionController {
     @Param('documentMissionId') documentMissionId: number,
     @Body() Dto: DocumentMissionDto.sendDTO,
   ) {
-    return await this.documentMissionService.sendDocument(documentMissionId, Dto);
+    return await this.documentMissionService.sendDocument(
+      documentMissionId,
+      Dto,
+    );
   }
 
   @UseGuards(AuthGuard)

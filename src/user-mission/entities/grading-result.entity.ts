@@ -26,7 +26,7 @@ export class GradingResult {
   @Column({ name: 'summery_feedback', type: 'text' })
   summeryFeedback: string;
 
-  @Column({ name: 'internal_note' })
+  @Column({ name: 'internal_note', nullable: true })
   internalNote: string;
 
   @OneToOne(() => UserMission, (userMission) => userMission.gradingResult, {
@@ -41,13 +41,6 @@ export class GradingResult {
     (gradingCriteria) => gradingCriteria.gradingResult,
   )
   gradingCriterias: GradingCriteriaEntity[];
-
-  @Column()
-  userId: number;
-
-  @ManyToOne(() => Mission, (mission) => mission.userMissions)
-  @JoinColumn({ name: 'missionId' })
-  mission: Mission;
 
   @CreateDateColumn()
   createdAt: Date;
