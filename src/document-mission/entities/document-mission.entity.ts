@@ -16,7 +16,7 @@ export class DocumentMission {
     @Column({ default: false })
     isSend: boolean;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'text' })
     documentContent: string;
 
     @OneToOne(() => UserMission, userMission => userMission.documentMission)
