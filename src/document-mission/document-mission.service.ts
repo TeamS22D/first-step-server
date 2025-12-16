@@ -140,12 +140,10 @@ export class DocumentMissionService {
       { completed: true },
     );
 
-    const result = await this.userMissionService.saveGradingResult(
+    return await this.userMissionService.saveGradingResult(
       gradingResult,
       documentMission.userMission.userMissionId,
     );
-
-    return result;
   }
 
   // 유저가 이메일 쓴 거 저장

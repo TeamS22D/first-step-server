@@ -419,7 +419,7 @@ export class UserMissionService {
     );
 
     await this.criteriaRepository.save(criteriaEntities);
-    return await this.resultRepository.findOne({
+    const response = await this.resultRepository.findOne({
       where: {
         id: gradingResult.id,
       },
@@ -427,6 +427,10 @@ export class UserMissionService {
         gradingCriterias: true,
       },
     });
+    if (!response) {
+      throw new BadRequestException({ message: '결과가 존재하지 않습니다.' });
+    }
+    return FeedbackResponseDto.fromEntity(response);
   }
 
   async getFeedback(userMissionId: number) {
