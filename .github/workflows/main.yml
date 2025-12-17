@@ -74,3 +74,4 @@ jobs:
               --env-file .env \
               --restart always \
               ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
+              
