@@ -123,7 +123,7 @@ export class DocumentMissionService {
 
     const payload = {
       user_answer: documentMission.documentContent,
-      question: documentMission.userMission.mission.requirement,
+      question: documentMission.userMission.mission.body,
       rubric: documentMission.userMission.mission.rubric.body,
     };
     const gradingResult =

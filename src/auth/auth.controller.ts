@@ -36,23 +36,35 @@ export class AuthController {
     const refreshToken = authHeader.split(' ')[1];
 
     let userId: number;
+    let tokenType: string;
+
     try {
       const payload = this.authService['jwtService'].decode(refreshToken);
+      
+      if (!payload) {
+        throw new Error();
+      }
+
       userId = payload['id'];
+      tokenType = payload['type'];
     } catch (e) {
-      throw new UnauthorizedException('유효하지 않은 리프레시 토큰입니다.');
+      throw new UnauthorizedException('유효하지 않은 토큰 형식입니다.');
     }
 
     if (!refreshToken || !userId) {
       throw new UnauthorizedException('토큰이 전달되지 않았거나 유저 ID를 확인할 수 없습니다.');
     }
 
+    if (tokenType !== 'refresh') {
+      throw new UnauthorizedException('리프레시 토큰이 아닙니다. (Access Token 사용 불가)');
+    }
+
     const { newAccessToken, newRefreshToken } = await this.authService.refresh(
       userId, 
       refreshToken,
     );
-    
-    return res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
+
+    return res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
   }
 
   private async handleSocialLoginRedirect(req: any, res: Response, provider: Provider) {

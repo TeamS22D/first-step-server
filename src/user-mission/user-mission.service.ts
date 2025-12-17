@@ -348,6 +348,7 @@ export class UserMissionService {
   async findUserMissionById(userMissionId: number) {
     return await this.userMissionRepository.findOne({
       where: { userMissionId },
+      relations: ['mission']
     });
   }
 
@@ -357,6 +358,7 @@ export class UserMissionService {
         user: { userId },
         mission: { missionId },
       },
+      relations: ['mission']
     });
 
     if (!userMission) {
