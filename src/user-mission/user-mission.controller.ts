@@ -13,7 +13,6 @@ import {
 import { UserMissionService } from './user-mission.service';
 import { UserMissionDTO } from 'src/user-mission/dto/user-mission-dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import type { Request } from 'express';
 import { MissionTheme } from '../mission/types/missoin-theme.enum';
 import { ProfileGraphDto } from './dto/profile-graph-dto';
 import { RolesGuard } from '../auth/guard/roles.guard';
@@ -63,25 +62,31 @@ export class UserMissionController {
     );
   }
 
-  // @UseGuards(AuthGuard)
-  // @Get('/missions/feedback')
-  // async findAllMission(
-  //   @Req() req,
-  //   @Query('missionTheme') missionTheme: MissionTheme,
-  // ) {
-  //   const userId = req.user['userId'];
-  //   if (!missionTheme) {
-  //     return this.userMissionService.findAllUserMission(userId);
-  //   }
-  //   return this.userMissionService.findAllUserMissionByTheme(
-  //     userId,
-  //     missionTheme,
-  //   );
-  // }
+  @UseGuards(AuthGuard)
+  @Get('/missions/feedback')
+  async findAllCompletedMission(
+    @Req() req,
+    @Query('missionTheme') missionTheme: MissionTheme,
+  ) {
+    const userId = req.user['userId'];
+    if (!missionTheme) {
+      return this.userMissionService.findAllCompletedUserMission(userId);
+    }
+    return this.userMissionService.findAllCompletedUserMissionByTheme(
+      userId,
+      missionTheme,
+    );
+  }
 
   @Get('/mission/:userMissionId')
   async findUserMissionById(@Param('userMissionId') userMissionId: number) {
     return this.userMissionService.findUserMissionById(userMissionId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/feedback/:userMissionId')
+  async getFeedback(@Param('userMissionId') userMissionId: number) {
+    return this.userMissionService.getFeedback(userMissionId);
   }
 
   @UseGuards(AuthGuard)
@@ -117,20 +122,5 @@ export class UserMissionController {
   @Delete('/:id')
   async deleteUserMission(@Param('id') id: number) {
     return this.userMissionService.deleteUserMission(Number(id));
-  }
-
-  @UseGuards(AuthGuard)
-  @Post('/answer/:id')
-  async createAnswer(
-    @Req() req: Request,
-    @Param('id') userMissionId: number,
-    @Body() userMissionDto: UserMissionDTO.createAnswer,
-  ) {
-    const userId = req.user?.['userId'];
-    return this.userMissionService.createAnswer(
-      userId,
-      userMissionId,
-      userMissionDto,
-    );
   }
 }

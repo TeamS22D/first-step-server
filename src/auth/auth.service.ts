@@ -71,7 +71,12 @@ export class AuthService {
   }
 
   async refresh(userId: number, refreshToken: string): Promise<RefreshResult> {
+
+    
     const user = await this.userService.findById(userId);
+
+    console.log(`[Refresh Debug] User ID: ${userId}`);
+    console.log(`[Refresh Debug] Client Token (Plain): ${refreshToken}`);
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException({
         message: '유저가 존재하지 않거나 로그인이 필요합니다.',

@@ -5,12 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserMissionModule } from 'src/user-mission/user-mission.module';
 import { DocumentMission } from './entities/document-mission.entity';
 import { InternalApiModule } from '../internal-api/internal-api.module';
+import { UserMission } from '../user-mission/entities/user-mission.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([DocumentMission]),
+    TypeOrmModule.forFeature([DocumentMission, UserMission]),
     forwardRef(() => UserMissionModule),
     InternalApiModule,
+    UserMissionModule,
   ],
   exports: [DocumentMissionService],
   providers: [DocumentMissionService],

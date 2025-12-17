@@ -16,6 +16,8 @@ import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { UserMissionInfoDto } from './dto/user-mission-info.dto';
 import { MissionInfoDto } from './dto/mission-info.dto';
+import { RawGradingResult } from './dto/raw-grading-result.dto'
+import { FeedbackResponseDto } from './dto/feedback-response.dto';
 
 dayjs.extend(isoWeek);
 
@@ -276,16 +278,64 @@ export class UserMissionService {
     return missions;
   }
 
-  async findUserMissionById(userMissionId: number) {
-    const userMission = await this.userMissionRepository.findOne({
-      where: { userMissionId },
+  async findAllCompletedUserMission(userId: number) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        completed: true,
+        endDate: MoreThan(now),
+      },
+      relations: ['mission'],
     });
 
-    if (!userMission) {
-      throw new BadRequestException({ message: '미션이 없습니다.' });
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
     }
 
-    return userMission;
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionId: um.mission.missionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
+    return missions;
+  }
+
+  async findAllCompletedUserMissionByTheme(
+    userId: number,
+    theme: MissionTheme,
+  ) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const origin = await this.userMissionRepository.find({
+      where: {
+        user: { userId },
+        completed: true,
+        endDate: MoreThan(now),
+        mission: { missionTheme: theme },
+      },
+      relations: ['mission'],
+    });
+
+    if (!origin || origin.length === 0) {
+      throw new BadRequestException({ message: '미션이 존재하지 않습니다.' });
+    }
+
+    const missions = origin.map((um) => ({
+      userMissionId: um.userMissionId,
+      missionId: um.mission.missionId,
+      missionName: um.mission.missionName,
+      missionTheme: um.mission.missionTheme,
+      startDate: um.startDate,
+      endDate: um.endDate,
+    }));
+    return missions;
   }
 
   async findAnswerByUserMissionId(userMissionId: number) {
@@ -295,12 +345,21 @@ export class UserMissionService {
     });
   }
 
+
+  async findUserMissionById(userMissionId: number) {
+    return await this.userMissionRepository.findOne({
+      where: { userMissionId },
+      relations: ['mission']
+    });
+  }
+
   async findUserMissionByMissionId(userId: number, missionId: number) {
     const userMission = await this.userMissionRepository.findOne({
       where: {
         user: { userId },
         mission: { missionId },
       },
+      relations: ['mission']
     });
 
     if (!userMission) {
@@ -338,6 +397,58 @@ export class UserMissionService {
 
     return { message: '유저 미션 삭제 완료' };
   }
+
+  async saveGradingResult(rawResult: RawGradingResult, userMissionId: number) {
+    const gradingResult = await this.resultRepository.save({
+      userMissionId: userMissionId,
+      totalScore: rawResult.total_score,
+      grade: rawResult.grade,
+      summeryFeedback: rawResult.general_feedback,
+    });
+
+    const criteriaEntities = rawResult.evaluations.map((ev, index) =>
+      this.criteriaRepository.create({
+        index,
+        item: ev.item,
+        score: ev.score,
+        maxScore: 100,
+        feedback: {
+          goodPoints: ev.feedback?.good_points ?? null,
+          improvementPoints: ev.feedback?.improvement_points ?? null,
+          suggestedFix: ev.feedback?.suggested_fix ?? null,
+        },
+        gradingResult: gradingResult,
+      }),
+    );
+
+    await this.criteriaRepository.save(criteriaEntities);
+    const response = await this.resultRepository.findOne({
+      where: {
+        id: gradingResult.id,
+      },
+      relations: {
+        gradingCriterias: true,
+      },
+    });
+    if (!response) {
+      throw new BadRequestException({ message: '결과가 존재하지 않습니다.' });
+    }
+    return FeedbackResponseDto.fromEntity(response);
+  }
+
+  async getFeedback(userMissionId: number) {
+    const response = await this.resultRepository.findOne({
+      where: {
+        userMission: { userMissionId: userMissionId },
+      },
+      relations: { gradingCriterias: true },
+    });
+    if (!response) {
+      throw new BadRequestException({ message: '결과가 존재하지 않습니다.' });
+    }
+    return FeedbackResponseDto.fromEntity(response);
+  }
+
   //TODO: 트랜젝션 설정
   async createAnswer(
     userId: number,
@@ -365,9 +476,6 @@ export class UserMissionService {
       totalScore: 100,
       grade: 'A',
       summeryFeedback: '너무 멋져요',
-      internalNote: 'a',
-      mission: { missionId: userMission.mission.missionId },
-      userId: userMission.user.userId,
       userMission,
     });
     await this.resultRepository.save(gradingResult);

@@ -112,6 +112,7 @@ export class UserService {
     return {
       message: '회원가입이 완료되었습니다.',
       email: email,
+      name: saved.name,
       userId: saved.userId,
     };
   }
@@ -350,6 +351,7 @@ export class UserService {
         user: { userId },
         endDate: MoreThan(now),
       },
+      relations: ['mission'],
     });
 
     if (!origin || origin.length === 0) {

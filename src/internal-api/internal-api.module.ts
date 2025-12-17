@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule,
 
     HttpModule.register({
-      timeout: 5000,
+      timeout: 500000000,
       maxRedirects: 5,
     }),
 
