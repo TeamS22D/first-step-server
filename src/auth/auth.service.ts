@@ -54,36 +54,37 @@ export class AuthService {
       });
     }
 
-      if (user.isVerified == false) {
-        throw new BadRequestException({ 
-        message: "인증이 되어 있지 않은 유저입니다.",
-      });
-    }
+    // if (user.isVerified === false) { 
+    //     throw new BadRequestException({ 
+    //     message: "인증이 되어 있지 않은 유저입니다.",
+    //   });
+    // }
 
     const payload = { id: user.userId };
 
-    const accessToken = this.jwtService.sign({ type: 'access', ...payload });
-    const refreshToken = this.jwtService.sign({ type: 'refresh', ...payload }, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign({ ...payload, type: 'access' });
+    const refreshToken = this.jwtService.sign({ ...payload, type: 'refresh' }, { expiresIn: '7d' });
 
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.userService.updateRefreshToken(user.userId, hashedRefreshToken);
+    await this.userService.updateRefreshToken(user.userId, refreshToken);
 
     return { userId: user.userId, email, accessToken, refreshToken };
   }
 
   async refresh(userId: number, refreshToken: string): Promise<RefreshResult> {
+
+    
     const user = await this.userService.findById(userId);
-    if (!user || !user.refreshToken) {
-      throw new UnauthorizedException({
-        message: '유저가 존재하지 않거나 토큰이 없습니다.',
-      });
-    }
 
     console.log(`[Refresh Debug] User ID: ${userId}`);
     console.log(`[Refresh Debug] Client Token (Plain): ${refreshToken}`);
-    console.log(`[Refresh Debug] DB Token (Hashed): ${user.refreshToken}`);
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException({
+        message: '유저가 존재하지 않거나 로그인이 필요합니다.',
+      });
+    }
 
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    
     if (!isMatch) {
       throw new UnauthorizedException({ message: '토큰이 일치하지 않습니다.' });
     }
@@ -91,16 +92,15 @@ export class AuthService {
     const payload = { id: user.userId };
     
     const newAccessToken = this.jwtService.sign(
-      { type: 'access', ...payload },
+      { ...payload, type: 'access' },
       { expiresIn: '15m' },
     );
     const newRefreshToken = this.jwtService.sign(
-      { type: 'refresh', ...payload },
+      { ...payload, type: 'refresh' },
       { expiresIn: '7d' },
     );
 
-    const hashedNewRefreshToken = await bcrypt.hash(newRefreshToken, 10);
-    await this.userService.updateRefreshToken(user.userId, hashedNewRefreshToken);
+    await this.userService.updateRefreshToken(user.userId, newRefreshToken);
 
     return { newAccessToken, newRefreshToken };
   }
@@ -127,8 +127,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign({ ...payload, type: 'access' });
     const refreshToken = this.jwtService.sign({ ...payload, type: 'refresh' }, { expiresIn: '7d' });
 
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.userService.updateRefreshToken(user!.userId, hashedRefreshToken);
+    await this.userService.updateRefreshToken(user!.userId, refreshToken);
 
     return { userId: user!.userId, email, accessToken, refreshToken };
   }
