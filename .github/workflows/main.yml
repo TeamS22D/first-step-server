@@ -38,8 +38,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          # main 브랜치에 push될 때만 이미지를 push
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          # main 브랜치에 push될 때만 이미지를 push && github.ref == 'refs/heads/main' 
+          push: ${{ github.event_name == 'push' }}
           # 태그를 latest와 함께 commit hash로 관리하여 추적성 확보
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
