@@ -348,7 +348,7 @@ export class UserMissionService {
   async findUserMissionById(userMissionId: number) {
     return await this.userMissionRepository.findOne({
       where: { userMissionId },
-      relations: ['mission']
+      relations: ['mission'],
     });
   }
 
@@ -358,7 +358,7 @@ export class UserMissionService {
         user: { userId },
         mission: { missionId },
       },
-      relations: ['mission']
+      relations: ['mission'],
     });
 
     if (!userMission) {
@@ -447,56 +447,5 @@ export class UserMissionService {
       throw new BadRequestException({ message: '결과가 존재하지 않습니다.' });
     }
     return FeedbackResponseDto.fromEntity(response);
-  }
-
-  //TODO: 트랜젝션 설정
-  async createAnswer(
-    userId: number,
-    userMissionId: number,
-    dto: UserMissionDTO.createAnswer,
-  ) {
-    const userMission = await this.userMissionRepository.findOne({
-      where: { userMissionId },
-      relations: ['mission', 'user'],
-    });
-    if (!userMission) {
-      throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
-    }
-    if (userMission.user.userId !== userId) {
-      throw new ForbiddenException({ message: '접근할 수 없습니다.' });
-    }
-    if (userMission.gradingResult) {
-      throw new BadRequestException({
-        message: '이미 결과가 나온 미션입니다.',
-      });
-    }
-    await this.userMissionRepository.update(userMissionId, dto);
-    // 평가 시스템 예시
-    const gradingResult = this.resultRepository.create({
-      totalScore: 100,
-      grade: 'A',
-      summeryFeedback: '너무 멋져요',
-      userMission,
-    });
-    await this.resultRepository.save(gradingResult);
-    for (let i = 0; i < 5; i++) {
-      const gradingCriteria = this.criteriaRepository.create({
-        index: i + 1,
-        item: `${i + 1}d`,
-        score: 100,
-        maxScore: 100,
-        gradingResult,
-        feedback: {
-          goodPoints: '1',
-          improvementPoints: '2',
-          suggestedFix: '3',
-        },
-      });
-      await this.criteriaRepository.save(gradingCriteria);
-    }
-    return await this.resultRepository.findOne({
-      where: { id: gradingResult.id },
-      relations: ['gradingCriterias'],
-    });
   }
 }
