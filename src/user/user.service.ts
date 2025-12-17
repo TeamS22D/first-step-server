@@ -25,18 +25,20 @@ export class UserService {
 
   async updateRefreshToken(userId: number, token: string) {
     let hashedToken: string | null = null;
-    
+
     if (token) {
       hashedToken = await bcrypt.hash(token, 10);
     }
 
-    await this.userRepository.update(userId, { refreshToken: hashedToken as any });
+    await this.userRepository.update(userId, {
+      refreshToken: hashedToken as any,
+    });
   }
 
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
     const user = await this.findById(userId);
     if (!user || !user.refreshToken) return null;
-    
+
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
     if (isMatch) {
       return user;
@@ -121,15 +123,17 @@ export class UserService {
 
   async socialSignup(userDto: SocialUserDto, provider: Provider) {
     const { email, name } = userDto;
-    
+
     let user = await this.findByEmail(email);
 
     if (user) {
-        if (user.provider === Provider.LOCAL) {
-            user = await this.updateProvider(user.userId, provider);
-            return user;
-        }
-        throw new ConflictException({ message: `이미 ${user.provider} 계정으로 사용 중인 이메일입니다.` });
+      if (user.provider === Provider.LOCAL) {
+        user = await this.updateProvider(user.userId, provider);
+        return user;
+      }
+      throw new ConflictException({
+        message: `이미 ${user.provider} 계정으로 사용 중인 이메일입니다.`,
+      });
     }
 
     const userEntity = this.userRepository.create({
@@ -322,7 +326,7 @@ export class UserService {
         user: { userId },
         endDate: MoreThan(now),
       },
-      relations: ['mission']
+      relations: ['mission'],
     });
 
     if (!origin || origin.length === 0) {
@@ -355,7 +359,7 @@ export class UserService {
     const missions = origin.map((um) => ({
       userMissionId: um.userMissionId,
       missionName: um.mission.missionName,
-      compeleted: um.completed
+      compeleted: um.completed,
     }));
     return missions;
   }
