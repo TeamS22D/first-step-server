@@ -64,48 +64,39 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
-  
+      
             docker stop nestjs-app || true
             docker rm nestjs-app || true
-
-      - name: Create .env file
-        run: |
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "JWT_TIME=${{ secrets.JWT_TIME }}" >> .env
-          echo "EMAIL_ADDRESS=${{ secrets.EMAIL_ADDRESS }}" >> .env
-          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
-          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
-          echo "REDIS_TTL=${{ secrets.REDIS_TTL }}" >> .env
-          echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
-          echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> .env
-          echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> .env
-          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
-          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
-          echo "GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}" >> .env
-          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
-          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
-          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
-          echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env
-          echo "KAKAO_CALLBACK_URL=${{ secrets.KAKAO_CALLBACK_URL }}" >> .env
-          echo "FASTAPI_URL=${{ secrets.FASTAPI_URL }}" >> .env
-          echo "INTERNAL_JWT_SECRET=${{ secrets.INTERNAL_JWT_SECRET }}" >> .env
-  
-            #docker run -d \
-              #--name nestjs-app \
-              #-p 3000:3000 \
-              #--env-file .env \
-              #--restart always \
-              #${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
-
-      - name: Run container
-        run: |
-          docker run -d \
-            --name nestjs-app \
-            --env-file .env \
-            -p 3000:3000 \
-            --restart always \
-            ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
-              
+      
+            cat <<EOF > .env
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_TIME=${{ secrets.JWT_TIME }}
+            EMAIL_ADDRESS=${{ secrets.EMAIL_ADDRESS }}
+            EMAIL_PASS=${{ secrets.EMAIL_PASS }}
+            REDIS_HOST=${{ secrets.REDIS_HOST }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            REDIS_TTL=${{ secrets.REDIS_TTL }}
+            DATABASE_HOST=${{ secrets.DATABASE_HOST }}
+            DATABASE_PORT=${{ secrets.DATABASE_PORT }}
+            DATABASE_USER=${{ secrets.DATABASE_USER }}
+            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+            DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
+            NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}
+            NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}
+            KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+            KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+            KAKAO_CALLBACK_URL=${{ secrets.KAKAO_CALLBACK_URL }}
+            FASTAPI_URL=${{ secrets.FASTAPI_URL }}
+            INTERNAL_JWT_SECRET=${{ secrets.INTERNAL_JWT_SECRET }}
+            EOF
+      
+            docker run -d \
+              --name nestjs-app \
+              --env-file .env \
+              -p 3000:3000 \
+              --restart always \
+              ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
+      
