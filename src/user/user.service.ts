@@ -110,6 +110,7 @@ export class UserService {
     return {
       message: '회원가입이 완료되었습니다.',
       email: email,
+      name: saved.name,
       userId: saved.userId,
     };
   }
