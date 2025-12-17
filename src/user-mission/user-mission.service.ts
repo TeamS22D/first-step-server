@@ -400,7 +400,7 @@ export class UserMissionService {
 
   async saveGradingResult(rawResult: RawGradingResult, userMissionId: number) {
     const gradingResult = await this.resultRepository.save({
-      userMissionId: userMissionId,
+      userMission: { userMissionId },
       totalScore: rawResult.total_score,
       grade: rawResult.grade,
       summeryFeedback: rawResult.general_feedback,
