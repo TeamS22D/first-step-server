@@ -3,11 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EmailMission } from './entities/email-mission.entity';
 import { Repository } from 'typeorm';
 import { EmailMissionDTO } from './dto/email-mission-dto';
-import { UserMission } from 'src/user-mission/entities/user-mission.entity';
+import { UserMissionService } from '../user-mission/user-mission.service';
+import { InternalApiService } from '../internal-api/internal-api.service';
+import { RawGradingResult } from '../user-mission/dto/raw-grading-result.dto';
 
 @Injectable()
 export class EmailMissionService {
   constructor(
+    private readonly userMissionService: UserMissionService,
+    private readonly internalApi: InternalApiService,
     @InjectRepository(EmailMission)
     private emailMissionRepository: Repository<EmailMission>,
   ) {}
@@ -95,12 +99,16 @@ export class EmailMissionService {
 
   // 유저가 이메일 쓴 거 제출
   async sendEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
-    const exists = await this.emailMissionRepository.existsBy({
-      emailMissionId,
-    });
+    const emailMission = await this.emailMissionRepository
+      .createQueryBuilder('em')
+      .innerJoinAndSelect('em.userMission', 'um')
+      .innerJoinAndSelect('um.mission', 'm')
+      .innerJoinAndSelect('m.rubric', 'r')
+      .where('em.emailMissionId = :emailMissionId', { emailMissionId: emailMissionId })
+      .getOne();
     const sendAt = new Date();
 
-    if (!exists) {
+    if (!emailMission) {
       throw new BadRequestException({ message: '이메일을 찾을 수 없습니다.' });
     }
 
@@ -110,15 +118,21 @@ export class EmailMissionService {
       isSend: true,
     });
 
-    const result = {
-      ...Dto,
-      sendAt,
+    const payload = {
+      user_answer: emailMission.emailContent,
+      question: emailMission.userMission.mission.requirement,
+      rubric: emailMission.userMission.mission.rubric.body,
     };
+    const gradingResult =
+      await this.internalApi.postToFastApi<RawGradingResult>(
+        '/api/v1/email/evaluate',
+        payload,
+      );
 
-    return {
-      message: '이메일이 제출되었습니다.',
-      send: result,
-    };
+    return await this.userMissionService.saveGradingResult(
+      gradingResult,
+      emailMission.userMission.userMissionId,
+    );
   }
 
   // 유저가 이메일 쓴 거 저장

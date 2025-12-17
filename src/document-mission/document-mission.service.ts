@@ -4,7 +4,6 @@ import { DocumentMission } from './entities/document-mission.entity';
 import { Repository } from 'typeorm';
 import { DocumentMissionDto } from './dto/document-mission-dto';
 import { InternalApiService } from '../internal-api/internal-api.service';
-import { UserMission } from '../user-mission/entities/user-mission.entity';
 import { UserMissionService } from '../user-mission/user-mission.service';
 import { RawGradingResult } from '../user-mission/dto/raw-grading-result.dto';
 
@@ -15,8 +14,6 @@ export class DocumentMissionService {
     private readonly internalApi: InternalApiService,
     @InjectRepository(DocumentMission)
     private documentMissionRepository: Repository<DocumentMission>,
-    @InjectRepository(UserMission)
-    private userMissionRepository: Repository<UserMission>,
   ) {}
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
@@ -37,6 +34,7 @@ export class DocumentMissionService {
   async findDocumentMission(documentMissionId: number) {
     const documentMission = await this.documentMissionRepository.findOne({
       where: { documentMissionId },
+      relations: ['userMission'],
     });
 
     if (!documentMission) {
@@ -45,7 +43,13 @@ export class DocumentMissionService {
       });
     }
 
-    return documentMission;
+    return {
+      documentMissionId: documentMission.documentMissionId,
+      documentContent: documentMission.documentContent,
+      sendAt: documentMission.sendAt,
+      userMissionId: documentMission.userMission.userMissionId,
+      isSend: documentMission.isSend,
+    };
   }
 
   // 문서 업데이트
@@ -119,7 +123,7 @@ export class DocumentMissionService {
 
     const payload = {
       user_answer: documentMission.documentContent,
-      question: documentMission.userMission.mission.body,
+      question: documentMission.userMission.mission.requirement,
       rubric: documentMission.userMission.mission.rubric.body,
     };
     const gradingResult =
@@ -127,10 +131,6 @@ export class DocumentMissionService {
         '/api/v1/document/evaluate',
         payload,
       );
-    await this.userMissionRepository.update(
-      documentMission.userMission.userMissionId,
-      { completed: true },
-    );
 
     return await this.userMissionService.saveGradingResult(
       gradingResult,

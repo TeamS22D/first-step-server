@@ -19,7 +19,7 @@ export class FeedbackResponseDto {
       })),
       total_score: result.gradingCriterias.reduce((sum, c) => sum + c.score, 0),
       grade: result.grade,
-      general_feedback: result.summeryFeedback
+      general_feedback: result.summeryFeedback,
     };
   }
 }
