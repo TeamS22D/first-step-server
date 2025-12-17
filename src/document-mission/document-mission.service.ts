@@ -37,6 +37,7 @@ export class DocumentMissionService {
   async findDocumentMission(documentMissionId: number) {
     const documentMission = await this.documentMissionRepository.findOne({
       where: { documentMissionId },
+      relations: ['userMission']
     });
 
     if (!documentMission) {
