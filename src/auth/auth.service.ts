@@ -72,17 +72,19 @@ export class AuthService {
   }
 
   async refresh(userId: number, refreshToken: string): Promise<RefreshResult> {
+
+    
     const user = await this.userService.findById(userId);
+
+    console.log(`[Refresh Debug] User ID: ${userId}`);
+    console.log(`[Refresh Debug] Client Token (Plain): ${refreshToken}`);
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException({
         message: '유저가 존재하지 않거나 토큰이 없습니다.',
       });
     }
 
-    console.log(`[Refresh Debug] User ID: ${userId}`);
-    console.log(`[Refresh Debug] Client Token (Plain): ${refreshToken}`);
     console.log(`[Refresh Debug] DB Token (Hashed): ${user.refreshToken}`);
-
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!isMatch) {
       throw new UnauthorizedException({ message: '토큰이 일치하지 않습니다.' });
