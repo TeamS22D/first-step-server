@@ -34,6 +34,7 @@ export class DocumentMissionService {
   async findDocumentMission(documentMissionId: number) {
     const documentMission = await this.documentMissionRepository.findOne({
       where: { documentMissionId },
+      relations: ['userMission'],
     });
 
     if (!documentMission) {
@@ -42,7 +43,13 @@ export class DocumentMissionService {
       });
     }
 
-    return documentMission;
+    return {
+      documentMissionId: documentMission.documentMissionId,
+      documentContent: documentMission.documentContent,
+      sendAt: documentMission.sendAt,
+      userMissionId: documentMission.userMission.userMissionId,
+      isSend: documentMission.isSend,
+    };
   }
 
   // 문서 업데이트
@@ -116,7 +123,7 @@ export class DocumentMissionService {
 
     const payload = {
       user_answer: documentMission.documentContent,
-      question: documentMission.userMission.mission.body,
+      question: documentMission.userMission.mission.requirement,
       rubric: documentMission.userMission.mission.rubric.body,
     };
     const gradingResult =
