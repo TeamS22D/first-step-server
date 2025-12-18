@@ -53,7 +53,7 @@ import { DocumentMission } from './document-mission/entities/document-mission.en
           EmailMission,
           DocumentMission,
         ],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
 
