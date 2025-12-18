@@ -17,7 +17,7 @@ export class FeedbackResponseDto {
           suggested_fix: c.feedback.suggestedFix,
         },
       })),
-      total_score: result.gradingCriterias.reduce((sum, c) => sum + c.score, 0),
+      total_score: result.totalScore,
       grade: result.grade,
       general_feedback: result.summeryFeedback,
     };

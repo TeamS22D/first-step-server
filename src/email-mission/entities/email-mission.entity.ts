@@ -22,7 +22,7 @@ export class EmailMission {
     @Column({ default: false })
     isSend: boolean;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'text' })
     emailContent: string;
 
     @OneToOne(() => UserMission, userMission => userMission.userMissionId)
