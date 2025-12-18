@@ -356,6 +356,7 @@ export class UserMissionService {
         requirement: userMission.mission.requirement,
         description: userMission.mission.description,
         index: userMission.mission.index,
+        userMissionId: userMissionId,
         ai_persona: {
           name: userMission.mission.personaName,
           role: userMission.mission.personaRole,
