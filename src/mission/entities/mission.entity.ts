@@ -5,7 +5,6 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -61,4 +60,22 @@ export class Mission {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ name: 'ai_persona_name', nullable: true })
+  personaName: string;
+
+  @Column({ name: 'ai_persona_role', nullable: true })
+  personaRole: string;
+
+  @Column({ name: 'ai_persona_character', nullable: true })
+  personaCharacter: string;
+
+  // @Column({ name: 'ai_persona_prompt', nullable: true, type: 'text' })
+  // aiPersonaPrompt: string;
+  //
+  // @Column({ name: 'evaluation_guideline', nullable: true, type: 'text' })
+  // evaluationGuideline: string;
+  //
+  // @Column({ name: 'example_conversations_file', nullable: true, type: 'text' })
+  // example_conversations_file: string;
 }

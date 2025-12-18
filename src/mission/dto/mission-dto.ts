@@ -32,6 +32,18 @@ export class createMissionDto {
 
   @IsNumber()
   rubricId: number;
+
+  @IsOptional()
+  @IsString()
+  personaName?: string;
+
+  @IsOptional()
+  @IsString()
+  personaRole?: string;
+
+  @IsOptional()
+  @IsString()
+  personaCharacter?: string;
 }
 
 export class readMissionDto {
@@ -69,4 +81,16 @@ export class updateMissionDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  personaName?: string;
+
+  @IsOptional()
+  @IsString()
+  personaRole?: string;
+
+  @IsOptional()
+  @IsString()
+  personaCharacter?: string;
 }
