@@ -67,7 +67,7 @@ export class updateMissionDto {
   missionTheme?: MissionTheme;
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   index?: number;
 
   @IsString()
