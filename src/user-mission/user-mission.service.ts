@@ -190,10 +190,8 @@ export class UserMissionService {
             index: key,
             document:
               matches.reduce((a, b) => a + b.document, 0) / matches.length,
-            chat:
-              matches.reduce((a, b) => a + b.chat, 0) / matches.length,
-            mail:
-              matches.reduce((a, b) => a + b.mail, 0) / matches.length,
+            chat: matches.reduce((a, b) => a + b.chat, 0) / matches.length,
+            mail: matches.reduce((a, b) => a + b.mail, 0) / matches.length,
           });
         } else {
           filled.push({
@@ -342,7 +340,7 @@ export class UserMissionService {
   async findUserMissionById(userMissionId: number) {
     return await this.userMissionRepository.findOne({
       where: { userMissionId },
-      relations: ['mission']
+      relations: ['mission'],
     });
   }
 
@@ -352,7 +350,7 @@ export class UserMissionService {
         user: { userId },
         mission: { missionId },
       },
-      relations: ['mission']
+      relations: ['mission'],
     });
 
     if (!userMission) {
@@ -392,6 +390,14 @@ export class UserMissionService {
   }
 
   async saveGradingResult(rawResult: RawGradingResult, userMissionId: number) {
+    const result = await this.resultRepository.findOne({
+      where: {
+        userMission: { userMissionId },
+      },
+    });
+    if (result) {
+      await this.resultRepository.delete(result.id);
+    }
     const gradingResult = await this.resultRepository.save({
       userMission: { userMissionId },
       totalScore: rawResult.total_score,

@@ -114,9 +114,6 @@ export class DocumentMissionService {
     if (!documentMission) {
       throw new BadRequestException({ message: '문서를 찾을 수 없습니다.' });
     }
-    if (documentMission.isSend) {
-      throw new BadRequestException({ message: '이미 제출한 미션 입니다.' });
-    }
 
     await this.documentMissionRepository.update(documentMissionId, {
       ...Dto,
