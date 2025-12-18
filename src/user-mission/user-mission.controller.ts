@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpCode,
   Param,
   Patch,
   Post,
@@ -18,6 +18,7 @@ import { ProfileGraphDto } from './dto/profile-graph-dto';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../user/types/user-role.enum';
+import { FeedbackRequestDto } from './dto/feedback-request.dto';
 
 @Controller('user-mission')
 export class UserMissionController {
@@ -103,6 +104,17 @@ export class UserMissionController {
     return this.userMissionService.findUserMissionByMissionId(
       userId,
       missionId,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/feedback')
+  @HttpCode(200)
+  async chatFeedback(@Body() dto: FeedbackRequestDto) {
+    console.log(dto.userMissionId);
+    return this.userMissionService.saveGradingResult(
+      dto.rawResult,
+      dto.userMissionId,
     );
   }
 
