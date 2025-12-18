@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { UserMissionInfoDto } from './dto/user-mission-info.dto';
 import { MissionInfoDto } from './dto/mission-info.dto';
-import { RawGradingResult } from './dto/raw-grading-result.dto'
+import { RawGradingResult } from './dto/raw-grading-result.dto';
 import { FeedbackResponseDto } from './dto/feedback-response.dto';
 
 dayjs.extend(isoWeek);
@@ -345,7 +345,6 @@ export class UserMissionService {
     });
   }
 
-
   async findUserMissionById(userMissionId: number) {
     return await this.userMissionRepository.findOne({
       where: { userMissionId },
@@ -422,6 +421,7 @@ export class UserMissionService {
     );
 
     await this.criteriaRepository.save(criteriaEntities);
+    await this.userMissionRepository.update(userMissionId, { completed: true });
     const response = await this.resultRepository.findOne({
       where: {
         id: gradingResult.id,

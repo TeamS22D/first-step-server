@@ -9,7 +9,7 @@ import { UserMission } from '../user-mission/entities/user-mission.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([DocumentMission, UserMission]),
+    TypeOrmModule.forFeature([DocumentMission]),
     forwardRef(() => UserMissionModule),
     InternalApiModule,
     UserMissionModule,
