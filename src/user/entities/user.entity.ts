@@ -13,6 +13,7 @@ import { UserMission } from '../../user-mission/entities/user-mission.entity';
 import { Provider } from '../../auth/dto/social-user.dto';
 import { Occupation } from '../types/occupation.enum';
 import { Job } from '../types/job.enum';
+import { GradingResult } from '../../user-mission/entities/grading-result.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -71,6 +72,9 @@ export class UserEntity {
 
   @OneToMany(() => UserMission, (userMission) => userMission.user)
   userMissions: UserMission[];
+
+  @OneToMany(() => GradingResult, (gradingResult) => gradingResult.user)
+  gradingResults: GradingResult[];
 
   @ManyToMany(() => Bizword)
   @JoinTable({ name: 'user_favorites' })

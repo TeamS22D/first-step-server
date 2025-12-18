@@ -11,6 +11,7 @@ import {
 import { UserMission } from './user-mission.entity';
 import { GradingCriteriaEntity } from './grading-criteria.entity';
 import { Mission } from '../../mission/entities/mission.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity({ name: 'grading_result' })
 export class GradingResult {
@@ -35,6 +36,13 @@ export class GradingResult {
   })
   @JoinColumn({ name: 'user_mission_id' })
   userMission: UserMission;
+
+  @ManyToOne(() => UserEntity, (userEntity) => userEntity.gradingResults, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
 
   @OneToMany(
     () => GradingCriteriaEntity,

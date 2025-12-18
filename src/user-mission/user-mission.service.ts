@@ -348,7 +348,7 @@ export class UserMissionService {
   async findUserMissionById(userMissionId: number) {
     return await this.userMissionRepository.findOne({
       where: { userMissionId },
-      relations: ['mission']
+      relations: ['mission'],
     });
   }
 
@@ -358,7 +358,7 @@ export class UserMissionService {
         user: { userId },
         mission: { missionId },
       },
-      relations: ['mission']
+      relations: ['mission'],
     });
 
     if (!userMission) {
@@ -398,11 +398,22 @@ export class UserMissionService {
   }
 
   async saveGradingResult(rawResult: RawGradingResult, userMissionId: number) {
+    const userMission = await this.userMissionRepository.findOne({
+      where: { userMissionId },
+      relations: { user: true },
+    });
+    if (!userMission) {
+      throw new BadRequestException({
+        message: '유저미션이 존재하지 않습니다.',
+      });
+    }
+
     const gradingResult = await this.resultRepository.save({
       userMission: { userMissionId },
       totalScore: rawResult.total_score,
       grade: rawResult.grade,
       summeryFeedback: rawResult.general_feedback,
+      user: { userId: userMission.user.userId },
     });
 
     const criteriaEntities = rawResult.evaluations.map((ev, index) =>
