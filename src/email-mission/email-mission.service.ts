@@ -18,14 +18,18 @@ export class EmailMissionService {
 
   // 이거 유저가 처음 미션 들어오자 마자 실행
   async createEmailMission(Dto: EmailMissionDTO.createDTO) {
-    const emailMission = this.emailMissionRepository.create(Dto);
+    const { userMissionId, ...rest } = Dto;
+    const emailMission = this.emailMissionRepository.create({
+      ...rest,
+      userMission: { userMissionId },
+    });
     const saved = await this.emailMissionRepository.save(emailMission);
     return {
       emailMissionId: saved.emailMissionId,
       title: saved.title,
       receiver: saved.receiver,
       emailContent: saved.emailContent,
-      userMissionId: saved.userMission,
+      userMission: { userMissionId: Dto.userMissionId },
     };
   }
 
