@@ -111,6 +111,9 @@ export class EmailMissionService {
     if (!emailMission) {
       throw new BadRequestException({ message: '이메일을 찾을 수 없습니다.' });
     }
+    if (emailMission.isSend) {
+      throw new BadRequestException({ message: '이미 제출한 미션 입니다.' });
+    }
 
     await this.emailMissionRepository.update(emailMissionId, {
       ...Dto,
