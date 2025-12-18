@@ -9,6 +9,7 @@ import { Mission } from './entities/mission.entity';
 import { RubricService } from '../rubric/rubric.service';
 import { createMissionDto, updateMissionDto } from './dto/mission-dto';
 import { Repository } from 'typeorm';
+import { MissionTheme } from './types/missoin-theme.enum';
 
 @Injectable()
 export class MissionService {
@@ -74,6 +75,22 @@ export class MissionService {
     });
     if (!mission) {
       throw new BadRequestException({ message: '미션을 찾을 수 없습니다.' });
+    }
+    if (mission.missionTheme === MissionTheme.CHAT) {
+      return {
+        missionId: mission.missionId,
+        missionName: mission.missionName,
+        missionTheme: mission.missionTheme,
+        situation: mission.situation,
+        tip: mission.tip,
+        requirement: mission.requirement,
+        description: mission.description,
+        ai_persona: {
+          name: mission.personaName,
+          role: mission.personaRole,
+          character: mission.personaCharacter,
+        },
+      };
     }
 
     return mission;
