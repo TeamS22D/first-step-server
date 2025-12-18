@@ -123,24 +123,23 @@ export class UserMissionService {
             new Date(now.getFullYear(), 0, 1),
             new Date(now.getFullYear() + 1, 0, 1),
           ];
-
-        default:
-          return [null, null];
       }
     };
 
     const [start, end] = getDateRange(range);
 
     /** -----------------------------------------------------
-     * ① 날짜를 YYYY-MM-DD로 강제 포맷 (중요!)
+     * ① GradingResult → UserMission → User / Mission JOIN
      * ----------------------------------------------------- */
     const raw = await this.resultRepository
       .createQueryBuilder('r')
-      .innerJoin('r.mission', 'm')
+      .innerJoin('r.userMission', 'um')
+      .innerJoin('um.user', 'u')
+      .innerJoin('um.mission', 'm')
       .select('m.missionTheme', 'theme')
       .addSelect(`DATE_FORMAT(r.createdAt, '%Y-%m-%d')`, 'date')
-      .addSelect('AVG(r.total_score)', 'avgScore')
-      .where('r.userId = :userId', { userId })
+      .addSelect('AVG(r.totalScore)', 'avgScore')
+      .where('u.userId = :userId', { userId })
       .andWhere('r.createdAt >= :start', { start })
       .andWhere('r.createdAt < :end', { end })
       .groupBy('theme, DATE_FORMAT(r.createdAt, "%Y-%m-%d")')
@@ -150,34 +149,32 @@ export class UserMissionService {
     /** -----------------------------------------------------
      * ② historyMap 생성
      * ----------------------------------------------------- */
-    const historyMap: any = {};
+    const historyMap: Record<string, any> = {};
 
     raw.forEach(({ date, avgScore, theme }) => {
       if (!historyMap[date]) {
         historyMap[date] = {
-          index: date, // 날짜가 항상 YYYY-MM-DD
+          index: date,
           document: 0,
           chat: 0,
           mail: 0,
         };
       }
-      historyMap[date][theme.toLowerCase()] = Number(avgScore) ?? 0;
+
+      historyMap[date][theme.toLowerCase()] = Number(avgScore) || 0;
     });
 
     /** -----------------------------------------------------
-     * YEAR → 12개월 강제 생성
+     * ③ YEAR → 12개월 강제 생성
      * ----------------------------------------------------- */
     if (range === GraphRange.YEAR) {
       const year = now.getFullYear();
       const filled: any[] = [];
 
-      // 날짜 "YYYY-MM"로 축소
       const normalized = Object.values(historyMap).map((h: any) => {
         const [y, m] = h.index.split('-');
-        const ym = `${y}-${m}`;
-
         return {
-          index: ym,
+          index: `${y}-${m}`,
           document: h.document,
           chat: h.chat,
           mail: h.mail,
@@ -186,21 +183,18 @@ export class UserMissionService {
 
       for (let month = 0; month < 12; month++) {
         const key = `${year}-${String(month + 1).padStart(2, '0')}`;
-
         const matches = normalized.filter((h) => h.index === key);
 
         if (matches.length > 0) {
-          const combined = {
+          filled.push({
             index: key,
             document:
-              matches.reduce((a, b) => a + (b.document ?? 0), 0) /
-              matches.length,
+              matches.reduce((a, b) => a + b.document, 0) / matches.length,
             chat:
-              matches.reduce((a, b) => a + (b.chat ?? 0), 0) / matches.length,
+              matches.reduce((a, b) => a + b.chat, 0) / matches.length,
             mail:
-              matches.reduce((a, b) => a + (b.mail ?? 0), 0) / matches.length,
-          };
-          filled.push(combined);
+              matches.reduce((a, b) => a + b.mail, 0) / matches.length,
+          });
         } else {
           filled.push({
             index: key,
