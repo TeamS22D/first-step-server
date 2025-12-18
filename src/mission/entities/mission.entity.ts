@@ -37,6 +37,9 @@ export class Mission {
   })
   missionTheme: MissionTheme;
 
+  @Column({ nullable: true })
+  index: number;
+
   @Column({ type: 'text', nullable: false })
   body: string;
 

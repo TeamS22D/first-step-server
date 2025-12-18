@@ -355,6 +355,7 @@ export class UserMissionService {
         tip: userMission.mission.tip,
         requirement: userMission.mission.requirement,
         description: userMission.mission.description,
+        index: userMission.mission.index,
         ai_persona: {
           name: userMission.mission.personaName,
           role: userMission.mission.personaRole,

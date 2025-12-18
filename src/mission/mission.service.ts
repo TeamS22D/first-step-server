@@ -85,6 +85,7 @@ export class MissionService {
         tip: mission.tip,
         requirement: mission.requirement,
         description: mission.description,
+        index: mission.index,
         ai_persona: {
           name: mission.personaName,
           role: mission.personaRole,

@@ -17,6 +17,10 @@ export class createMissionDto {
 
   @IsOptional()
   @IsString()
+  index?: number;
+
+  @IsOptional()
+  @IsString()
   situation?: string;
 
   @IsString()
@@ -61,6 +65,10 @@ export class updateMissionDto {
   @IsEnum(MissionTheme, { message: "Invalid MissionTheme'})" })
   @IsOptional()
   missionTheme?: MissionTheme;
+
+  @IsOptional()
+  @IsString()
+  index?: number;
 
   @IsString()
   @IsOptional()
