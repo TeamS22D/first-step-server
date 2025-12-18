@@ -39,6 +39,9 @@ export class GradingResult {
   @OneToMany(
     () => GradingCriteriaEntity,
     (gradingCriteria) => gradingCriteria.gradingResult,
+    {
+      onDelete: 'CASCADE',
+    },
   )
   gradingCriterias: GradingCriteriaEntity[];
 
