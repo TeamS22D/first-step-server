@@ -338,10 +338,32 @@ export class UserMissionService {
   }
 
   async findUserMissionById(userMissionId: number) {
-    return await this.userMissionRepository.findOne({
+    const userMission = await this.userMissionRepository.findOne({
       where: { userMissionId },
       relations: ['mission'],
     });
+    if (!userMission) {
+      throw new BadRequestException({ message: '미션이 없습니다.' });
+    }
+
+    if (userMission.mission.missionTheme === MissionTheme.CHAT) {
+      return {
+        missionId: userMission.mission.missionId,
+        missionName: userMission.mission.missionName,
+        missionTheme: userMission.mission.missionTheme,
+        situation: userMission.mission.situation,
+        tip: userMission.mission.tip,
+        requirement: userMission.mission.requirement,
+        description: userMission.mission.description,
+        ai_persona: {
+          name: userMission.mission.personaName,
+          role: userMission.mission.personaRole,
+          character: userMission.mission.personaCharacter,
+        },
+      };
+    }
+
+    return userMission.mission;
   }
 
   async findUserMissionByMissionId(userId: number, missionId: number) {
