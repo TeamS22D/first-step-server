@@ -154,10 +154,13 @@ export class EmailMissionService {
       throw new BadRequestException({ message: '이메일을 찾을 수 없습니다.' });
     }
 
-    await this.emailMissionRepository.update(emailMissionId, {
-      ...Dto,
-      saveAt,
-    });
+    await this.emailMissionRepository.update(
+      { userMission: { userMissionId: emailMissionId } },
+      {
+        ...Dto,
+        saveAt,
+      },
+    );
 
     const save = {
       ...Dto,
