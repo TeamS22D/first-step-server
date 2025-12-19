@@ -146,7 +146,7 @@ export class DocumentMissionService {
     Dto: DocumentMissionDto.sendDTO,
   ) {
     const exists = await this.documentMissionRepository.existsBy({
-      documentMissionId,
+      userMission: { userMissionId: documentMissionId },
     });
     const saveAt = new Date();
 

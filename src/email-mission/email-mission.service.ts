@@ -35,7 +35,9 @@ export class EmailMissionService {
 
   async findEmailMission(emailMissionId: number) {
     const emailMission = await this.emailMissionRepository.findOne({
-      where: { emailMissionId },
+      where: {
+        userMission: { userMissionId: emailMissionId },
+      },
       relations: ['userMission'],
     });
 
@@ -108,7 +110,9 @@ export class EmailMissionService {
       .innerJoinAndSelect('em.userMission', 'um')
       .innerJoinAndSelect('um.mission', 'm')
       .innerJoinAndSelect('m.rubric', 'r')
-      .where('em.emailMissionId = :emailMissionId', { emailMissionId: emailMissionId })
+      .where('um.userMissionId = :emailMissionId', {
+        emailMissionId: emailMissionId,
+      })
       .getOne();
     const sendAt = new Date();
 
@@ -142,7 +146,7 @@ export class EmailMissionService {
   // 유저가 이메일 쓴 거 저장
   async saveEmail(emailMissionId: number, Dto: EmailMissionDTO.sendDTO) {
     const exists = await this.emailMissionRepository.existsBy({
-      emailMissionId,
+      userMission: { userMissionId: emailMissionId },
     });
     const saveAt = new Date();
 
