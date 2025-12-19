@@ -109,7 +109,7 @@ export class DocumentMissionService {
       .innerJoinAndSelect('dm.userMission', 'um')
       .innerJoinAndSelect('um.mission', 'm')
       .innerJoinAndSelect('m.rubric', 'r')
-      .where('dm.documentMissionId = :documentMissionId', { documentMissionId })
+      .where('um.userMissionId = :documentMissionId', { documentMissionId })
       .getOne();
     const sendAt = new Date();
 
