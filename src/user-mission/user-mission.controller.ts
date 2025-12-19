@@ -2,7 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get, HttpCode,
+  Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -108,13 +109,13 @@ export class UserMissionController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/feedback')
+  @Post('/feedback/:id')
   @HttpCode(200)
-  async chatFeedback(@Body() dto: FeedbackRequestDto) {
+  async chatFeedback(@Param('id') id: number, @Body() dto: FeedbackRequestDto) {
     console.log(dto.userMissionId);
     return this.userMissionService.saveGradingResult(
       dto.rawResult,
-      dto.userMissionId,
+      id,
     );
   }
 
